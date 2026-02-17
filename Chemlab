@@ -1,0 +1,638 @@
+{
+  "overlay365Extension": {
+    "name": "overlay365-bioos-chemlab",
+    "version": "3.0.0",
+    "description": "Immersive Bio-OS chemistry and biotech lab inside VS Code — powered by Monaco, PixiJS, RDKit, and a full math/logic analysis engine grounded in predicate logic, probabilistic scoring, linear-algebra embeddings, information-theoretic ranking, and gradient-descent optimization. Extended with first‑principles catalysis data for NO+CO on Pd surfaces.",
+    "publisher": "overlay365",
+    "main": "dist/extension.js",
+
+    "activationEvents": [
+      "onLanguage:chem",
+      "onLanguage:python",
+      "onLanguage:typescript",
+      "onView:overlay365.reactionHud",
+      "onCommand:overlay365.openLab",
+      "onCommand:overlay365.analyzeSelection",
+      "onCommand:overlay365.deepExperiment",
+      "onCommand:overlay365.scoreRisk",
+      "onCommand:overlay365.explainLogic",
+      "onCommand:overlay365.showEnergyDiagram",
+      "onCommand:overlay365.runMicrokinetic",
+      "onCommand:overlay365.compareFacets",
+      "onCommand:overlay365.dopingEffect",
+      "onCommand:overlay365.suddenModelPlot"
+    ],
+
+    "contributes": {
+      "views": {
+        "editor": [
+          { "id": "overlay365.reactionHud",      "name": "Reaction HUD",          "type": "webview" },
+          { "id": "overlay365.logicProof",       "name": "Logic & Proof Trace",   "type": "webview" },
+          { "id": "overlay365.mathDashboard",    "name": "Math Analysis Dashboard","type": "webview" },
+          { "id": "overlay365.catalysisHud",     "name": "Catalysis HUD",         "type": "webview" },
+          { "id": "overlay365.energyDiagram",    "name": "Energy Diagram",        "type": "webview" },
+          { "id": "overlay365.surfaceViewer",    "name": "Surface Slab 3D",       "type": "webview" }
+        ]
+      },
+      "commands": [
+        { "command": "overlay365.openLab",               "title": "Open Overlay365 Bio-OS Lab" },
+        { "command": "overlay365.analyzeSelection",      "title": "Quick-Analyze Selected Chemistry" },
+        { "command": "overlay365.deepExperiment",        "title": "Deep Bio-OS Experiment Analysis" },
+        { "command": "overlay365.scoreRisk",             "title": "Score Compound Risk (Probabilistic)" },
+        { "command": "overlay365.explainLogic",          "title": "Show Predicate Logic Proof Trace" },
+        { "command": "overlay365.showEnergyDiagram",     "title": "Show Energy Diagram (NO+CO)" },
+        { "command": "overlay365.runMicrokinetic",       "title": "Run Microkinetic Simulation" },
+        { "command": "overlay365.compareFacets",         "title": "Compare Pd(111) vs Pd(100)" },
+        { "command": "overlay365.dopingEffect",          "title": "Estimate Ti‑Doping Effect" },
+        { "command": "overlay365.suddenModelPlot",       "title": "Plot Reaction Probability vs Temperature" }
+      ],
+      "configuration": {
+        "type": "object",
+        "title": "Overlay365 Settings",
+        "properties": {
+          "overlay365.api.pubchemBaseUrl":                { "type": "string",  "default": "https://pubchem.ncbi.nlm.nih.gov/rest/pug" },
+          "overlay365.api.cheminformaticsMicroserviceUrl":{ "type": "string",  "default": "https://cheminformatics-microservice.yourdomain.com" },
+          "overlay365.api.bioinformaticsUrl":             { "type": "string",  "default": "https://bioinformatics.yourdomain.com" },
+          "overlay365.api.chemblUrl":                     { "type": "string",  "default": "https://www.ebi.ac.uk/chembl/api/data" },
+          "overlay365.api.uniprotUrl":                    { "type": "string",  "default": "https://rest.uniprot.org" },
+          "overlay365.api.ensemblUrl":                    { "type": "string",  "default": "https://rest.ensembl.org" },
+          "overlay365.api.reactomeUrl":                   { "type": "string",  "default": "https://reactome.org/ContentService" },
+          "overlay365.api.opentargetsUrl":                { "type": "string",  "default": "https://api.platform.opentargets.org/api/v4/graphql" },
+          "overlay365.api.openFDAUrl":                    { "type": "string",  "default": "https://api.fda.gov/drug" },
+          "overlay365.api.catalysisHubUrl":                { "type": "string",  "default": "https://www.catalysis-hub.org/api" },
+          "overlay365.api.materialsProjectUrl":            { "type": "string",  "default": "https://api.materialsproject.org" },
+          "overlay365.assets.reactionMapPath":             { "type": "string",  "default": "./media/reaction-map.json" },
+          "overlay365.visuals.enableComplexTier":          { "type": "boolean", "default": true },
+          "overlay365.privacy.disableExternalCalls":       { "type": "boolean", "default": false },
+          "overlay365.math.riskScoreThreshold":            { "type": "number",  "default": 0.65, "description": "Bayesian posterior risk threshold above which a compound is flagged." },
+          "overlay365.math.embeddingDimension":            { "type": "number",  "default": 128,  "description": "Dimensionality d of Morgan-fingerprint embedding vectors." },
+          "overlay365.math.gradientDescentLR":             { "type": "number",  "default": 0.01, "description": "Learning rate η for the local property-optimization step." }
+        }
+      }
+    },
+
+    "logicFoundation": {
+      "_rationale": "Every pipeline decision is a predicate over typed sets. Contracts (precondition ⟹ postcondition) guard every external call. De Morgan rewriting and quantifier duality drive code-path simplification inside the LSP watcher.",
+      "corePredicates": {
+        "ValidFormula(s)":     "s ∈ String  ∧  regex_enhanced matches s  ∧  RDKit.get_mol(s) ≠ null",
+        "SafeCompound(c)":     "ValidFormula(c)  ∧  RiskScore(c) < threshold  ∧  ¬Restricted(c)",
+        "APIReachable(url)":   "¬disableExternalCalls  ∧  lastPingLatency(url) < 5000ms",
+        "CacheHit(key)":       "∃ entry ∈ inMemoryMap : entry.key = normalize(key)  ∧  entry.ttl > now()",
+        "HardwareAdequate()":  "navigator.hardwareConcurrency ≥ 4  ∧  WebGLSupported()",
+        "AnalysisComplete(e)": "∀ mol ∈ e.molecules : ValidFormula(mol)  ∧  ∃ result ∈ e.results : result.cid = mol.cid"
+      },
+      "contracts": {
+        "analyzeSelectionCommand": {
+          "requires": "ValidFormula(selection)  ∧  (CacheHit(selection)  ∨  APIReachable(pubchemBaseUrl))",
+          "ensures":  "∃ report : report.smiles = canonical(selection)  ∧  report.riskScore ∈ [0,1]"
+        },
+        "deepExperimentCommand": {
+          "requires": "∀ mol ∈ parsedMolecules : ValidFormula(mol)  ∧  APIReachable(cheminformaticsUrl)  ∧  APIReachable(bioinformaticsUrl)",
+          "ensures":  "AnalysisComplete(experiment)  ∧  experiment.persistedInSupabase = true"
+        },
+        "renderTier": {
+          "requires": "∃ asset : CacheHit(asset.key)  ∧  (HardwareAdequate()  ∨  asset.tier = 'basic')",
+          "ensures":  "pixiCanvas.children contains newSprite  ∧  newSprite.zIndex ≥ 100"
+        },
+        "suddenModelPlot": {
+          "requires": "metal ∈ Object.keys(catalysisDFT.datasets)  ∧  reaction ∈ catalysisDFT.reactions  ∧  T ∈ [300,800]",
+          "ensures":  "∃ plot : plot.title = `Reaction probability for ${reaction} on ${metal}`  ∧  plot.data.length ≥ 20"
+        }
+      },
+      "decisionTable": {
+        "_description": "Maps (cacheHit, apiReachable, hardwareAdequate) → rendering action. Exhaustive via truth-table (2³ = 8 rows), verified to be non-redundant.",
+        "columns": ["CacheHit", "APIReachable", "HardwareAdequate", "Action"],
+        "rows": [
+          [true,  true,  true,  "renderComplex + fetchFreshBackground"],
+          [true,  true,  false, "renderBasic  + fetchFreshBackground"],
+          [true,  false, true,  "renderComplex + useCachedData"],
+          [true,  false, false, "renderBasic  + useCachedData"],
+          [false, true,  true,  "fetchSync    + renderComplex"],
+          [false, true,  false, "fetchSync    + renderBasic"],
+          [false, false, true,  "renderGenericParticle + queueRetry"],
+          [false, false, false, "renderGenericParticle + queueRetry"]
+        ]
+      },
+      "rewriteRules": {
+        "_source": "Wayne – Logic for Programmers §3.2 (De Morgan, quantifier duality)",
+        "shouldSkipMolecule": {
+          "original":  "!all(mol => ValidFormula(mol)) || any(mol => Restricted(mol))",
+          "step1_deMorgan": "some(mol => !ValidFormula(mol)) || any(mol => Restricted(mol))",
+          "step2_simplify": "some(mol => !ValidFormula(mol) || Restricted(mol))",
+          "final": "some(mol => !SafeCompound(mol))"
+        }
+      }
+    },
+
+    "catalysisDFT": {
+      "_rationale": "First‑principles data and models for heterogeneous catalysis, starting with the NO+CO reaction on Pd surfaces.",
+      "defaultMetal": "Pd",
+      "defaultFacet": "111",
+      "reactions": [
+        "NO_dissociation",
+        "N2_formation",
+        "CO2_formation",
+        "N2O_formation",
+        "N2O_dissociation"
+      ],
+      "adsorptionSites": ["top", "bridge", "fcc", "hcp"],
+      "datasets": {
+        "Pd_111": {
+          "source": "Jayadev et al. 2023",
+          "doi": "10.1007/s12039-023-02185-8",
+          "adsorptionEnergies": {
+            "NO":   {"fcc": -2.11, "hcp": -2.07, "bridge": -1.50, "top": -1.01},
+            "CO":   {"fcc": -1.92, "hcp": -1.90, "bridge": -1.72, "top": -1.32},
+            "N":    {"fcc": -4.68, "hcp": -4.64, "bridge": -3.93, "top": -2.25},
+            "O":    {"fcc": -3.14, "hcp": -2.88, "bridge": -2.56, "top": -1.60}
+          },
+          "activationEnergies": {
+            "NO_dissociation":   2.46,
+            "N2_formation":      1.73,
+            "CO2_formation":     0.84,
+            "N2O_formation":     1.55,
+            "N2O_dissociation":  0.95
+          },
+          "reactionEnergies": {
+            "NO_dissociation":   0.83,
+            "N2_formation":     -1.43,
+            "CO2_formation":    -0.80,
+            "N2O_formation":     0.38,
+            "N2O_dissociation": -1.29
+          },
+          "rateConstants_475K": {
+            "NO_dissociation":   4.10e-14,
+            "N2_formation":      2.46e-6,
+            "CO2_formation":     1.03e-2,
+            "N2O_formation":     1.08e-3,
+            "N2O_dissociation":  8.11e-1
+          },
+          "dBandCenter": -1.8
+        },
+        "Pd_100": {
+          "source": "Jayadev et al. 2023 (this work)",
+          "activationEnergies": {
+            "NO_dissociation": 2.12
+          },
+          "dBandCenter": -1.71
+        }
+      }
+    },
+
+    "mathEngine": {
+      "_rationale": "Hinton – Essential Math for AI: linear algebra for molecular embeddings, probability for risk scoring, calculus/gradient-descent for property optimization, information theory for API result ranking, plus new catalysis modules.",
+      "molecularEmbedding": {
+        "_theory": "Represent each molecule as a d-dimensional real vector via Morgan fingerprints. Similarity = cosine(v₁, v₂) = (v₁·v₂)/(‖v₁‖·‖v₂‖). Eigendecomposition of the similarity matrix surfaces molecular clusters without labels.",
+        "dimension": 128,
+        "fingerprintRadius": 2,
+        "similarityMetric": "cosine",
+        "clusteringMethod": "spectralClustering",
+        "spectralClustering": {
+          "steps": [
+            "Build n×n similarity matrix S where S[i][j] = cosine(embed(molᵢ), embed(molⱼ))",
+            "Compute normalized Laplacian L = I − D^(-½) S D^(-½)",
+            "Take top-k eigenvectors of L → form n×k matrix U",
+            "Run k-means on rows of U to assign cluster labels"
+          ],
+          "outputSchema": {
+            "clusterId": "integer",
+            "centroidSmiles": "string",
+            "intraClusterVariance": "float"
+          }
+        }
+      },
+      "bayesianRiskScoring": {
+        "_theory": "P(toxic | features) via Bayes: posterior ∝ likelihood × prior. Features are the embedding vector. Prior from ChEMBL toxicity prevalence. Likelihood from a logistic regression trained on PubChem BioAssay outcomes.",
+        "formula": "P(toxic|x) = σ(wᵀx + b)  where σ(z) = 1/(1+e^(-z))",
+        "priorSource": "ChEMBL compound toxicity base rates",
+        "likelihoodModel": "logisticRegression",
+        "threshold": 0.65,
+        "calibration": "Platt scaling post-hoc",
+        "outputFields": {
+          "posteriorRisk": "float [0,1]",
+          "confidence95CI": "[float, float]",
+          "dominantFeatures": "top-5 embedding dimensions by |wᵢ|",
+          "flagged": "boolean — true if posteriorRisk ≥ threshold"
+        }
+      },
+      "propertyOptimization": {
+        "_theory": "Gradient descent (Hinton §Optimization) on a differentiable scoring function f(x) = −desirability(x). Starting from the parsed molecule's embedding, take steps xₙ₊₁ = xₙ − η∇f(xₙ) to suggest structurally similar but higher-scoring analogues.",
+        "algorithm": "AdamW",
+        "learningRate": 0.01,
+        "beta1": 0.9,
+        "beta2": 0.999,
+        "epsilon": 1e-8,
+        "maxIterations": 200,
+        "convergenceCriterion": "‖∇f(x)‖ < 1e-4",
+        "scoringFunction": "desirability(x) = α·druglikeness(x) + β·(1−toxicity(x)) + γ·selectivity(x)",
+        "weights": { "alpha": 0.5, "beta": 0.35, "gamma": 0.15 },
+        "output": "Top-3 optimized SMILES with Δdesirability vs. input"
+      },
+      "informationTheoreticRanking": {
+        "_theory": "Rank API results by mutual information I(result ; query) = H(query) − H(query|result). Higher I means the result resolves more uncertainty about the query molecule. Used to sort multi-source results from PubChem, ChEMBL, and UniProt.",
+        "entropyEstimation": "plugin estimator on fingerprint bit-vector distributions",
+        "rankingMetric": "normalizedMutualInformation",
+        "formula": "NMI(X;Y) = I(X;Y) / sqrt(H(X)·H(Y))",
+        "appliedTo": ["pubchemAssayResults", "chemblActivities", "uniprotTargets"],
+        "outputOrder": "descending NMI — most informative result first"
+      },
+      "loopInvariantVerification": {
+        "_theory": "Wayne §6.2.1 — every batch-processing loop carries a formally checked invariant to guarantee termination and correctness.",
+        "batchMoleculeLoop": {
+          "invariant": "∀ i ∈ 0..<processed : ValidFormula(molecules[i])  ∧  results[i].cid ≠ null",
+          "terminationArgument": "processed strictly increases each iteration; bounded above by |molecules|",
+          "onViolation": "abort batch, surface failing molecule index, emit structured error"
+        }
+      },
+      "microkinetics": {
+        "_theory": "Solve mean‑field rate equations for surface coverage using DFT‑derived barriers and pre‑factors.",
+        "solver": "CVODE (via wasm) or embedded Runge‑Kutta",
+        "odeSystem": "dθ_i/dt = Σ (rate of formation) - Σ (rate of consumption)",
+        "temperatureRange": [300, 800],
+        "pressureRange": [1e-6, 1],
+        "output": "Coverage vs time, turnover frequency, rate‑determining degree of rate control"
+      },
+      "suddenModel": {
+        "_theory": "Electronic (β) and mechanical (α) coupling parameters correct activation barrier for surface motion (equations 7‑10 from paper).",
+        "parameters": {
+          "Pd_111": { "β": 0.37, "α": 0.12 },
+          "Ti_Pd_111": { "β": 0.42, "α": 0.15 }
+        },
+        "reactionProbability": "P(E;T) = ∫ ... (equation 9)",
+        "temperatureDependence": "Equation 10 with recoil effect",
+        "plot": "Reaction probability vs incident energy at selectable T"
+      },
+      "dBandCenter": {
+        "_theory": "Center of d‑projected density of states relative to Fermi level. Higher (less negative) → stronger adsorption.",
+        "computeFromDOS": "∫ E·ρ_d(E) dE / ∫ ρ_d(E) dE",
+        "inputFormat": "Array of {energy, dos} pairs",
+        "output": "d‑band center value in eV",
+        "correlation": "Linear scaling with NO dissociation barrier (empirical)"
+      }
+    },
+
+    "runtime": {
+      "watcher": {
+        "debounceMs": 500,
+        "regex": {
+          "formula":  "\\b([A-Z][a-z]?\\d*)+\\b",
+          "enhanced": "\\b(?:[A-Z][a-z]?[⁰-⁹+*‑⁻()]+|\\[[A-Za-z0-9+‑⁻()]+\\]|C[HRF]?|N[OP]?|O[S]?|P[OS]?|S[ei]?|(?:[A-Z][a-z]?)=?[0-9*+‑]*|\\([^()]*\\)[0-9+]*)\\b",
+          "smiles":   "[A-Za-z0-9@+\\-\\[\\]()=#$:/\\.]{6,}"
+        },
+        "lspContextAwareness": {
+          "enabled": true,
+          "ignoreZones": ["comments","stringLiterals","importPaths"],
+          "triggerZones": ["functionCalls:Simulation.run","annotations:@overlay365Experiment","cells:analysis"],
+          "logicGate": "IsValidToken(t) = InTriggerZone(t) ∧ ¬InIgnoreZone(t) ∧ ValidFormula(t.text)"
+        }
+      },
+
+      "localAssetManager": {
+        "reactionMapSchema": {
+          "file": "media/reaction-map.json",
+          "structure": {
+            "version": "3.0.0",
+            "metadata": { "lastUpdated": "2026-02-17", "provider": "Overlay365-Ingest" },
+            "assets": {
+              "H2O": {
+                "id": "water_v1", "tier": "basic",
+                "visuals": { "videoSrc": "assets/vids/h2o_alpha.webm", "loop": true, "playbackRate": 1.0 },
+                "mathAnnotations": { "molecularWeight": 18.015, "dipoleMoment_D": 1.85, "embeddingVector": "float32[128] — precomputed" }
+              },
+              "C6H12O6": {
+                "id": "glucose_struc", "tier": "complex",
+                "visuals": { "videoSrc": "assets/vids/glucose_lattice.webm", "playbackRate": 0.8 },
+                "mathAnnotations": { "molecularWeight": 180.156, "riskScore": 0.03, "clusterLabel": "saccharides" }
+              }
+            }
+          }
+        },
+        "lookupStrategy": {
+          "order": ["exactKeyMatch","normalizedKeyMatch","smilesFallback","embeddingNearestNeighbor","genericTierSprite"],
+          "embeddingNearestNeighbor": {
+            "method": "cosine k-NN on precomputed index",
+            "k": 3,
+            "fallbackThreshold": 0.80,
+            "contract": {
+              "requires": "embed(query) ≠ null  ∧  |assetIndex| > 0",
+              "ensures":  "∀ result ∈ kNearest : cosine(embed(query), result.vector) ≥ fallbackThreshold"
+            }
+          },
+          "normalization": { "stripWhitespace": true, "stripHyphensUnderscores": true, "uppercase": true },
+          "hardwareAwareTiering": { "method": "navigator.hardwareConcurrency + WebGL", "logic": "HardwareAdequate() ? 'complex' : 'basic'" }
+        },
+        "caching": {
+          "inMemory": true,
+          "dataStructures": ["Map<string,Asset>","Map<string,Asset> normalizedMap","Float32Array embeddingIndex"],
+          "warmOnWebviewInit": true,
+          "offlineMode": true,
+          "ttlSeconds": 3600,
+          "evictionPolicy": "LRU"
+        }
+      },
+
+      "webview": {
+        "renderer": "PixiJS + GSAP",
+        "canvasId": "pixi-canvas",
+        "hudElementId": "hud",
+        "loaderElementId": "loader",
+        "themeIntegration": {
+          "useVSCodeCSSVariables": true,
+          "variables": ["--vscode-editor-background","--vscode-foreground","--vscode-charts-blue","--vscode-textLink-foreground"]
+        },
+        "visualTiers": {
+          "basic":   { "type": "transparentWebM",              "engine": "PIXI.VideoTexture",                        "effects": ["fadeIn","fadeOut"] },
+          "complex": { "type": "transparentWebM + particles",   "engine": "PIXI.VideoTexture + ParticleContainer",    "effects": ["screenShake","bondFlash","HUDPulse"] },
+          "generic": { "type": "particleOnly",                  "engine": "ParticleContainer",                        "effects": ["genericBurst"] }
+        },
+        "mathOverlays": {
+          "riskGauge":        "SVG arc chart — arc length proportional to posteriorRisk ∈ [0,1]",
+          "similarityRadar":  "Radar chart — axes = top-6 molecular properties; polygon area = desirability score",
+          "clusterMap":       "2D UMAP projection of embedding vectors; color = cluster label",
+          "entropyBar":       "Horizontal bar — height = H(bits) of each property distribution"
+        },
+        "catalysisVisuals": {
+          "energyDiagram":   { "type": "Chart.js", "data": "from catalysisDFT.datasets" },
+          "surface3D":       { "type": "three.js", "models": "slab+adsorbates" },
+          "reactionPath":    { "type": "Lottie/WebM", "frames": "pre‑computed" },
+          "dosPlot":         { "type": "Plotly.js", "layout": "with d‑band marker" }
+        }
+      },
+
+      "rdkitTier2": {
+        "enabled": true,
+        "wasmBundlePath": "media/rdkit.wasm",
+        "initMethod": "WebAssembly.instantiateStreaming",
+        "apis": {
+          "smilesToMol":       "get_mol(smiles)",
+          "molToSvg":          "get_svg_for_mol(mol)",
+          "getMorganFP":       "get_morgan_fp(mol, radius=2, nBits=128)  → Float32Array[128]",
+          "computeDescriptors":"get_descriptors(mol)  → {MW, LogP, TPSA, HBD, HBA, RotBonds}"
+        },
+        "performance": { "expectedLatencyMs": "10-30", "lazyLoad": true, "loadOnIdle": true },
+        "pixiIntegration": {
+          "svgToTexture": "Blob(SVG) → Image → PIXI.Texture.from(image)",
+          "spriteProperties": { "anchor": 0.5, "scale": 0.8, "zIndex": 100 }
+        }
+      },
+
+      "apiIntegrations": {
+        "pubchem": {
+          "baseUrl": "https://pubchem.ncbi.nlm.nih.gov/rest/pug",
+          "endpoints": {
+            "bySmiles":       "/compound/smiles/{smiles}/property/MolecularWeight,CanonicalSMILES,InChIKey,XLogP,TPSA,HBondDonorCount,HBondAcceptorCount/JSON",
+            "byCid3D":        "/compound/cid/{cid}/record/JSON",
+            "bioassays":      "/compound/cid/{cid}/assaysummary/JSON"
+          },
+          "contract": {
+            "requires": "APIReachable('https://pubchem.ncbi.nlm.nih.gov')  ∧  ValidFormula(smiles)",
+            "ensures":  "response.MW > 0  ∧  response.InChIKey matches /^[A-Z]{14}-[A-Z]{10}-[A-Z]$/"
+          }
+        },
+        "chembl": {
+          "baseUrl": "https://www.ebi.ac.uk/chembl/api/data",
+          "endpoints": {
+            "activities":   "/activity?molecule_chembl_id={id}&format=json",
+            "targets":      "/target?molecule_chembl_id={id}&format=json",
+            "mechanisms":   "/mechanism?molecule_chembl_id={id}&format=json"
+          },
+          "purpose": "IC50/Ki bioactivity data for risk and selectivity scoring in the math engine."
+        },
+        "uniprot": {
+          "baseUrl": "https://rest.uniprot.org",
+          "endpoints": {
+            "targetSearch":  "/uniprotkb/search?query={geneName}+AND+organism_id:9606&format=json",
+            "entryFetch":    "/uniprotkb/{accession}.json"
+          },
+          "purpose": "Human protein targets for pathway-level interaction graph construction."
+        },
+        "ensembl": {
+          "baseUrl": "https://rest.ensembl.org",
+          "endpoints": {
+            "variantConsequences": "/vep/human/hgvs/{hgvs}?content-type=application/json",
+            "geneInfo":            "/lookup/id/{ensemblId}?content-type=application/json"
+          },
+          "purpose": "Variant annotation feeding the bioinformatics multi-omics pipeline."
+        },
+        "reactome": {
+          "baseUrl": "https://reactome.org/ContentService",
+          "endpoints": {
+            "pathwayEnrichment": "/data/pathways/low/diagram/entity/{stId}/allForms?species=9606",
+            "moleculePathways":  "/data/pathways/low/entity/{id}/allForms"
+          },
+          "purpose": "Map compound targets to biological pathways; feed graph-theory adjacency matrix."
+        },
+        "opentargets": {
+          "baseUrl": "https://api.platform.opentargets.org/api/v4/graphql",
+          "queryTemplate": "{ disease(efoId: \"{efoId}\") { associatedTargets { rows { target { id approvedSymbol } score } } } }",
+          "purpose": "Disease–gene association scores used as priors in Bayesian risk model."
+        },
+        "openFDA": {
+          "baseUrl": "https://api.fda.gov/drug",
+          "endpoints": {
+            "adverseEvents": "/event.json?search=patient.drug.medicinalproduct:\"{name}\"&limit=10",
+            "labels":        "/label.json?search=openfda.substance_name:\"{name}\"&limit=5"
+          },
+          "purpose": "Post-market adverse-event counts update P(adverse | compound) posterior."
+        },
+        "cheminformaticsMicroservice": {
+          "baseUrl": "https://cheminformatics-microservice.yourdomain.com/api",
+          "modules": ["chem","convert","depict","ocsr","tools"],
+          "examples": ["POST /chem/standardize","POST /depict/svg","POST /chem/descriptors"],
+          "purpose": "Batch standardization + descriptor computation for the math engine's logistic-regression feature matrix."
+        },
+        "bioinformatics": {
+          "baseUrl": "https://bioinformatics.yourdomain.com",
+          "capabilities": ["multiOmicsIntegration","variantAnnotation","diseaseAssociationLookup","pathwayDifferentialExpression"],
+          "graphTheoryIntegration": {
+            "description": "Build a directed graph G=(V,E) where V = {genes ∪ pathways ∪ compounds}, E = {interaction edges weighted by Open Targets score}. Run PageRank to surface highest-influence nodes.",
+            "adjacencyRepresentation": "sparse CSR matrix — O(|V|+|E|) memory",
+            "pageRankFormula": "PR(u) = (1−d)/|V|  +  d · Σᵥ PR(v)/out_degree(v)",
+            "dampingFactor": 0.85
+          }
+        },
+        "customOverlay365Backend": {
+          "baseUrl": "https://api.overlay365.com",
+          "endpoints": {
+            "reactionAssets":  "/assets/reaction-map",
+            "analyticsIngest": "/telemetry/usage",
+            "nbaAnalogCore":   "/analytics/nba-analog",
+            "riskModelWeights":"/models/risk-weights/latest",
+            "embeddingIndex":  "/embeddings/molecular-index"
+          },
+          "notes": "Backed by FastAPI/Go + Supabase. Model weights versioned in Supabase Storage; pulled on extension activation."
+        },
+        "catalysisHub": {
+          "baseUrl": "https://www.catalysis-hub.org/api",
+          "endpoints": {
+            "reactions": "/reactions/?surface={surface}&reactants={smiles}",
+            "adsorption": "/adsorption/?surface={surface}&species={smiles}"
+          },
+          "purpose": "Fetch DFT adsorption energies and barriers for comparison."
+        },
+        "materialsProject": {
+          "baseUrl": "https://api.materialsproject.org",
+          "endpoints": {
+            "surfaceProperties": "/surfaces/core?material_id={mpid}",
+            "dos": "/electronic_structure/dos?material_id={mpid}"
+          },
+          "purpose": "Retrieve bulk and surface DOS for d‑band center calculations."
+        }
+      },
+
+      "analysisPipelines": {
+        "chemlabQuickView": {
+          "trigger": "overlay365.analyzeSelection",
+          "logicGuard": "ValidFormula(selection)  ∧  (CacheHit(selection)  ∨  APIReachable(pubchemBaseUrl))",
+          "steps": [
+            "1. Read selection or formula under cursor",
+            "2. Run enhanced regex + RDKit validation (contract: ValidFormula)",
+            "3. Compute 128-dim Morgan fingerprint embedding via RDKit WASM",
+            "4. Check embedding k-NN cache (cosine ≥ 0.80 → cache hit)",
+            "5. If miss: query PubChem for MW, LogP, TPSA, HBD, HBA",
+            "6. Score Bayesian risk: P(toxic|x) = σ(wᵀx + b)",
+            "7. Render PixiJS visual at tier chosen by HardwareAdequate()",
+            "8. Show Math Overlay: risk gauge + property radar",
+            "9. Emit JSON summary to Output Channel"
+          ],
+          "outputs": [
+            "HUD animation (tier = basic|complex|generic)",
+            "Risk gauge SVG overlay",
+            "Property radar chart",
+            "JSON: { smiles, inchikey, MW, LogP, TPSA, riskScore, cluster, nearestNeighbors[3] }",
+            "Optional Markdown report in new editor tab"
+          ]
+        },
+
+        "deepBioOsAnalysis": {
+          "trigger": "@overlay365Experiment annotation  OR  Simulation.run() call",
+          "logicGuard": "∀ mol ∈ parsedMolecules : ValidFormula(mol)  ∧  APIReachable(cheminformaticsUrl)  ∧  APIReachable(bioinformaticsUrl)",
+          "steps": [
+            "1. Parse code block via LSP → extract all formulas/SMILES",
+            "2. Loop-invariant check: ∀ i processed: ValidFormula(molecules[i])",
+            "3. Batch-send to cheminformatics microservice: standardize + descriptors",
+            "4. Build n×n molecular similarity matrix (cosine on 128-dim embeddings)",
+            "5. Spectral clustering: eigendecompose Laplacian → k-means → cluster labels",
+            "6. Fetch ChEMBL bioactivities + Open Targets disease scores → Bayesian prior update",
+            "7. Run AdamW property optimization (200 iter, η=0.01) → top-3 analogues per molecule",
+            "8. Query Reactome pathway enrichment + Ensembl variant consequences",
+            "9. Build directed gene–pathway–compound graph; run PageRank (d=0.85)",
+            "10. Rank all API results by Normalized Mutual Information (NMI)",
+            "11. Persist experiment JSON to Supabase with version timestamp",
+            "12. Return ranked analysis summary + interactive overlays"
+          ],
+          "loopInvariant": "∀ i ∈ 0..<processed : molecules[i].standardized = true  ∧  results[i].riskScore ∈ [0,1]",
+          "outputs": [
+            "Interactive HUD: per-molecule overlays with risk gauge + cluster badge",
+            "2D UMAP cluster map (Math Dashboard panel)",
+            "PageRank influence chart for pathway graph",
+            "Optimized-analogue suggestions (top-3 per compound, SMILES + Δdesirability)",
+            "Structured JSON for downstream pipelines",
+            "Links to Supabase experiment record + Cloudflare dashboard"
+          ]
+        },
+
+        "propertyOptimizationPipeline": {
+          "trigger": "overlay365.scoreRisk",
+          "description": "Gradient-descent traversal of the molecular embedding space toward higher desirability.",
+          "inputContract": "ValidFormula(smiles)  ∧  embed(smiles) ≠ null",
+          "algorithm": {
+            "init": "x₀ = embed(smiles)  ∈ ℝ¹²⁸",
+            "step": "xₙ₊₁ = xₙ − η · ∇desirability(xₙ)   via AdamW",
+            "project": "After each step, find nearest real molecule in index by cosine similarity",
+            "stop": "‖∇desirability(xₙ)‖ < 1e-4  OR  n = 200"
+          },
+          "outputContract": "∀ analogue ∈ top3 : ValidFormula(analogue.smiles)  ∧  analogue.desirability > input.desirability"
+        },
+
+        "logicProofTrace": {
+          "trigger": "overlay365.explainLogic",
+          "description": "Exposes the predicate-logic proof trace for the last analysis in the Logic & Proof panel.",
+          "format": "Step | Rule | Expression",
+          "exampleTrace": [
+            { "step": 1, "rule": "init",        "expression": "!all(mol => ValidFormula(mol)) || any(mol => Restricted(mol))" },
+            { "step": 2, "rule": "deMorgan",    "expression": "some(mol => !ValidFormula(mol)) || any(mol => Restricted(mol))" },
+            { "step": 3, "rule": "simplify",    "expression": "some(mol => !ValidFormula(mol) || Restricted(mol))" },
+            { "step": 4, "rule": "definition",  "expression": "some(mol => !SafeCompound(mol))" },
+            { "step": 5, "rule": "conclusion",  "expression": "→ abort batch, surface failing molecule" }
+          ]
+        }
+      },
+
+      "telemetry": {
+        "enabled": true,
+        "provider": "PostHog",
+        "events": [
+          "reaction_played", "rdkit_fallback_used", "api_call_made",
+          "tier_downgraded_for_hardware", "risk_score_computed",
+          "optimization_converged", "optimization_diverged",
+          "cache_hit", "cache_miss", "cluster_computed",
+          "pagerank_computed", "proof_trace_viewed"
+        ],
+        "privacyControls": {
+          "respectDisableExternalCalls": true,
+          "doNotSendSourceCode": true,
+          "onlyHashesAndFormulaStrings": true
+        }
+      }
+    },
+
+    "devOps": {
+      "repoLayout": {
+        "root": ".",
+        "packages": [
+          "extensions/overlay365-bioos-chemlab",
+          "services/bioos-fastapi",
+          "services/cheminformatics-microservice-proxy",
+          "services/math-engine",
+          "packages/logic-contracts",
+          "packages/molecular-embeddings"
+        ]
+      },
+      "build": {
+        "bundler": "esbuild/webpack",
+        "scripts": {
+          "compileExtension":       "tsc -p ./",
+          "bundleWebview":          "webpack --config webview.webpack.config.js",
+          "bundleMathEngine":       "esbuild packages/math-engine/src/index.ts --bundle --platform=node --outfile=dist/math-engine.js",
+          "buildEmbeddingIndex":    "python services/math-engine/build_index.py --dim 128 --radius 2",
+          "testContracts":          "jest packages/logic-contracts --coverage",
+          "packageVsix":            "vsce package"
+        }
+      },
+      "testing": {
+        "propertyBasedTests": {
+          "_source": "Wayne §4.2 Property-Based Testing",
+          "framework": "fast-check (TypeScript)",
+          "properties": [
+            "∀ smiles ∈ ValidSMILES : RDKit.get_mol(smiles) ≠ null",
+            "∀ x ∈ embeddings : ‖x‖₂ > 0  (no zero vectors in index)",
+            "∀ risk ∈ riskScores : risk ∈ [0,1]",
+            "∀ analogue ∈ optimizationOutput : analogue.desirability ≥ input.desirability − ε"
+          ]
+        },
+        "contractTests": {
+          "framework": "jest + custom @requires/@ensures decorators",
+          "coverage": "100% of public pipeline entry-points"
+        }
+      },
+      "deployment": {
+        "cloudflareWorkers": [
+          "cheminformatics-proxy-worker",
+          "bioos-ingest-worker",
+          "math-engine-inference-worker",
+          "embedding-index-worker"
+        ],
+        "supabase": {
+          "usedFor": [
+            "reaction-map.json storage/versioning",
+            "Bio-OS experiment metadata",
+            "user/org configs",
+            "risk-model weight blobs (versioned)",
+            "molecular embedding index (binary Float32Array)"
+          ]
+        }
+      }
+    }
+  }
+}
