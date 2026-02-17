@@ -1,0 +1,367 @@
+We'll now integrate the two scientific packages into a working VS Code extension with a rich webview. This will give you a functional analyzeSelection command that computes Morgan fingerprints, Bayesian risk scores, and nearest neighbors, then displays them in a custom panel.
+
+We'll assume you have the monorepo structure with packages/ and extensions/ as described earlier. The extension lives in extensions/overlay365-bioos-chemlab/.
+
+---
+
+1. Extension package.json
+
+Update the extension's package.json to include dependencies on the local packages and configuration for the webview.
+
+```json
+{
+  "name": "overlay365-bioos-chemlab",
+  "version": "0.1.0",
+  "description": "Bio-OS chemistry lab with DFT‑powered analysis",
+  "publisher": "overlay365",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onCommand:overlay365.analyzeSelection"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "overlay365.analyzeSelection",
+        "title": "Quick-Analyze Selected Chemistry"
+      }
+    ],
+    "configuration": {
+      "title": "Overlay365",
+      "properties": {
+        "overlay365.math.riskScoreThreshold": {
+          "type": "number",
+          "default": 0.65,
+          "description": "Bayesian posterior risk threshold above which a compound is flagged."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "pnpm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "pnpm run compile"
+  },
+  "dependencies": {
+    "bayesian-risk": "workspace:*",
+    "molecular-embeddings": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.85.0",
+    "@types/node": "^18.x",
+    "typescript": "^5.0.0"
+  }
+}
+```
+
+---
+
+2. Extension Activation (src/extension.ts)
+
+This file registers the command, loads the necessary data, creates the webview panel, and handles messages.
+
+```typescript
+import * as vscode from 'vscode';
+import { smilesToFingerprint, findNearestNeighbors, defaultIndex } from 'molecular-embeddings';
+import { computeRisk } from 'bayesian-risk';
+
+export function activate(context: vscode.ExtensionContext) {
+  console.log('Overlay365 Bio-OS Chemlab is now active!');
+
+  const disposable = vscode.commands.registerCommand('overlay365.analyzeSelection', async () => {
+    const editor = vscode.window.activeTextEditor;
+    if (!editor) {
+      vscode.window.showErrorMessage('No active editor');
+      return;
+    }
+
+    const selection = editor.document.getText(editor.selection);
+    if (!selection) {
+      vscode.window.showErrorMessage('No text selected');
+      return;
+    }
+
+    // Basic SMILES validation (can be improved)
+    if (!/^[A-Za-z0-9@+\\-\\[\\]()=#$:\\.]+$/.test(selection)) {
+      vscode.window.showErrorMessage('Selected text does not look like a valid SMILES string');
+      return;
+    }
+
+    // Show progress indicator
+    await vscode.window.withProgress({
+      location: vscode.ProgressLocation.Notification,
+      title: 'Analyzing molecule...',
+      cancellable: false
+    }, async (progress) => {
+      progress.report({ message: 'Computing fingerprint...' });
+
+      try {
+        // 1. Compute embedding
+        const embedding = await smilesToFingerprint(selection);
+
+        progress.report({ message: 'Scoring risk...' });
+
+        // 2. Compute risk
+        const risk = computeRisk(embedding);
+
+        progress.report({ message: 'Finding similar compounds...' });
+
+        // 3. Find nearest neighbors (using pre‑built index)
+        const neighbors = findNearestNeighbors(embedding, defaultIndex, 5);
+
+        // 4. Create and show webview panel with results
+        const panel = vscode.window.createWebviewPanel(
+          'overlay365.analysis',
+          `Analysis: ${selection}`,
+          vscode.ViewColumn.Beside,
+          {
+            enableScripts: true,
+            retainContextWhenHidden: true,
+            localResourceRoots: [
+              vscode.Uri.joinPath(context.extensionUri, 'media')
+            ]
+          }
+        );
+
+        // Get paths to webview resources
+        const scriptUri = panel.webview.asWebviewUri(
+          vscode.Uri.joinPath(context.extensionUri, 'media', 'app.js')
+        );
+        const styleUri = panel.webview.asWebviewUri(
+          vscode.Uri.joinPath(context.extensionUri, 'media', 'style.css')
+        );
+
+        // HTML template
+        panel.webview.html = getWebviewContent(scriptUri, styleUri, selection);
+
+        // Send data to webview once it's ready
+        panel.webview.onDidReceiveMessage(
+          message => {
+            if (message.command === 'ready') {
+              panel.webview.postMessage({
+                command: 'displayResults',
+                data: {
+                  smiles: selection,
+                  risk,
+                  neighbors
+                }
+              });
+            }
+          },
+          undefined,
+          context.subscriptions
+        );
+
+      } catch (error: any) {
+        vscode.window.showErrorMessage(`Analysis failed: ${error.message}`);
+      }
+    });
+  });
+
+  context.subscriptions.push(disposable);
+}
+
+function getWebviewContent(scriptUri: vscode.Uri, styleUri: vscode.Uri, smiles: string): string {
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="${styleUri}" rel="stylesheet">
+  <title>Molecular Analysis</title>
+</head>
+<body>
+  <div class="container">
+    <h2>Analysis of <code>${smiles}</code></h2>
+    <div id="risk-gauge" class="gauge"></div>
+    <div id="confidence" class="confidence"></div>
+    <div id="features" class="features"></div>
+    <div id="neighbors" class="neighbors"></div>
+  </div>
+  <script src="${scriptUri}"></script>
+</body>
+</html>`;
+}
+
+export function deactivate() {}
+```
+
+---
+
+3. Webview Client Script (media/app.js)
+
+This script runs inside the webview, receives the analysis data, and renders it using simple DOM manipulation. For the risk gauge, we'll draw an SVG arc.
+
+```javascript
+(function() {
+  const vscode = acquireVsCodeApi();
+
+  // Send ready message when the page loads
+  window.addEventListener('load', () => {
+    vscode.postMessage({ command: 'ready' });
+  });
+
+  // Listen for messages from the extension
+  window.addEventListener('message', event => {
+    const message = event.data;
+    if (message.command === 'displayResults') {
+      renderResults(message.data);
+    }
+  });
+
+  function renderResults(data) {
+    const { smiles, risk, neighbors } = data;
+    const probability = risk.probability;
+    const [ciLow, ciHigh] = risk.confidence95;
+    const dominant = risk.dominantFeatures;
+
+    // Risk gauge (simple SVG arc)
+    const gaugeDiv = document.getElementById('risk-gauge');
+    gaugeDiv.innerHTML = createGaugeSVG(probability);
+
+    // Confidence interval
+    const confDiv = document.getElementById('confidence');
+    confDiv.innerHTML = `<p><strong>95% CI:</strong> [${(ciLow*100).toFixed(1)}%, ${(ciHigh*100).toFixed(1)}%]</p>`;
+
+    // Dominant features (just indices for now; could map to interpretable names later)
+    const featuresDiv = document.getElementById('features');
+    featuresDiv.innerHTML = `<p><strong>Dominant features (indices):</strong> ${dominant.join(', ')}</p>`;
+
+    // Neighbors
+    const neighborsDiv = document.getElementById('neighbors');
+    if (neighbors && neighbors.length) {
+      let html = '<h3>Similar compounds</h3><ul>';
+      neighbors.forEach(n => {
+        html += `<li><code>${n.smiles}</code> — similarity: ${(n.similarity*100).toFixed(1)}%</li>`;
+      });
+      html += '</ul>';
+      neighborsDiv.innerHTML = html;
+    } else {
+      neighborsDiv.innerHTML = '<p>No similar compounds found.</p>';
+    }
+  }
+
+  function createGaugeSVG(prob) {
+    const angle = prob * 180; // map [0,1] to [0,180] degrees
+    const largeArcFlag = angle > 180 ? 1 : 0;
+    const endX = 50 + 40 * Math.cos((angle - 90) * Math.PI / 180);
+    const endY = 50 + 40 * Math.sin((angle - 90) * Math.PI / 180);
+
+    return `
+      <svg width="120" height="120" viewBox="0 0 100 100">
+        <circle cx="50" cy="50" r="40" fill="none" stroke="#ddd" stroke-width="10" />
+        <path d="M50,10 L50,50 L90,50" fill="none" stroke="#3a7" stroke-width="10" stroke-dasharray="125.6" stroke-dashoffset="${125.6 * (1-prob)}" />
+        <circle cx="50" cy="50" r="5" fill="#333" />
+        <text x="50" y="85" text-anchor="middle">${(prob*100).toFixed(1)}%</text>
+      </svg>
+    `;
+  }
+})();
+```
+
+---
+
+4. Basic Styling (media/style.css)
+
+```css
+body {
+  font-family: var(--vscode-font-family);
+  color: var(--vscode-foreground);
+  background-color: var(--vscode-editor-background);
+  padding: 1rem;
+}
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+}
+.gauge svg {
+  display: block;
+  margin: 1rem auto;
+}
+.confidence, .features {
+  margin: 1rem 0;
+}
+.neighbors ul {
+  list-style-type: none;
+  padding-left: 0;
+}
+.neighbors li {
+  background-color: var(--vscode-input-background);
+  margin: 0.25rem 0;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+}
+```
+
+---
+
+5. Build and Run
+
+Ensure all packages are built
+
+From the repository root:
+
+```bash
+pnpm install
+pnpm run build   # this runs build in all packages
+```
+
+Prepare RDKit WASM and model files
+
+The molecular-embeddings package needs to have data/rdkit.wasm downloaded. Run its prepare script:
+
+```bash
+cd packages/molecular-embeddings
+pnpm run prepare
+```
+
+Also ensure the data/index.json exists (if you want nearest neighbors). You can create a small dummy file for testing:
+
+```json
+{
+  "entries": [
+    { "smiles": "CCO", "embedding": [1,0,0,0, ...] },
+    { "smiles": "CCN", "embedding": [0,1,0,0, ...] }
+  ]
+}
+```
+
+But for a real index, run the build-index script with a list of SMILES.
+
+The bayesian-risk package needs data/model.json from training. For testing, create a dummy:
+
+```json
+{
+  "weights_mean": [0.1, 0.2, ...],
+  "weights_std": [0.01, 0.02, ...],
+  "intercept_mean": 0.5,
+  "intercept_std": 0.1
+}
+```
+
+Copy assets to extension media folder
+
+The webview needs the JS and CSS files. We'll place them in extensions/overlay365-bioos-chemlab/media/. The extension expects them there. You can either copy them manually or set up a build script. For simplicity, create the media folder and put app.js and style.css there.
+
+Launch the extension
+
+Open the extension folder in VS Code, press F5 to start debugging. In the new Extension Development Host window, open a file (e.g., a text file with a SMILES string), select a SMILES, and run the command "Quick-Analyze Selected Chemistry" from the command palette.
+
+---
+
+6. Enhancements and Next Steps
+
+· Improve error handling – show meaningful messages when RDKit fails.
+· Add loading spinner in the webview while waiting for data.
+· Map dominant feature indices to actual molecular substructures (requires interpretable ML).
+· Add more visualizations – radar chart for properties, 2D structure via RDKit SVG.
+· Use React for a more interactive UI (optional).
+· Integrate other packages (microkinetics, sudden model) as separate commands.
+
+This integration gives you a solid foundation to build upon, with all scientific rigor preserved and a clear separation between computation and presentation.
