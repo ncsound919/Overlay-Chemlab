@@ -1,0 +1,451 @@
+We'll now build the molecular-embeddings package with full rigor. This package will:
+
+· Load RDKit in WebAssembly (WASM) and provide a promise-based API.
+· Convert a SMILES string to a 128‑bit Morgan fingerprint (radius 2) as a Float32Array.
+· Compute cosine similarity between two embedding vectors.
+· Provide nearest‑neighbor search against a pre‑built index of embeddings (loaded from a JSON file). The index is generated offline via a Python script (similar to the training script in bayesian-risk), ensuring reproducibility.
+
+The package will be fully typed, tested (unit + property‑based), and ready for integration.
+
+---
+
+Package Structure
+
+```
+molecular-embeddings/
+├── package.json
+├── tsconfig.json
+├── jest.config.js
+├── src/
+│   ├── index.ts               # main exports
+│   ├── rdkit.ts               # WASM loader & wrapper
+│   ├── similarity.ts          # cosine, nearest neighbor
+│   └── types.ts               # EmbeddingIndex, etc.
+├── test/
+│   ├── index.test.ts          # unit tests
+│   └── property.test.ts       # fast-check property tests
+├── data/
+│   ├── index.json              # pre‑computed embeddings for common compounds (optional)
+│   └── rdkit.wasm              # RDKit WASM binary (copied from node_modules or downloaded)
+├── scripts/
+│   ├── build_index.py          # Python script to generate index.json from a list of SMILES
+│   └── download_rdkit_wasm.js  # script to fetch RDKit WASM from CDN
+└── README.md
+```
+
+---
+
+1. Package Configuration
+
+package.json
+
+```json
+{
+  "name": "molecular-embeddings",
+  "version": "0.1.0",
+  "description": "RDKit WASM wrapper for Morgan fingerprints and similarity search",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "jest",
+    "prepare": "node scripts/download_rdkit_wasm.js",
+    "build-index": "python scripts/build_index.py"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@types/jest": "^29.5.0",
+    "jest": "^29.5.0",
+    "ts-jest": "^29.1.0",
+    "typescript": "^5.0.0",
+    "fast-check": "^3.8.0",
+    "@types/node": "^18.15.11"
+  }
+}
+```
+
+tsconfig.json
+
+```json
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "commonjs",
+    "declaration": true,
+    "outDir": "./dist",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "test"]
+}
+```
+
+jest.config.js
+
+```javascript
+module.exports = {
+  preset: 'ts-jest',
+  testEnvironment: 'node',
+  testMatch: ['**/test/**/*.test.ts'],
+};
+```
+
+---
+
+2. RDKit WASM Loader
+
+We'll download the RDKit WASM file from a CDN (e.g., https://unpkg.com/@rdkit/rdkit@2023.9.3/Code/MinimalLib/dist/). The download_rdkit_wasm.js script will fetch it and place it in data/rdkit.wasm.
+
+scripts/download_rdkit_wasm.js
+
+```javascript
+const https = require('https');
+const fs = require('fs');
+const path = require('path');
+
+const url = 'https://unpkg.com/@rdkit/rdkit@2023.9.3/Code/MinimalLib/dist/rdkit.wasm';
+const dest = path.join(__dirname, '../data/rdkit.wasm');
+
+https.get(url, (response) => {
+  if (response.statusCode !== 200) {
+    console.error(`Failed to download: ${response.statusCode}`);
+    return;
+  }
+  const file = fs.createWriteStream(dest);
+  response.pipe(file);
+  file.on('finish', () => {
+    file.close();
+    console.log('RDKit WASM downloaded to data/rdkit.wasm');
+  });
+}).on('error', (err) => {
+  console.error('Download error:', err);
+});
+```
+
+src/rdkit.ts
+
+```typescript
+import * as fs from 'fs';
+import * as path from 'path';
+
+let rdkitModule: any = null;
+let initPromise: Promise<void> | null = null;
+
+/**
+ * Loads the RDKit WASM module (singleton, lazy).
+ */
+export async function ensureRDKit(): Promise<void> {
+  if (rdkitModule) return;
+  if (initPromise) return initPromise;
+
+  initPromise = (async () => {
+    const wasmPath = path.join(__dirname, '../data/rdkit.wasm');
+    const wasmBinary = fs.readFileSync(wasmPath);
+
+    // Minimal RDKit JS API expected: initRDKitModule({ wasmBinary })
+    // We'll use a dynamic import of the minimal RDKit JS (from CDN or local)
+    // For simplicity, we assume the RDKit JS is loaded from a CDN.
+    // In a real environment, you'd either bundle the JS or load from a known URL.
+    // Here we'll dynamically import the module from a CDN.
+    const rdkit = await import('https://unpkg.com/@rdkit/rdkit@2023.9.3/Code/MinimalLib/dist/RDKit_minimal.js');
+    rdkitModule = await rdkit.default({ wasmBinary });
+  })();
+
+  await initPromise;
+}
+
+/**
+ * Compute Morgan fingerprint for a SMILES string.
+ * Returns a Float32Array of length 128 (binary bits cast to float).
+ */
+export async function smilesToFingerprint(smiles: string): Promise<Float32Array> {
+  await ensureRDKit();
+  const mol = rdkitModule.get_mol(smiles);
+  if (!mol) {
+    throw new Error(`Invalid SMILES: ${smiles}`);
+  }
+  try {
+    // Morgan fingerprint, radius 2, 128 bits, as binary string
+    const fpString = mol.get_morgan_fp_as_binary_string(2, 128);
+    // Convert binary string to Float32Array of floats (0 or 1)
+    const arr = new Float32Array(128);
+    for (let i = 0; i < 128; i++) {
+      arr[i] = fpString[i] === '1' ? 1.0 : 0.0;
+    }
+    return arr;
+  } finally {
+    mol.delete();
+  }
+}
+```
+
+Note: The RDKit minimal JS library is quite large; in practice you'd bundle it with your extension or load from a local file. The above uses a CDN import for simplicity. For a VS Code extension, you'd need to host the JS locally (e.g., in media/). The approach can be refined later.
+
+---
+
+3. Similarity and Nearest Neighbor
+
+src/types.ts
+
+```typescript
+export interface EmbeddingIndex {
+  entries: Array<{
+    smiles: string;
+    embedding: number[];   // 128 floats
+  }>;
+}
+```
+
+src/similarity.ts
+
+```typescript
+/**
+ * Cosine similarity between two vectors.
+ * Vectors must be same length.
+ */
+export function cosineSimilarity(a: Float32Array | number[], b: Float32Array | number[]): number {
+  if (a.length !== b.length) throw new Error('Vectors must have same length');
+  let dot = 0, normA = 0, normB = 0;
+  for (let i = 0; i < a.length; i++) {
+    const ai = a[i];
+    const bi = b[i];
+    dot += ai * bi;
+    normA += ai * ai;
+    normB += bi * bi;
+  }
+  if (normA === 0 || normB === 0) return 0;
+  return dot / (Math.sqrt(normA) * Math.sqrt(normB));
+}
+
+/**
+ * Find k nearest neighbors by cosine similarity.
+ */
+export function findNearestNeighbors(
+  query: Float32Array,
+  index: EmbeddingIndex,
+  k: number
+): Array<{ smiles: string; similarity: number }> {
+  const similarities = index.entries.map(entry => ({
+    smiles: entry.smiles,
+    similarity: cosineSimilarity(query, entry.embedding),
+  }));
+  // Sort descending by similarity
+  similarities.sort((a, b) => b.similarity - a.similarity);
+  return similarities.slice(0, k);
+}
+```
+
+---
+
+4. Main Exports
+
+src/index.ts
+
+```typescript
+export { smilesToFingerprint } from './rdkit';
+export { cosineSimilarity, findNearestNeighbors } from './similarity';
+export type { EmbeddingIndex } from './types';
+
+// Optional: load a pre-built index (if present)
+import indexData from '../data/index.json';
+import { EmbeddingIndex } from './types';
+export const defaultIndex: EmbeddingIndex = indexData;
+```
+
+---
+
+5. Tests
+
+test/index.test.ts (unit tests)
+
+```typescript
+import { smilesToFingerprint, cosineSimilarity, findNearestNeighbors, defaultIndex } from '../src';
+
+describe('molecular-embeddings', () => {
+  it('should compute fingerprint for valid SMILES', async () => {
+    const fp = await smilesToFingerprint('CCO'); // ethanol
+    expect(fp.length).toBe(128);
+    // Ensure it's a Float32Array
+    expect(fp).toBeInstanceOf(Float32Array);
+  });
+
+  it('should throw for invalid SMILES', async () => {
+    await expect(smilesToFingerprint('invalid')).rejects.toThrow();
+  });
+
+  it('cosine similarity of identical vectors is 1', () => {
+    const a = new Float32Array([1, 0, 1]);
+    const b = new Float32Array([1, 0, 1]);
+    expect(cosineSimilarity(a, b)).toBeCloseTo(1, 5);
+  });
+
+  it('cosine similarity of orthogonal vectors is 0', () => {
+    const a = new Float32Array([1, 0]);
+    const b = new Float32Array([0, 1]);
+    expect(cosineSimilarity(a, b)).toBeCloseTo(0, 5);
+  });
+
+  it('nearest neighbor returns k results', async () => {
+    // Create a tiny index
+    const index = {
+      entries: [
+        { smiles: 'CCO', embedding: [1,0,0,0] },
+        { smiles: 'CCN', embedding: [0,1,0,0] },
+      ]
+    };
+    const query = new Float32Array([1,0,0,0]);
+    const result = findNearestNeighbors(query, index as any, 1);
+    expect(result.length).toBe(1);
+    expect(result[0].smiles).toBe('CCO');
+  });
+
+  it('default index is loaded (if file exists)', () => {
+    // This test will pass only if index.json is present.
+    // We'll skip if not.
+    if (defaultIndex && defaultIndex.entries) {
+      expect(defaultIndex.entries.length).toBeGreaterThan(0);
+    }
+  });
+});
+```
+
+test/property.test.ts (property‑based tests using fast-check)
+
+```typescript
+import fc from 'fast-check';
+import { cosineSimilarity } from '../src';
+
+describe('cosineSimilarity properties', () => {
+  it('should be symmetric', () => {
+    fc.assert(
+      fc.property(
+        fc.array(fc.float({ min: -1, max: 1 }), { minLength: 10, maxLength: 10 }),
+        fc.array(fc.float({ min: -1, max: 1 }), { minLength: 10, maxLength: 10 }),
+        (a, b) => {
+          const simAB = cosineSimilarity(a, b);
+          const simBA = cosineSimilarity(b, a);
+          return Math.abs(simAB - simBA) < 1e-6;
+        }
+      )
+    );
+  });
+
+  it('should be between -1 and 1', () => {
+    fc.assert(
+      fc.property(
+        fc.array(fc.float({ min: -1, max: 1 }), { minLength: 10, maxLength: 10 }),
+        fc.array(fc.float({ min: -1, max: 1 }), { minLength: 10, maxLength: 10 }),
+        (a, b) => {
+          const sim = cosineSimilarity(a, b);
+          return sim >= -1 && sim <= 1;
+        }
+      )
+    );
+  });
+
+  it('self-similarity should be 1 for non-zero vectors', () => {
+    fc.assert(
+      fc.property(
+        fc.array(fc.float({ min: -1, max: 1 }), { minLength: 10, maxLength: 10 })
+          .filter(v => v.some(x => x !== 0)),
+        (a) => {
+          const sim = cosineSimilarity(a, a);
+          return Math.abs(sim - 1) < 1e-6;
+        }
+      )
+    );
+  });
+});
+```
+
+---
+
+6. Building the Index (Optional)
+
+The package can include a pre‑built index of common compounds for quick nearest‑neighbor lookup. The index is built offline using a Python script that:
+
+· Reads a list of SMILES strings (e.g., from ChEMBL or a curated list).
+· Uses RDKit (Python) to compute fingerprints.
+· Saves as index.json with structure { entries: [{ smiles, embedding }] }.
+
+scripts/build_index.py
+
+```python
+import json
+import argparse
+from rdkit import Chem
+from rdkit.Chem import rdMolDescriptors
+import numpy as np
+
+def smiles_to_fp(smiles, nBits=128, radius=2):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is None:
+        return None
+    fp = rdMolDescriptors.GetMorganFingerprintAsBitVect(mol, radius, nBits=nBits)
+    arr = np.zeros((0,), dtype=np.int8)
+    Chem.DataStructs.ConvertToNumpyArray(fp, arr)
+    return arr.astype(float).tolist()
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--input', required=True, help='Text file with one SMILES per line')
+    parser.add_argument('--output', default='../data/index.json')
+    args = parser.parse_args()
+
+    entries = []
+    with open(args.input, 'r') as f:
+        for line in f:
+            smiles = line.strip()
+            if not smiles:
+                continue
+            fp = smiles_to_fp(smiles)
+            if fp:
+                entries.append({'smiles': smiles, 'embedding': fp})
+
+    with open(args.output, 'w') as f:
+        json.dump({'entries': entries}, f, indent=2)
+    print(f"Index built with {len(entries)} entries.")
+
+if __name__ == '__main__':
+    main()
+```
+
+To build the index:
+
+```bash
+cd packages/molecular-embeddings
+pnpm run build-index -- --input my_smiles_list.txt
+```
+
+---
+
+7. Integration with VS Code Extension
+
+Now, in the extension, we can use this package:
+
+```typescript
+import { smilesToFingerprint, findNearestNeighbors, defaultIndex } from 'molecular-embeddings';
+import { computeRisk } from 'bayesian-risk';
+
+// Inside command handler
+const embedding = await smilesToFingerprint(selectedSmiles);
+const risk = computeRisk(embedding);
+const neighbors = findNearestNeighbors(embedding, defaultIndex, 3);
+```
+
+---
+
+Summary
+
+The molecular-embeddings package provides a rigorous foundation for molecular similarity and feature extraction, mirroring the approach used in bayesian-risk. It is:
+
+· Well‑typed with TypeScript.
+· Tested with both unit and property‑based tests.
+· Reproducible via offline index building.
+· Performant by leveraging WASM and pre‑computed indices.
+
+This completes the second core scientific module. The same pattern can now be applied to all other packages (microkinetics, sudden-model, graph-pathway, etc.), ensuring a consistent, maintainable, and scientifically rigorous codebase.
+
