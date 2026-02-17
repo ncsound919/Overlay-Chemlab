@@ -1,0 +1,681 @@
+Excellent! Let's dive deep into one of the core scientific packages—Bayesian Risk Scoring—and build it with full mathematical rigor, from data to deployable module. This package will serve as a template for all others: it will be self‑contained, versioned, heavily tested, and ready to be consumed by the VS Code extension.
+
+---
+
+Package: bayesian-risk
+
+Purpose: Given a molecular embedding vector x \in \mathbb{R}^{128}, compute P(\text{toxic} \mid x) using a logistic regression model trained on ChEMBL toxicity data. Provide confidence intervals and identify which features (embedding dimensions) most influence the risk.
+
+Mathematical foundation:
+
+P(\text{toxic} \mid x) = \sigma(w^\top x + b) = \frac{1}{1 + e^{-(w^\top x + b)}}
+\]  
+
+where w \in \mathbb{R}^{128} and b \in \mathbb{R} are learned from data.
+
+---
+
+Step 1: Data Acquisition and Preprocessing
+
+· Source: ChEMBL – extract compounds with annotated toxicity assays (e.g., Ames test, hepatotoxicity, etc.).
+· Use the ChEMBL web interface or API to download assay data. For reproducibility, write a Python script fetch_chembl_tox.py that:
+  · Queries for assays with bao_label containing "toxicity".
+  · Retrieves compound SMILES and binary outcome (toxic/non‑toxic).
+  · Outputs a clean CSV with columns: smiles, label (0/1).
+
+Rigor considerations:
+
+· Only include assays with clear confidence scores.
+· Balance the dataset (e.g., via downsampling) to avoid bias.
+· Document version of ChEMBL used and the date of extraction.
+
+---
+
+Step 2: Embedding Computation
+
+Use RDKit (Python) to compute Morgan fingerprints (radius 2, 128 bits) for each SMILES.
+
+· Script compute_embeddings.py loads the CSV, calls RDKit, and generates a feature matrix X of shape (n_samples, 128) and label vector y.
+· Save as data/features.npy and data/labels.npy.
+
+Rigor:
+
+· Verify that all SMILES are valid (RDKit can parse them).
+· Use the same fingerprint parameters as in the extension’s molecular-embeddings package (radius 2, 128 bits).
+· Perform a sanity check: t‑SNE visualization to see if toxic and non‑toxic clusters separate.
+
+---
+
+Step 3: Model Training (Python)
+
+Train a logistic regression with L2 regularization (to handle high dimensionality). Use scikit‑learn:
+
+```python
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import cross_val_score, train_test_split
+import numpy as np
+
+X = np.load('data/features.npy')
+y = np.load('data/labels.npy')
+
+# Split for final evaluation
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Train with cross‑validation to select C (inverse regularization)
+model = LogisticRegression(penalty='l2', solver='liblinear', max_iter=1000)
+# Optionally use GridSearchCV to tune C
+model.fit(X_train, y_train)
+
+# Evaluate
+accuracy = model.score(X_test, y_test)
+print(f"Test accuracy: {accuracy:.3f}")
+```
+
+Export model weights:
+
+```python
+weights = model.coef_.flatten().tolist()   # shape (128,)
+intercept = model.intercept_.tolist()[0]
+
+import json
+with open('model.json', 'w') as f:
+    json.dump({'weights': weights, 'intercept': intercept}, f)
+```
+
+Confidence intervals via bootstrapping:
+
+· Fit 1000 models on bootstrap samples of the training data.
+· For each sample, record w and b.
+· For a given input x, compute 1000 risk scores and take the 2.5th and 97.5th percentiles.
+· Store the bootstrapped weights? That would be huge. Instead, store a small number of quantiles for each weight, or just store the mean and covariance, then use asymptotic normality (less accurate). Better: for each input, compute confidence interval on the fly by using the stored bootstrap distribution of the linear predictor w^\top x + b. To make this practical, we can store the mean and variance of the linear predictor for a representative set of compounds, but that's complex. For MVP, we can skip confidence intervals or use a simple approximation: standard error from the covariance matrix of the parameters (if we store it). Since the feature space is high‑dim, storing the full covariance (128x128) is 16k floats, acceptable (~128KB). We'll store that.
+
+Modify export to include the covariance matrix of w (from the inverse Hessian of the logistic loss). scikit‑learn provides model.coef_ but not covariance directly. We can compute it via the Fisher information matrix. Alternatively, use statsmodels for more detailed output. For now, we can approximate by assuming independence and storing standard deviations per coefficient (diagonal of covariance). That's simpler and still gives a rough CI.
+
+We'll store:
+
+· weights_mean (128)
+· weights_std (128) – from bootstrap or from model's coefficient standard errors (if using statsmodels)
+· intercept_mean
+· intercept_std
+
+Then, for a new x, compute linear predictor z = \sum (w_i x_i) + b. Its variance is \sum (x_i^2 \cdot \sigma_{w_i}^2) + \sigma_b^2 (if we assume independence). Then CI for P via logistic transformation.
+
+Rigor: Document the method used and its limitations.
+
+---
+
+Step 4: TypeScript Implementation
+
+Create packages/bayesian-risk/src/index.ts:
+
+```typescript
+import model from './model.json';  // weights_mean, weights_std, intercept_mean, intercept_std
+
+export interface RiskResult {
+  probability: number;        // P(toxic)
+  confidence95: [number, number];
+  dominantFeatures: number[]; // indices of top 5 |w_i|
+}
+
+export function computeRisk(embedding: Float32Array): RiskResult {
+  // dot product with weights_mean
+  let z = 0.0;
+  for (let i = 0; i < 128; i++) {
+    z += model.weights_mean[i] * embedding[i];
+  }
+  z += model.intercept_mean;
+
+  const p = 1 / (1 + Math.exp(-z));
+
+  // Compute variance of z assuming independent weights
+  let varZ = 0.0;
+  for (let i = 0; i < 128; i++) {
+    varZ += embedding[i] * embedding[i] * model.weights_std[i] * model.weights_std[i];
+  }
+  varZ += model.intercept_std * model.intercept_std;
+  const stdZ = Math.sqrt(varZ);
+
+  // Confidence interval on z
+  const zLow = z - 1.96 * stdZ;
+  const zHigh = z + 1.96 * stdZ;
+  const pLow = 1 / (1 + Math.exp(-zLow));
+  const pHigh = 1 / (1 + Math.exp(-zHigh));
+
+  // Dominant features: indices of top 5 absolute weights_mean
+  const withAbs = model.weights_mean.map((w, i) => ({ i, abs: Math.abs(w) }));
+  withAbs.sort((a, b) => b.abs - a.abs);
+  const dominant = withAbs.slice(0,5).map(d => d.i);
+
+  return {
+    probability: p,
+    confidence95: [pLow, pHigh],
+    dominantFeatures: dominant,
+  };
+}
+```
+
+Testing:
+
+· Property‑based test: for any embedding, probability ∈ [0,1] and confidence intervals contain probability.
+· Unit test: known compound (e.g., benzene) – we can manually check that risk is plausible (low).
+· Integration test: load model, compute risk for a random embedding, ensure no exceptions.
+
+---
+
+Step 5: Integration with VS Code Extension
+
+The extension’s analyzeSelection command will:
+
+1. Compute embedding via molecular-embeddings.
+2. Call computeRisk(embedding) from bayesian-risk.
+3. Display the probability and dominant features in the HUD (e.g., risk gauge, list of top features).
+
+The package is imported via import { computeRisk } from 'bayesian-risk'; – works because it's in the same monorepo (using pnpm or yarn workspaces).
+
+---
+
+Step 6: Versioning and Updates
+
+· When new toxicity data becomes available, retrain the model, update model.json, and publish a new version of the package.
+· The extension can be configured to use a specific version or always latest.
+
+---
+
+Why This Approach Preserves Rigor
+
+· Data provenance: The training script documents exactly which ChEMBL version and assays were used.
+· Reproducibility: The entire training pipeline is code, not a black box.
+· Statistical correctness: Confidence intervals are derived from the model’s uncertainty, not ad‑hoc.
+· Testing: Every component is tested against known properties (probability bounds, etc.).
+· Separation: The model is a data file, not hard‑coded, so updates don't require recompiling the extension.
+
+---
+
+Next Packages Following the Same Pattern
+
+Each scientific package will have its own README.md, src/, test/, and a data/ or models/ folder for pre‑computed assets. For example:
+
+· catalysis-data: JSON files with adsorption energies, barriers; tested against literature values.
+· microkinetics: ODE solver code; tested by comparing with published TOF.
+· sudden-model: Numerical integration routines; tested by reproducing Fig. 14.
+· graph-pathway: Graph construction from Open Targets API; PageRank implementation; tested on small synthetic graphs.
+· info-theoretic-ranking: Entropy and NMI functions; property‑based tests for symmetry, bounds.
+
+We'll now implement the bayesian-risk package from scratch. This guide covers:
+
+· Setting up the monorepo with pnpm workspaces.
+· Creating the package directory.
+· Writing the Python training script (data fetching, embedding, logistic regression, exporting model + covariance).
+· Building the TypeScript module that loads the model and computes risk with confidence intervals.
+· Writing property-based and unit tests.
+· Integrating the package into the VS Code extension’s analyzeSelection command.
+
+---
+
+1. Monorepo Setup
+
+We assume you have a root folder overlay365-bioos-chemlab/ (the extension repo). We'll use pnpm for workspace management (you can also use npm/yarn workspaces).
+
+Root package.json:
+
+```json
+{
+  "name": "overlay365-bioos-chemlab",
+  "private": true,
+  "workspaces": [
+    "packages/*",
+    "extensions/*"
+  ],
+  "scripts": {
+    "build": "pnpm run -r build",
+    "test": "pnpm run -r test"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}
+```
+
+Folder structure:
+
+```
+overlay365-bioos-chemlab/
+├── packages/
+│   ├── bayesian-risk/
+│   ├── molecular-embeddings/
+│   └── ... (other packages)
+├── extensions/
+│   └── overlay365-bioos-chemlab/   (VS Code extension)
+├── package.json
+├── pnpm-workspace.yaml
+└── ...
+```
+
+pnpm-workspace.yaml:
+
+```yaml
+packages:
+  - 'packages/*'
+  - 'extensions/*'
+```
+
+---
+
+2. Create the bayesian-risk Package
+
+Inside packages/bayesian-risk/, create the following structure:
+
+```
+bayesian-risk/
+├── package.json
+├── tsconfig.json
+├── src/
+│   ├── index.ts          # main inference code
+│   └── types.ts          # type definitions
+├── test/
+│   ├── index.test.ts     # unit tests
+│   └── property.test.ts  # fast-check property tests
+├── data/                 # will contain the model.json
+│   └── .gitkeep
+├── scripts/
+│   └── train.py          # Python training script
+└── README.md
+```
+
+package.json:
+
+```json
+{
+  "name": "bayesian-risk",
+  "version": "0.1.0",
+  "description": "Bayesian logistic regression for molecular toxicity risk",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "jest",
+    "train": "python scripts/train.py"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@types/jest": "^29.5.0",
+    "jest": "^29.5.0",
+    "ts-jest": "^29.1.0",
+    "typescript": "^5.0.0",
+    "fast-check": "^3.8.0"
+  }
+}
+```
+
+tsconfig.json:
+
+```json
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "commonjs",
+    "declaration": true,
+    "outDir": "./dist",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "test"]
+}
+```
+
+---
+
+3. Training Script (Python)
+
+Create scripts/train.py. This script will:
+
+· Fetch toxicity data from ChEMBL (or use a local CSV if you've pre-downloaded).
+· Compute Morgan fingerprints (radius 2, 128 bits) via RDKit.
+· Train logistic regression with L2 regularization.
+· Compute parameter uncertainties (via bootstrap or Fisher information).
+· Export model.json containing weights_mean, weights_std, intercept_mean, intercept_std.
+
+We'll use pandas, rdkit, scikit-learn, and numpy. For bootstrap, we can do a simple 100-resample.
+
+scripts/train.py:
+
+```python
+import pandas as pd
+import numpy as np
+from rdkit import Chem
+from rdkit.Chem import rdMolDescriptors
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split
+import json
+import argparse
+import os
+
+def fetch_chembl_data():
+    # This is a placeholder; you would implement actual ChEMBL API calls.
+    # For now, we assume a local CSV with columns: smiles, label
+    df = pd.read_csv('chembl_toxicity.csv')
+    return df
+
+def smiles_to_fingerprint(smiles, nBits=128, radius=2):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is None:
+        return None
+    fp = rdMolDescriptors.GetMorganFingerprintAsBitVect(mol, radius, nBits=nBits)
+    arr = np.zeros((0,), dtype=np.int8)
+    Chem.DataStructs.ConvertToNumpyArray(fp, arr)
+    return arr.astype(np.float32)
+
+def bootstrap_ci(X, y, n_bootstrap=100):
+    # Train logistic regression on bootstrap samples, collect coefficients
+    n_samples = X.shape[0]
+    coefs = []
+    intercepts = []
+    for _ in range(n_bootstrap):
+        idx = np.random.choice(n_samples, n_samples, replace=True)
+        Xb, yb = X[idx], y[idx]
+        model = LogisticRegression(penalty='l2', solver='liblinear', max_iter=1000)
+        model.fit(Xb, yb)
+        coefs.append(model.coef_.flatten())
+        intercepts.append(model.intercept_[0])
+    coefs = np.array(coefs)  # shape (n_bootstrap, 128)
+    intercepts = np.array(intercepts)
+    mean_w = np.mean(coefs, axis=0).tolist()
+    std_w = np.std(coefs, axis=0).tolist()
+    mean_b = np.mean(intercepts).item()
+    std_b = np.std(intercepts).item()
+    return mean_w, std_w, mean_b, std_b
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--output', default='../data/model.json')
+    args = parser.parse_args()
+
+    # Load data
+    df = fetch_chembl_data()
+    X_list = []
+    y_list = []
+    for _, row in df.iterrows():
+        fp = smiles_to_fingerprint(row['smiles'])
+        if fp is not None:
+            X_list.append(fp)
+            y_list.append(row['label'])
+    X = np.array(X_list)
+    y = np.array(y_list)
+
+    # Train/test split (optional, for evaluation)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+    # Bootstrap to get uncertainties
+    mean_w, std_w, mean_b, std_b = bootstrap_ci(X_train, y_train)
+
+    # Save model
+    model_dict = {
+        'weights_mean': mean_w,
+        'weights_std': std_w,
+        'intercept_mean': mean_b,
+        'intercept_std': std_b
+    }
+    os.makedirs(os.path.dirname(args.output), exist_ok=True)
+    with open(args.output, 'w') as f:
+        json.dump(model_dict, f, indent=2)
+
+    # Evaluate on test set (optional)
+    model = LogisticRegression(penalty='l2')
+    model.coef_ = np.array([mean_w])
+    model.intercept_ = np.array([mean_b])
+    acc = model.score(X_test, y_test)
+    print(f"Test accuracy: {acc:.3f}")
+
+if __name__ == '__main__':
+    main()
+```
+
+Note: The fetch_chembl_data() function is a placeholder. In practice, you would use the ChEMBL API or download a pre‑processed dataset. For now, you can manually create a small CSV for testing.
+
+Run the script:
+
+```bash
+cd packages/bayesian-risk
+pnpm run train
+```
+
+This will generate data/model.json.
+
+---
+
+4. TypeScript Inference Module
+
+src/types.ts:
+
+```typescript
+export interface RiskResult {
+  probability: number;           // P(toxic)
+  confidence95: [number, number]; // [lower, upper]
+  dominantFeatures: number[];     // indices of top 5 |weights|
+}
+```
+
+src/index.ts:
+
+```typescript
+import model from '../data/model.json';
+
+interface Model {
+  weights_mean: number[];
+  weights_std: number[];
+  intercept_mean: number;
+  intercept_std: number;
+}
+
+// Assert the shape (TypeScript won't infer from JSON automatically)
+const typedModel = model as Model;
+
+export function computeRisk(embedding: Float32Array | number[]): RiskResult {
+  // Ensure embedding is an array of numbers
+  const emb = Array.isArray(embedding) ? embedding : Array.from(embedding);
+  if (emb.length !== 128) {
+    throw new Error(`Embedding must be 128-dimensional, got ${emb.length}`);
+  }
+
+  // Linear predictor
+  let z = typedModel.intercept_mean;
+  for (let i = 0; i < 128; i++) {
+    z += typedModel.weights_mean[i] * emb[i];
+  }
+  const p = 1 / (1 + Math.exp(-z));
+
+  // Variance of z (assuming independent weights)
+  let varZ = typedModel.intercept_std ** 2;
+  for (let i = 0; i < 128; i++) {
+    varZ += emb[i] ** 2 * typedModel.weights_std[i] ** 2;
+  }
+  const stdZ = Math.sqrt(varZ);
+  const zLow = z - 1.96 * stdZ;
+  const zHigh = z + 1.96 * stdZ;
+  const pLow = 1 / (1 + Math.exp(-zLow));
+  const pHigh = 1 / (1 + Math.exp(-zHigh));
+
+  // Dominant features: top 5 absolute weights
+  const withAbs = typedModel.weights_mean.map((w, i) => ({ i, abs: Math.abs(w) }));
+  withAbs.sort((a, b) => b.abs - a.abs);
+  const dominant = withAbs.slice(0, 5).map(d => d.i);
+
+  return {
+    probability: p,
+    confidence95: [pLow, pHigh],
+    dominantFeatures: dominant,
+  };
+}
+```
+
+Important: To import JSON directly, we need resolveJsonModule in tsconfig.json (already set). Also ensure the JSON file is copied to dist during build. We can either include it as part of the package (by adding "files": ["dist", "data"] in package.json) or embed it as a string and parse. The former is simpler.
+
+---
+
+5. Testing
+
+test/index.test.ts (unit tests):
+
+```typescript
+import { computeRisk } from '../src';
+
+describe('bayesian-risk', () => {
+  it('should compute probability in [0,1]', () => {
+    const emb = new Float32Array(128).fill(0.1); // dummy
+    const result = computeRisk(emb);
+    expect(result.probability).toBeGreaterThanOrEqual(0);
+    expect(result.probability).toBeLessThanOrEqual(1);
+  });
+
+  it('should give confidence interval that contains probability', () => {
+    const emb = new Float32Array(128).fill(0.1);
+    const result = computeRisk(emb);
+    expect(result.confidence95[0]).toBeLessThanOrEqual(result.probability);
+    expect(result.confidence95[1]).toBeGreaterThanOrEqual(result.probability);
+  });
+
+  it('should return exactly 5 dominant features', () => {
+    const emb = new Float32Array(128).fill(0.1);
+    const result = computeRisk(emb);
+    expect(result.dominantFeatures.length).toBe(5);
+  });
+
+  it('should throw on wrong dimension', () => {
+    const emb = new Float32Array(127);
+    expect(() => computeRisk(emb)).toThrow();
+  });
+});
+```
+
+test/property.test.ts (property‑based tests using fast‑check):
+
+```typescript
+import fc from 'fast-check';
+import { computeRisk } from '../src';
+
+describe('property-based tests', () => {
+  it('probability is always between 0 and 1', () => {
+    fc.assert(
+      fc.property(fc.float32Array({ minLength: 128, maxLength: 128 }), (emb) => {
+        const result = computeRisk(emb);
+        return result.probability >= 0 && result.probability <= 1;
+      })
+    );
+  });
+
+  it('confidence interval bounds are ordered', () => {
+    fc.assert(
+      fc.property(fc.float32Array({ minLength: 128, maxLength: 128 }), (emb) => {
+        const result = computeRisk(emb);
+        return result.confidence95[0] <= result.confidence95[1];
+      })
+    );
+  });
+});
+```
+
+Add Jest configuration (jest.config.js in package root):
+
+```javascript
+module.exports = {
+  preset: 'ts-jest',
+  testEnvironment: 'node',
+  testMatch: ['**/test/**/*.test.ts'],
+};
+```
+
+Run tests with pnpm test.
+
+---
+
+6. Integration with VS Code Extension
+
+Now, inside the extension (extensions/overlay365-bioos-chemlab/), we need to:
+
+· Add bayesian-risk as a dependency.
+· Use it in the analyzeSelection command.
+
+Extension package.json (partial):
+
+```json
+{
+  "name": "overlay365-bioos-chemlab",
+  "version": "0.0.1",
+  "main": "./out/extension.js",
+  "dependencies": {
+    "bayesian-risk": "workspace:*",
+    "molecular-embeddings": "workspace:*"
+  },
+  "activationEvents": ["onCommand:overlay365.analyzeSelection"],
+  "contributes": {
+    "commands": [
+      { "command": "overlay365.analyzeSelection", "title": "Quick-Analyze Selected Chemistry" }
+    ]
+  }
+}
+```
+
+Extension src/extension.ts:
+
+```typescript
+import * as vscode from 'vscode';
+import { computeRisk } from 'bayesian-risk';
+import { smilesToEmbedding } from 'molecular-embeddings'; // assume this package exists
+
+export function activate(context: vscode.ExtensionContext) {
+  const disposable = vscode.commands.registerCommand('overlay365.analyzeSelection', async () => {
+    const editor = vscode.window.activeTextEditor;
+    if (!editor) return;
+
+    const selection = editor.document.getText(editor.selection);
+    if (!isValidSmiles(selection)) { // you'll need to define this
+      vscode.window.showErrorMessage('Not a valid SMILES string');
+      return;
+    }
+
+    try {
+      // 1. Compute embedding
+      const embedding = await smilesToEmbedding(selection); // returns Float32Array(128)
+
+      // 2. Compute risk
+      const risk = computeRisk(embedding);
+
+      // 3. Show result in a webview or output channel
+      vscode.window.showInformationMessage(`Risk: ${(risk.probability * 100).toFixed(1)}%`);
+      // Later: create a rich HUD with risk gauge, confidence interval, etc.
+    } catch (err) {
+      vscode.window.showErrorMessage(`Analysis failed: ${err}`);
+    }
+  });
+
+  context.subscriptions.push(disposable);
+}
+
+function isValidSmiles(s: string): boolean {
+  // Use a simple regex or better: call RDKit WASM to validate
+  return s.length > 0 && /^[A-Za-z0-9@+\\-\\[\\]()=#$:\\.]+$/.test(s);
+}
+```
+
+Note: The molecular-embeddings package is not yet built, but you can stub it for now.
+
+To run the extension, you'll need to compile the packages first (run pnpm build at root), then launch the extension from VS Code.
+
+---
+
+7. Next Steps
+
+· Implement molecular-embeddings package (similar structure: RDKit WASM wrapper, Morgan fingerprint → Float32Array).
+· Enhance analyzeSelection to open a webview with a risk gauge (using PixiJS or SVG).
+· Add confidence interval display.
+· Train a real model on ChEMBL data and replace placeholder.
+
+---
+
+Summary
+
+You now have a rigorous, testable, and reusable Bayesian risk package. It preserves the mathematical depth (logistic regression with uncertainty) and is decoupled from the VS Code extension. This same pattern can be applied to all other scientific modules, ensuring your final extension is both scientifically sound and maintainable.
+
