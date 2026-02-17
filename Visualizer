@@ -1,0 +1,212 @@
+{
+  "overlay365BioOsVisualization": {
+    "version": "2.0.0",
+    "renderingEngine": "PixiJS 8 + Plotly.js + Three.js (optional)",
+    "dashboards": {
+      "reactionHud": {
+        "type": "overlay",
+        "position": "aboveSelection",
+        "components": [
+          {
+            "id": "videoOverlay",
+            "type": "PIXI.VideoTexture",
+            "source": "reaction-map.json → visuals.videoSrc",
+            "effects": ["crossfade", "screenShake", "particleBurst"],
+            "tier": "basic|complex"
+          },
+          {
+            "id": "riskGauge",
+            "type": "PIXI.Graphics",
+            "data": "bayesian-risk.score → prob",
+            "visual": {
+              "arc": { "start": -Math.PI/2, "end": (prob * 2 * Math.PI - Math.PI/2) },
+              "colors": ["#ff4444", "#ffaa00", "#44ff44"],
+              "thresholds": [0.7, 0.3, 0]
+            }
+          },
+          {
+            "id": "propertyRadar",
+            "type": "PIXI.Container",
+            "data": "PubChem {MW, LogP, TPSA}",
+            "axes": 3,
+            "scale": "min-max normalized"
+          }
+        ]
+      },
+      "energyDiagram": {
+        "type": "sidePanel",
+        "library": "Chart.js",
+        "chartType": "line",
+        "data": "catalysis-data → {reactants: [-1.42], TS: [0.89], products: [-2.1]}",
+        "facets": ["Pd111", "Pd100", "Ti-doped"],
+        "annotations": ["Ea_fwd", "Ea_rev", "ΔG"],
+        "colors": ["#1f77b4", "#ff7f0e", "#2ca02c"]
+      },
+      "coveragePlot": {
+        "type": "modal",
+        "library": "Plotly.js",
+        "traces": [
+          {
+            "name": "θ_CO",
+            "x": "time (s)",
+            "y": "coverage",
+            "line": { "color": "#d62728", "width": 3 }
+          },
+          {
+            "name": "θ_O",
+            "x": "time (s)",
+            "y": "coverage",
+            "line": { "color": "#9467bd", "width": 3 }
+          },
+          {
+            "name": "TOF",
+            "yaxis": "y2",
+            "line": { "color": "#ff7f0e", "dash": "dot" }
+          }
+        ],
+        "layout": {
+          "yaxis2": { "overlaying": "y", "side": "right", "title": "TOF (s⁻¹)" },
+          "sliders": [{ "steps": [{T:300},{T:475},{T:800}] }]
+        }
+      },
+      "suddenModelCurves": {
+        "type": "tab",
+        "library": "Plotly.js",
+        "traces": [
+          {
+            "name": "P_react(T)",
+            "x": "T (K) [300,1000]",
+            "y": "sudden-model.integrate(Q=0.1) → P(T)",
+            "line": { "color": "#e377c2", "width": 4 }
+          }
+        ],
+        "reproduce": "Fig. 14 from paper"
+      },
+      "dbandScatter": {
+        "type": "scatter",
+        "data": [
+          {
+            "surface": "Pd111",
+            "epsilon_d": -1.8,
+            "E_ads_CO": -1.42,
+            "color": "#1f77b4"
+          },
+          {
+            "surface": "Pd100",
+            "epsilon_d": -1.71,
+            "E_ads_CO": -1.35,
+            "color": "#ff7f0e"
+          }
+        ],
+        "trendline": "linear fit ε_d vs E_ads"
+      },
+      "pathwayNetwork": {
+        "type": "forceDirected",
+        "library": "D3.js forceSimulation or Cytoscape.js",
+        "nodes": [
+          { "id": "H2O", "group": "compound", "pagerank": 0.87 },
+          { "id": "glycolysis", "group": "pathway", "pagerank": 0.92 }
+        ],
+        "edges": [
+          { "source": "H2O", "target": "glycolysis", "weight": 0.65 }
+        ],
+        "nodeSize": "pagerank * scale",
+        "edgeWidth": "weight * scale"
+      }
+    },
+    "realTimeAnimations": {
+      "reactionSequence": {
+        "timeline": [
+          { "t": 0.0, "event": "reactants_appear", "ease": "power2.out" },
+          { "t": 0.5, "event": "hydrogen_bond_pulse", "effect": "PIXI.filters.GlowFilter" },
+          { "t": 1.2, "event": "ts_flash", "effect": "screenShake(5px, 0.1s)" },
+          { "t": 2.0, "event": "products_form", "effect": "particle_explosion" }
+        ],
+        "gsapTweens": {
+          "bondFormation": "scaleX(1.2) → scaleX(1.0)",
+          "energyRelease": "sprite.alpha → 0 + particles"
+        }
+      },
+      "riskEvolution": {
+        "animate": "bayesian-risk.score → arc sweep",
+        "confidence": "shaded region CI_low → CI_high"
+      }
+    },
+    "interactiveControls": {
+      "temperatureSlider": {
+        "min": 300,
+        "max": 1000,
+        "step": 25,
+        "liveUpdate": "suddenModelPlot.recompute(T)",
+        "callback": "microkinetics.simulate(T)"
+      },
+      "pressureSliders": {
+        "P_CO": { "min": 0, "max": 1, "step": 0.05 },
+        "P_O2": { "min": 0, "max": 1, "step": 0.05 }
+      },
+      "facetSelector": ["Pd111", "Pd100", "Ti-doped"],
+      "tierToggle": ["basic", "complex"]
+    },
+    "hardwareAdaptiveRendering": {
+      "detection": {
+        "cores": "navigator.hardwareConcurrency",
+        "gpu": "WebGLRenderingContext",
+        "memory": "navigator.deviceMemory"
+      },
+      "rules": [
+        {
+          "condition": "cores < 4 || !gpu",
+          "action": "forceBasicTier; disableThreeJS; useChartJS"
+        },
+        {
+          "condition": "cores >= 8 && gpu",
+          "action": "enableComplexTier; preloadWebM; useParticleContainers"
+        }
+      ]
+    },
+    "themeIntegration": {
+      "vscodeVariables": [
+        "--vscode-editor-background → pixi.renderer.backgroundColor",
+        "--vscode-foreground → textLabels",
+        "--vscode-charts-blue → bonds",
+        "--vscode-textLink-foreground → pathways"
+      ],
+      "darkMode": {
+        "particleColors": ["#4a90e2", "#7ed321", "#f5a623"],
+        "gaugeBackground": "#2d3748"
+      },
+      "lightMode": {
+        "particleColors": ["#3182ce", "#38a169", "#ed8936"],
+        "gaugeBackground": "#f7fafc"
+      }
+    },
+    "scientificAccuracyVisuals": {
+      "energyLevels": {
+        "scale": "1 pixel = 0.1 eV",
+        "colors": {
+          "reactants": "#2ca02c",
+          "TS": "#d62728",
+          "products": "#1f77b4",
+          "barriers": "#ff7f0e"
+        }
+      },
+      "coveragePlots": {
+        "θ_scale": "0-1",
+        "TOF_scale": "log10(s⁻¹)",
+        "validationOverlay": "literature data as dashed lines"
+      },
+      "dbandCorrelation": {
+        "x": "ε_d (eV)",
+        "y": "E_ads (eV)",
+        "r²": "display linear fit coefficient"
+      }
+    },
+    "performanceMetrics": {
+      "frameBudget": "16ms (60fps)",
+      "wasmLoad": "WebAssembly.instantiateStreaming → <500ms",
+      "rdkitSMILES": "10-30ms per molecule",
+      "microkineticsODE": "RK4 step <1ms; full sim 10s → 500ms",
+      "webMLoad": "preload + cache → 2nd play instant"
+    }
+  }
+}
