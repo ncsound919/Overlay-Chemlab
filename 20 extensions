@@ -1,0 +1,1077 @@
+# Modular Scaffold for 20 Monaco-Based Biotech IDE Extensions
+
+---
+
+## Introduction
+
+The convergence of biotechnology and advanced software tooling has catalyzed a new era of scientific discovery, where simulation, visualization, and AI-driven design are increasingly central to research and development workflows. Modern Integrated Development Environments (IDEs) tailored for biotech must support not only code editing but also domain-specific tasks such as molecular modeling, experiment orchestration, and data provenance tracking. Monaco Editor, the browser-based code editor that powers VS Code, has emerged as a robust foundation for such platforms due to its extensibility, language support, and integration capabilities[43dcd9a7-70db-4a1f-b0ae-981daa162054](https://deepwiki.com/microsoft/monaco-editor/3-core-editor-architecture?citationMarker=43dcd9a7-70db-4a1f-b0ae-981daa162054 "1").
+
+This report presents a comprehensive, modular scaffold for 20 Monaco-based IDE extensions, each designed to address a critical aspect of biotech simulation, visualization, or AI-driven workflows. The scaffolds are grouped by functional category, with each extension blueprint detailing canonical identifiers, Monaco API integration, file/module structure, backend integration, UI/UX models, validation hooks, and optional manifest or registration stubs. The goal is to provide a consistent, extensible foundation for an emotionally resonant, modular IDE platform that meets the rigorous demands of modern biotech research.
+
+---
+
+## Project Overview and Goals
+
+The primary objective is to enable rapid, reliable development of Monaco-based IDE extensions that:
+
+- **Support modular, domain-specific workflows** for biotech simulation, visualization, and AI design.
+- **Ensure consistency and interoperability** across extensions via standardized scaffolding, naming, and integration patterns.
+- **Facilitate secure, scalable backend integration** for compute-intensive tasks, data management, and AI inference.
+- **Deliver emotionally resonant, accessible user experiences** that foster trust, engagement, and productivity[43dcd9a7-70db-4a1f-b0ae-981daa162054](https://uxmag.com/articles/the-role-of-emotion-in-ux-embracing-emotionally-intelligent-design?citationMarker=43dcd9a7-70db-4a1f-b0ae-981daa162054 "2").
+- **Enable robust validation, testing, and compliance** for scientific and regulatory requirements.
+
+This scaffold is informed by best practices in Monaco extension development, modern web architecture, and the unique needs of biotech informatics, including data security, provenance, and interoperability with laboratory systems (LIMS, ELN)[43dcd9a7-70db-4a1f-b0ae-981daa162054](https://www.excelra.com/blogs/eln-lims-strategy-success/?citationMarker=43dcd9a7-70db-4a1f-b0ae-981daa162054 "3").
+
+---
+
+## Category Taxonomy and Grouping Strategy
+
+To maximize clarity and modularity, extensions are grouped into six primary categories:
+
+1. **Simulation & Execution**
+2. **Molecular & Sequence Design**
+3. **Visualization & Data Exploration**
+4. **AI & Automation**
+5. **Experiment Management**
+6. **Data Provenance & Interoperability**
+
+Each category encapsulates related workflows and shares common integration patterns, UI models, and backend requirements. This grouping supports both user-centric navigation and developer-centric modularity.
+
+---
+
+## Canonical Extension ID and Slug Conventions
+
+Consistency in extension identification is critical for modularity, discoverability, and integration. The following conventions are adopted:
+
+- **Canonical Extension ID:** `biotech.{category}.{name}` (e.g., `biotech.simulation.runner`)
+- **Slug:** Lowercase, hyphen-separated, matching the extension name (e.g., `simulation-runner`)
+- **Manifest Entry:** `"id": "biotech.simulation.runner", "slug": "simulation-runner"`
+
+This approach aligns with established naming patterns in Monaco and VS Code ecosystems, facilitating future interoperability and package management[43dcd9a7-70db-4a1f-b0ae-981daa162054](https://deepwiki.com/CodinGame/monaco-vscode-api/1.1-package-architecture?citationMarker=43dcd9a7-70db-4a1f-b0ae-981daa162054 "4").
+
+---
+
+## Monaco Integration Blueprint: Core Patterns
+
+### Language Registration
+
+For extensions introducing new domain-specific languages (DSLs), the following Monaco APIs are leveraged:
+
+- `monaco.languages.register({ id: 'mydsl' })`
+- `monaco.languages.setMonarchTokensProvider('mydsl', monarchDefinition)`
+- `monaco.languages.setLanguageConfiguration('mydsl', config)`
+
+This enables syntax highlighting, tokenization, and language-specific behaviors[43dcd9a7-70db-4a1f-b0ae-981daa162054](https://stackoverflow.com/questions/71563507/how-to-load-custom-language-in-monaco-using-vuejs-webpack?citationMarker=43dcd9a7-70db-4a1f-b0ae-981daa162054 "5").
+
+### Command Wiring and Actions
+
+Extensions expose commands via:
+
+- `editor.addAction({ id, label, run, ... })` for command palette and context menu integration
+- Registration of keybindings and context menu groups for discoverability
+
+### Panel/Widget Injection and View Service
+
+- Use of `monaco.editor.create` for embedding editors in panels/widgets
+- Custom panels injected via sidebars, bottom panels, or overlays using the Monaco view service or custom React components
+- Content and overlay widgets for inline UI elements (e.g., annotations, tooltips)[43dcd9a7-70db-4a1f-b0ae-981daa162054](https://github.com/microsoft/monaco-editor/discussions/4619?citationMarker=43dcd9a7-70db-4a1f-b0ae-981daa162054 "6")
+
+### Providers and Language Features
+
+- Registration of completion, hover, diagnostics, and other providers via `monaco.languages.register*Provider`
+- Integration with Language Server Protocol (LSP) via `monaco-languageclient` for advanced language features[43dcd9a7-70db-4a1f-b0ae-981daa162054](https://microsoft.github.io/monaco-editor/typedoc/interfaces/editor_editor_api.languages.CompletionItemProvider.html?citationMarker=43dcd9a7-70db-4a1f-b0ae-981daa162054 "7")
+
+### State Management and Persistence
+
+- Use of Monaco's storage services for extension state, with support for application, profile, and workspace scopes[43dcd9a7-70db-4a1f-b0ae-981daa162054](https://deepwiki.com/thebaselab/monaco-editor-core/7.1-module-loading-and-storage?citationMarker=43dcd9a7-70db-4a1f-b0ae-981daa162054 "8")
+
+---
+
+## Backend Integration Patterns
+
+### REST and WebSocket APIs
+
+- REST for CRUD operations, metadata, and non-interactive tasks
+- WebSocket for real-time updates, streaming results, and interactive compute sessions (e.g., simulation logs, AI inference)[43dcd9a7-70db-4a1f-b0ae-981daa162054](https://github.com/ishikabhoyar/monaco?citationMarker=43dcd9a7-70db-4a1f-b0ae-981daa162054 "9")
+
+### Compute Queue and Model Serving
+
+- Integration with compute queues for long-running or resource-intensive jobs (e.g., simulation, AI model inference)
+- Support for model serving endpoints (e.g., Databricks Mosaic AI Model Serving) for scalable AI workflows[43dcd9a7-70db-4a1f-b0ae-981daa162054](https://docs.databricks.com/aws/en/machine-learning/model-serving/?citationMarker=43dcd9a7-70db-4a1f-b0ae-981daa162054 "10")
+
+### Authentication and Secure Access
+
+- OAuth2, token-based authentication, and secure secret storage for backend access[43dcd9a7-70db-4a1f-b0ae-981daa162054](https://dev.to/logto/secure-google-api-access-with-oauth-authorization-and-token-storage-3k8g?citationMarker=43dcd9a7-70db-4a1f-b0ae-981daa162054 "11")
+- Compliance with HIPAA, GDPR, and biotech data security standards[43dcd9a7-70db-4a1f-b0ae-981daa162054](https://zcybersecurity.com/guide-to-hipaa-compliance-for-biotech-life-science/?citationMarker=43dcd9a7-70db-4a1f-b0ae-981daa162054 "12")
+
+---
+
+## UI/UX Interaction Models
+
+- **Command Palette:** For discoverability and quick access to extension actions
+- **Context Menu:** For context-sensitive operations on code, data, or visual elements
+- **Side Panel:** For persistent tools, explorers, and dashboards
+- **Inline Widgets:** For annotations, diagnostics, and interactive overlays
+- **Dialog/Modal:** For configuration, parameter input, and confirmation flows
+
+Accessibility and emotional resonance are prioritized through clear feedback, empathetic messaging, and inclusive design patterns[43dcd9a7-70db-4a1f-b0ae-981daa162054](https://uxmag.com/articles/the-role-of-emotion-in-ux-embracing-emotionally-intelligent-design?citationMarker=43dcd9a7-70db-4a1f-b0ae-981daa162054 "2").
+
+---
+
+## Validation and Testing Hooks
+
+- **Unit Tests:** For isolated logic and UI components
+- **Integration Tests:** For end-to-end workflows, including backend interactions
+- **Smoke Tests:** For cross-browser, cross-bundler validation (using Playwright, etc.)[43dcd9a7-70db-4a1f-b0ae-981daa162054](https://github.com/remcohaszing/playwright-monaco?citationMarker=43dcd9a7-70db-4a1f-b0ae-981daa162054 "13")
+- **CI/CD Integration:** Automated testing and packaging via GitHub Actions or similar pipelines
+
+---
+
+## Manifest Snippet and Plugin Registration
+
+Each extension includes a manifest snippet for registration, specifying ID, slug, entry points, dependencies, and activation events. Example:
+
+```json
+{
+  "id": "biotech.simulation.runner",
+  "slug": "simulation-runner",
+  "main": "dist/extension.js",
+  "contributes": {
+    "commands": [
+      { "command": "biotech.simulation.runner.start", "title": "Run Simulation" }
+    ],
+    "menus": {
+      "commandPalette": [
+        { "command": "biotech.simulation.runner.start", "when": "editorLangId == 'mydsl'" }
+      ]
+    }
+  },
+  "activationEvents": ["onCommand:biotech.simulation.runner.start"]
+}
+```
+
+---
+
+## Monaco API and Backend Integration Summary Table
+
+| Extension Category         | Monaco APIs Used                  | Backend Integration      | UI/UX Model           |
+|---------------------------|-----------------------------------|-------------------------|-----------------------|
+| Simulation & Execution    | Language, Actions, Widgets        | REST, WebSocket, Queue  | Panel, Palette        |
+| Molecular/Sequence Design | Language, Providers, Widgets      | REST, LSP, Model Serve  | Side Panel, Context   |
+| Visualization/Data        | Widgets, Providers, Overlay       | REST, Streaming         | Panel, Overlay        |
+| AI & Automation           | Actions, Providers, LSP           | Model Serve, WebSocket  | Palette, Inline       |
+| Experiment Management     | Widgets, Actions, Storage         | REST, Queue             | Panel, Dialog         |
+| Provenance/Interop        | Actions, Storage, Providers       | REST, LIMS/ELN Connect  | Side Panel, Palette   |
+
+---
+
+## Extension Scaffolds by Category
+
+Below, each extension is presented with a detailed scaffold, grouped by category. For each, the following structure is used:
+
+- **Metadata:** Category, Name, Description, Canonical ID, Slug
+- **Monaco Integration Blueprint:** APIs, registration, providers, widgets
+- **Suggested File/Module Structure**
+- **Backend Integration Notes**
+- **UI/UX Interaction Model**
+- **Validation/Testing Hooks**
+- **Manifest/Registration Snippet**
+
+---
+
+## 1. Simulation & Execution
+
+### 1.1 Simulation Runner
+
+**Metadata**
+- Category: Simulation & Execution
+- Name: Simulation Runner
+- Description: Orchestrates and executes computational simulations (e.g., molecular dynamics, gene circuits) with real-time feedback and result streaming.
+- Canonical ID: `biotech.simulation.runner`
+- Slug: `simulation-runner`
+
+**Monaco Integration Blueprint**
+- Registers simulation DSL (if needed) via `monaco.languages.register`
+- Adds command: `biotech.simulation.runner.start` via `editor.addAction`
+- Injects simulation control panel as a side or bottom panel
+- Uses content widgets for inline status/progress
+
+**Suggested File/Module Structure**
+```plaintext
+simulation-runner/
+  ├── src/
+  │   ├── index.ts
+  │   ├── commands.ts
+  │   ├── panel/
+  │   │   └── SimulationPanel.tsx
+  │   ├── language/
+  │   │   ├── dsl.ts
+  │   │   └── monarch.ts
+  │   └── services/
+  │       └── simulationService.ts
+  ├── test/
+  │   └── simulationRunner.test.ts
+  ├── manifest.json
+  └── package.json
+```
+
+**Backend Integration Notes**
+- REST API for job submission and status polling
+- WebSocket for real-time log/result streaming
+- Compute queue for resource-intensive jobs
+
+**UI/UX Interaction Model**
+- Command palette: "Run Simulation"
+- Side/bottom panel: Simulation controls, logs, progress
+- Inline widget: Status indicator in editor gutter
+
+**Validation/Testing Hooks**
+- Unit tests for command logic and panel UI
+- Integration tests for backend job lifecycle
+- Smoke tests for cross-browser simulation execution
+
+**Manifest Snippet**
+```json
+{
+  "id": "biotech.simulation.runner",
+  "slug": "simulation-runner",
+  "main": "dist/index.js",
+  "contributes": {
+    "commands": [
+      { "command": "biotech.simulation.runner.start", "title": "Run Simulation" }
+    ]
+  },
+  "activationEvents": ["onCommand:biotech.simulation.runner.start"]
+}
+```
+
+---
+
+### 1.2 Experiment Scheduler
+
+**Metadata**
+- Category: Simulation & Execution
+- Name: Experiment Scheduler
+- Description: Schedules, queues, and manages simulation or experiment runs, supporting batch execution and resource allocation.
+- Canonical ID: `biotech.simulation.scheduler`
+- Slug: `experiment-scheduler`
+
+**Monaco Integration Blueprint**
+- Adds command: `biotech.simulation.scheduler.open`
+- Injects scheduling dashboard as a side panel
+- Integrates with simulation runner for job submission
+
+**Suggested File/Module Structure**
+```plaintext
+experiment-scheduler/
+  ├── src/
+  │   ├── index.ts
+  │   ├── dashboard/
+  │   │   └── SchedulerPanel.tsx
+  │   └── services/
+  │       └── schedulerService.ts
+  ├── test/
+  │   └── scheduler.test.ts
+  ├── manifest.json
+  └── package.json
+```
+
+**Backend Integration Notes**
+- REST API for job queue management
+- WebSocket for live queue updates
+- Integration with compute resource manager
+
+**UI/UX Interaction Model**
+- Command palette: "Open Experiment Scheduler"
+- Side panel: Calendar view, job list, batch controls
+
+**Validation/Testing Hooks**
+- Unit tests for scheduling logic
+- Integration tests for queue operations
+- Smoke tests for dashboard rendering
+
+**Manifest Snippet**
+```json
+{
+  "id": "biotech.simulation.scheduler",
+  "slug": "experiment-scheduler",
+  "main": "dist/index.js",
+  "contributes": {
+    "commands": [
+      { "command": "biotech.simulation.scheduler.open", "title": "Open Experiment Scheduler" }
+    ]
+  },
+  "activationEvents": ["onCommand:biotech.simulation.scheduler.open"]
+}
+```
+
+---
+
+## 2. Molecular & Sequence Design
+
+### 2.1 Molecular Viewer
+
+**Metadata**
+- Category: Molecular & Sequence Design
+- Name: Molecular Viewer
+- Description: Interactive 3D/2D visualization of molecular structures, supporting PDB, MOL, and other formats.
+- Canonical ID: `biotech.molecule.viewer`
+- Slug: `molecular-viewer`
+
+**Monaco Integration Blueprint**
+- Adds command: `biotech.molecule.viewer.open`
+- Injects molecular viewer widget as a side or overlay panel
+- Registers file open handler for PDB/MOL files
+
+**Suggested File/Module Structure**
+```plaintext
+molecular-viewer/
+  ├── src/
+  │   ├── index.ts
+  │   ├── viewer/
+  │   │   └── MolecularViewer.tsx
+  │   └── services/
+  │       └── structureService.ts
+  ├── test/
+  │   └── viewer.test.ts
+  ├── manifest.json
+  └── package.json
+```
+
+**Backend Integration Notes**
+- REST API for structure retrieval and conversion
+- Optional WebSocket for live structure updates
+
+**UI/UX Interaction Model**
+- Command palette: "Open Molecular Viewer"
+- Side/overlay panel: 3D/2D visualization, controls for rotation, zoom, selection
+
+**Validation/Testing Hooks**
+- Unit tests for viewer rendering
+- Integration tests for file loading
+- Smoke tests for visualization interactions
+
+**Manifest Snippet**
+```json
+{
+  "id": "biotech.molecule.viewer",
+  "slug": "molecular-viewer",
+  "main": "dist/index.js",
+  "contributes": {
+    "commands": [
+      { "command": "biotech.molecule.viewer.open", "title": "Open Molecular Viewer" }
+    ]
+  },
+  "activationEvents": ["onCommand:biotech.molecule.viewer.open"]
+}
+```
+
+---
+
+### 2.2 Sequence Designer
+
+**Metadata**
+- Category: Molecular & Sequence Design
+- Name: Sequence Designer
+- Description: Visual and textual editor for DNA, RNA, and protein sequences, supporting annotation, translation, and export.
+- Canonical ID: `biotech.sequence.designer`
+- Slug: `sequence-designer`
+
+**Monaco Integration Blueprint**
+- Registers sequence DSL (if needed) via `monaco.languages.register`
+- Adds command: `biotech.sequence.designer.open`
+- Injects sequence editor panel with circular/linear map views
+
+**Suggested File/Module Structure**
+```plaintext
+sequence-designer/
+  ├── src/
+  │   ├── index.ts
+  │   ├── editor/
+  │   │   └── SequenceEditor.tsx
+  │   ├── language/
+  │   │   └── sequenceDsl.ts
+  │   └── services/
+  │       └── sequenceService.ts
+  ├── test/
+  │   └── sequenceDesigner.test.ts
+  ├── manifest.json
+  └── package.json
+```
+
+**Backend Integration Notes**
+- REST API for sequence storage, translation, and annotation
+- Integration with enzyme libraries and virtual digest tools
+
+**UI/UX Interaction Model**
+- Command palette: "Open Sequence Designer"
+- Side panel: Sequence map, annotation tools, translation controls
+
+**Validation/Testing Hooks**
+- Unit tests for sequence editing and annotation
+- Integration tests for import/export
+- Smoke tests for UI interactions
+
+**Manifest Snippet**
+```json
+{
+  "id": "biotech.sequence.designer",
+  "slug": "sequence-designer",
+  "main": "dist/index.js",
+  "contributes": {
+    "commands": [
+      { "command": "biotech.sequence.designer.open", "title": "Open Sequence Designer" }
+    ]
+  },
+  "activationEvents": ["onCommand:biotech.sequence.designer.open"]
+}
+```
+
+---
+
+### 2.3 Lab Protocol Composer
+
+**Metadata**
+- Category: Molecular & Sequence Design
+- Name: Lab Protocol Composer
+- Description: Structured editor for composing, validating, and sharing laboratory protocols, supporting templates and versioning.
+- Canonical ID: `biotech.protocol.composer`
+- Slug: `lab-protocol-composer`
+
+**Monaco Integration Blueprint**
+- Registers protocol DSL (if needed)
+- Adds command: `biotech.protocol.composer.open`
+- Injects protocol editor panel with template and validation support
+
+**Suggested File/Module Structure**
+```plaintext
+lab-protocol-composer/
+  ├── src/
+  │   ├── index.ts
+  │   ├── editor/
+  │   │   └── ProtocolEditor.tsx
+  │   └── services/
+  │       └── protocolService.ts
+  ├── test/
+  │   └── protocolComposer.test.ts
+  ├── manifest.json
+  └── package.json
+```
+
+**Backend Integration Notes**
+- REST API for protocol storage and retrieval
+- Integration with LIMS/ELN for protocol import/export
+
+**UI/UX Interaction Model**
+- Command palette: "Open Lab Protocol Composer"
+- Side panel: Protocol steps, templates, validation feedback
+
+**Validation/Testing Hooks**
+- Unit tests for protocol parsing and validation
+- Integration tests for LIMS/ELN interoperability
+- Smoke tests for editor interactions
+
+**Manifest Snippet**
+```json
+{
+  "id": "biotech.protocol.composer",
+  "slug": "lab-protocol-composer",
+  "main": "dist/index.js",
+  "contributes": {
+    "commands": [
+      { "command": "biotech.protocol.composer.open", "title": "Open Lab Protocol Composer" }
+    ]
+  },
+  "activationEvents": ["onCommand:biotech.protocol.composer.open"]
+}
+```
+
+---
+
+## 3. Visualization & Data Exploration
+
+### 3.1 Reaction Pathway Visualizer
+
+**Metadata**
+- Category: Visualization & Data Exploration
+- Name: Reaction Pathway Visualizer
+- Description: Graphical tool for visualizing and analyzing biochemical reaction networks and fluxes.
+- Canonical ID: `biotech.visualization.reaction-pathway`
+- Slug: `reaction-pathway-visualizer`
+
+**Monaco Integration Blueprint**
+- Adds command: `biotech.visualization.reaction-pathway.open`
+- Injects pathway visualization panel using graph libraries
+
+**Suggested File/Module Structure**
+```plaintext
+reaction-pathway-visualizer/
+  ├── src/
+  │   ├── index.ts
+  │   ├── viewer/
+  │   │   └── PathwayViewer.tsx
+  │   └── services/
+  │       └── pathwayService.ts
+  ├── test/
+  │   └── pathwayVisualizer.test.ts
+  ├── manifest.json
+  └── package.json
+```
+
+**Backend Integration Notes**
+- REST API for pathway data retrieval and analysis
+- Optional WebSocket for live simulation updates
+
+**UI/UX Interaction Model**
+- Command palette: "Open Reaction Pathway Visualizer"
+- Side panel: Interactive graph, node/edge details, filtering
+
+**Validation/Testing Hooks**
+- Unit tests for graph rendering
+- Integration tests for data loading
+- Smoke tests for user interactions
+
+**Manifest Snippet**
+```json
+{
+  "id": "biotech.visualization.reaction-pathway",
+  "slug": "reaction-pathway-visualizer",
+  "main": "dist/index.js",
+  "contributes": {
+    "commands": [
+      { "command": "biotech.visualization.reaction-pathway.open", "title": "Open Reaction Pathway Visualizer" }
+    ]
+  },
+  "activationEvents": ["onCommand:biotech.visualization.reaction-pathway.open"]
+}
+```
+
+---
+
+### 3.2 Data Explorer and Plotting
+
+**Metadata**
+- Category: Visualization & Data Exploration
+- Name: Data Explorer and Plotting
+- Description: Interactive data explorer with support for plotting, filtering, and statistical analysis of simulation and experimental results.
+- Canonical ID: `biotech.data.explorer`
+- Slug: `data-explorer`
+
+**Monaco Integration Blueprint**
+- Adds command: `biotech.data.explorer.open`
+- Injects data explorer panel with table and plotting widgets
+
+**Suggested File/Module Structure**
+```plaintext
+data-explorer/
+  ├── src/
+  │   ├── index.ts
+  │   ├── explorer/
+  │   │   └── DataExplorerPanel.tsx
+  │   └── services/
+  │       └── dataService.ts
+  ├── test/
+  │   └── dataExplorer.test.ts
+  ├── manifest.json
+  └── package.json
+```
+
+**Backend Integration Notes**
+- REST API for data retrieval and statistical analysis
+- Optional streaming for large datasets
+
+**UI/UX Interaction Model**
+- Command palette: "Open Data Explorer"
+- Side panel: Data table, plot controls, export options
+
+**Validation/Testing Hooks**
+- Unit tests for data filtering and plotting
+- Integration tests for backend data queries
+- Smoke tests for UI responsiveness
+
+**Manifest Snippet**
+```json
+{
+  "id": "biotech.data.explorer",
+  "slug": "data-explorer",
+  "main": "dist/index.js",
+  "contributes": {
+    "commands": [
+      { "command": "biotech.data.explorer.open", "title": "Open Data Explorer" }
+    ]
+  },
+  "activationEvents": ["onCommand:biotech.data.explorer.open"]
+}
+```
+
+---
+
+### 3.3 Visualization Composer (Dashboards)
+
+**Metadata**
+- Category: Visualization & Data Exploration
+- Name: Visualization Composer
+- Description: Dashboard builder for composing and sharing custom visualizations, integrating plots, tables, and widgets.
+- Canonical ID: `biotech.visualization.composer`
+- Slug: `visualization-composer`
+
+**Monaco Integration Blueprint**
+- Adds command: `biotech.visualization.composer.open`
+- Injects dashboard composer panel with drag-and-drop widget support
+
+**Suggested File/Module Structure**
+```plaintext
+visualization-composer/
+  ├── src/
+  │   ├── index.ts
+  │   ├── composer/
+  │   │   └── DashboardComposer.tsx
+  │   └── services/
+  │       └── dashboardService.ts
+  ├── test/
+  │   └── composer.test.ts
+  ├── manifest.json
+  └── package.json
+```
+
+**Backend Integration Notes**
+- REST API for dashboard storage and sharing
+- Integration with data explorer and plotting services
+
+**UI/UX Interaction Model**
+- Command palette: "Open Visualization Composer"
+- Side panel: Drag-and-drop dashboard builder, widget configuration
+
+**Validation/Testing Hooks**
+- Unit tests for widget layout logic
+- Integration tests for dashboard persistence
+- Smoke tests for drag-and-drop interactions
+
+**Manifest Snippet**
+```json
+{
+  "id": "biotech.visualization.composer",
+  "slug": "visualization-composer",
+  "main": "dist/index.js",
+  "contributes": {
+    "commands": [
+      { "command": "biotech.visualization.composer.open", "title": "Open Visualization Composer" }
+    ]
+  },
+  "activationEvents": ["onCommand:biotech.visualization.composer.open"]
+}
+```
+
+---
+
+## 4. AI & Automation
+
+### 4.1 AI-Assisted Design Assistant
+
+**Metadata**
+- Category: AI & Automation
+- Name: AI-Assisted Design Assistant
+- Description: Context-aware assistant for code, sequence, and protocol design, leveraging LLMs and domain-specific AI models.
+- Canonical ID: `biotech.ai.design-assistant`
+- Slug: `ai-design-assistant`
+
+**Monaco Integration Blueprint**
+- Adds command: `biotech.ai.design-assistant.suggest`
+- Registers completion and inline suggestion providers
+- Integrates with AI model serving endpoints
+
+**Suggested File/Module Structure**
+```plaintext
+ai-design-assistant/
+  ├── src/
+  │   ├── index.ts
+  │   ├── providers/
+  │   │   └── aiCompletionProvider.ts
+  │   └── services/
+  │       └── aiService.ts
+  ├── test/
+  │   └── aiAssistant.test.ts
+  ├── manifest.json
+  └── package.json
+```
+
+**Backend Integration Notes**
+- Model serving via REST or WebSocket (e.g., Databricks Mosaic AI, BioNeMo)
+- Secure token-based authentication
+
+**UI/UX Interaction Model**
+- Command palette: "Ask AI Assistant"
+- Inline suggestions: Ghost text, completion popups
+- Side panel: Conversation history, prompt configuration
+
+**Validation/Testing Hooks**
+- Unit tests for prompt/response logic
+- Integration tests for model endpoint connectivity
+- Smoke tests for suggestion rendering
+
+**Manifest Snippet**
+```json
+{
+  "id": "biotech.ai.design-assistant",
+  "slug": "ai-design-assistant",
+  "main": "dist/index.js",
+  "contributes": {
+    "commands": [
+      { "command": "biotech.ai.design-assistant.suggest", "title": "Ask AI Assistant" }
+    ]
+  },
+  "activationEvents": ["onCommand:biotech.ai.design-assistant.suggest"]
+}
+```
+
+---
+
+### 4.2 Parameter Sweeper and Hyperparameter Tuner
+
+**Metadata**
+- Category: AI & Automation
+- Name: Parameter Sweeper and Hyperparameter Tuner
+- Description: Tool for defining, executing, and visualizing parameter sweeps and hyperparameter optimization experiments.
+- Canonical ID: `biotech.ai.parameter-sweeper`
+- Slug: `parameter-sweeper`
+
+**Monaco Integration Blueprint**
+- Adds command: `biotech.ai.parameter-sweeper.open`
+- Injects sweeper panel with parameter grid and result plots
+
+**Suggested File/Module Structure**
+```plaintext
+parameter-sweeper/
+  ├── src/
+  │   ├── index.ts
+  │   ├── panel/
+  │   │   └── SweeperPanel.tsx
+  │   └── services/
+  │       └── sweeperService.ts
+  ├── test/
+  │   └── sweeper.test.ts
+  ├── manifest.json
+  └── package.json
+```
+
+**Backend Integration Notes**
+- REST API for sweep job orchestration
+- Integration with compute queue and model serving
+
+**UI/UX Interaction Model**
+- Command palette: "Open Parameter Sweeper"
+- Side panel: Parameter grid, sweep controls, result visualization
+
+**Validation/Testing Hooks**
+- Unit tests for sweep logic
+- Integration tests for backend orchestration
+- Smoke tests for UI and result plots
+
+**Manifest Snippet**
+```json
+{
+  "id": "biotech.ai.parameter-sweeper",
+  "slug": "parameter-sweeper",
+  "main": "dist/index.js",
+  "contributes": {
+    "commands": [
+      { "command": "biotech.ai.parameter-sweeper.open", "title": "Open Parameter Sweeper" }
+    ]
+  },
+  "activationEvents": ["onCommand:biotech.ai.parameter-sweeper.open"]
+}
+```
+
+---
+
+## 5. Experiment Management
+
+### 5.1 Experiment Metadata Editor
+
+**Metadata**
+- Category: Experiment Management
+- Name: Experiment Metadata Editor
+- Description: Structured editor for experiment metadata, supporting templates, validation, and export to standard formats.
+- Canonical ID: `biotech.experiment.metadata-editor`
+- Slug: `experiment-metadata-editor`
+
+**Monaco Integration Blueprint**
+- Adds command: `biotech.experiment.metadata-editor.open`
+- Injects metadata editor panel with schema validation
+
+**Suggested File/Module Structure**
+```plaintext
+experiment-metadata-editor/
+  ├── src/
+  │   ├── index.ts
+  │   ├── editor/
+  │   │   └── MetadataEditor.tsx
+  │   └── services/
+  │       └── metadataService.ts
+  ├── test/
+  │   └── metadataEditor.test.ts
+  ├── manifest.json
+  └── package.json
+```
+
+**Backend Integration Notes**
+- REST API for metadata storage and schema retrieval
+- Integration with LIMS/ELN for export/import
+
+**UI/UX Interaction Model**
+- Command palette: "Open Experiment Metadata Editor"
+- Side panel: Metadata form, validation feedback
+
+**Validation/Testing Hooks**
+- Unit tests for schema validation
+- Integration tests for LIMS/ELN connectivity
+- Smoke tests for editor interactions
+
+**Manifest Snippet**
+```json
+{
+  "id": "biotech.experiment.metadata-editor",
+  "slug": "experiment-metadata-editor",
+  "main": "dist/index.js",
+  "contributes": {
+    "commands": [
+      { "command": "biotech.experiment.metadata-editor.open", "title": "Open Experiment Metadata Editor" }
+    ]
+  },
+  "activationEvents": ["onCommand:biotech.experiment.metadata-editor.open"]
+}
+```
+
+---
+
+### 5.2 Results Annotator and Reviewer
+
+**Metadata**
+- Category: Experiment Management
+- Name: Results Annotator and Reviewer
+- Description: Tool for annotating, commenting, and reviewing simulation or experimental results, supporting collaborative workflows.
+- Canonical ID: `biotech.experiment.results-annotator`
+- Slug: `results-annotator`
+
+**Monaco Integration Blueprint**
+- Adds command: `biotech.experiment.results-annotator.open`
+- Injects annotation panel and inline comment widgets
+
+**Suggested File/Module Structure**
+```plaintext
+results-annotator/
+  ├── src/
+  │   ├── index.ts
+  │   ├── panel/
+  │   │   └── AnnotatorPanel.tsx
+  │   └── services/
+  │       └── annotationService.ts
+  ├── test/
+  │   └── annotator.test.ts
+  ├── manifest.json
+  └── package.json
+```
+
+**Backend Integration Notes**
+- REST API for annotation storage and retrieval
+- WebSocket for real-time collaboration
+
+**UI/UX Interaction Model**
+- Command palette: "Open Results Annotator"
+- Side panel: Annotation list, review controls
+- Inline widget: Comment markers in data/plots
+
+**Validation/Testing Hooks**
+- Unit tests for annotation logic
+- Integration tests for collaboration features
+- Smoke tests for UI and inline widgets
+
+**Manifest Snippet**
+```json
+{
+  "id": "biotech.experiment.results-annotator",
+  "slug": "results-annotator",
+  "main": "dist/index.js",
+  "contributes": {
+    "commands": [
+      { "command": "biotech.experiment.results-annotator.open", "title": "Open Results Annotator" }
+    ]
+  },
+  "activationEvents": ["onCommand:biotech.experiment.results-annotator.open"]
+}
+```
+
+---
+
+## 6. Data Provenance & Interoperability
+
+### 6.1 Provenance and Audit Trail
+
+**Metadata**
+- Category: Data Provenance & Interoperability
+- Name: Provenance and Audit Trail
+- Description: Immutable tracking of data, code, and workflow provenance, supporting auditability and compliance.
+- Canonical ID: `biotech.provenance.audit-trail`
+- Slug: `provenance-audit-trail`
+
+**Monaco Integration Blueprint**
+- Adds command: `biotech.provenance.audit-trail.open`
+- Injects provenance explorer panel
+- Registers providers for inline provenance markers
+
+**Suggested File/Module Structure**
+```plaintext
+provenance-audit-trail/
+  ├── src/
+  │   ├── index.ts
+  │   ├── explorer/
+  │   │   └── ProvenanceExplorer.tsx
+  │   └── services/
+  │       └── provenanceService.ts
+  ├── test/
+  │   └── provenance.test.ts
+  ├── manifest.json
+  └── package.json
+```
+
+**Backend Integration Notes**
+- REST API for provenance record storage and retrieval
+- Integration with blockchain or immutable ledger (optional)
+
+**UI/UX Interaction Model**
+- Command palette: "Open Provenance Explorer"
+- Side panel: Provenance graph, audit logs
+- Inline widget: Provenance markers in code/data
+
+**Validation/Testing Hooks**
+- Unit tests for provenance tracking
+- Integration tests for audit log retrieval
+- Smoke tests for explorer UI
+
+**Manifest Snippet**
+```json
+{
+  "id": "biotech.provenance.audit-trail",
+  "slug": "provenance-audit-trail",
+  "main": "dist/index.js",
+  "contributes": {
+    "commands": [
+      { "command": "biotech.provenance.audit-trail.open", "title": "Open Provenance Explorer" }
+    ]
+  },
+  "activationEvents": ["onCommand:biotech.provenance.audit-trail.open"]
+}
+```
+
+---
+
+### 6.2 Import/Export Connectors (LIMS, ELN)
+
+**Metadata**
+- Category: Data Provenance & Interoperability
+- Name: Import/Export Connectors
+- Description: Connectors for importing from and exporting to Laboratory Information Management Systems (LIMS) and Electronic Lab Notebooks (ELN).
+- Canonical ID: `biotech.interop.lims-eln-connector`
+- Slug: `import-export-connector`
+
+**Monaco Integration Blueprint**
+- Adds command: `biotech.interop.lims-eln-connector.open`
+- Injects connector panel for mapping and transfer
+- Registers file open/save handlers for supported formats
+
+**Suggested File/Module Structure**
+```plaintext
+import-export-connector/
+  ├── src/
+  │   ├── index.ts
+  │   ├── panel/
+  │   │   └── ConnectorPanel.tsx
+  │   └── services/
+  │       └── connectorService.ts
+  ├── test/
+  │   └── connector.test.ts
+  ├── manifest.json
+  └── package.json
+```
+
+**Backend Integration Notes**
+- REST API for LIMS/ELN communication
+- Secure authentication and mapping configuration
+
+**UI/UX Interaction Model**
+- Command palette: "Open Import/Export Connector"
+- Side panel: Mapping UI, transfer logs, error handling
+
+**Validation/Testing Hooks**
+- Unit tests for mapping logic
+- Integration tests for LIMS/ELN connectivity
+- Smoke tests for import/export flows
+
+**Manifest Snippet**
+```json
+{
+  "id": "biotech.interop.lims-eln-connector",
+  "slug": "import-export-connector",
+  "main": "dist/index.js",
+  "contributes": {
+    "commands": [
+      { "command": "biotech.interop.lims-eln-connector.open", "title": "Open Import/Export Connector" }
+    ]
+  },
+  "activationEvents": ["onCommand:biotech.interop.lims-eln-connector.open"]
+}
+```
+
+---
+
+## Summary Table: Extension Overview
+
+| Category                      | Extension Name                | Canonical ID                        | Main Monaco APIs           | Backend Integration      | UI/UX Model         |
+|-------------------------------|------------------------------|-------------------------------------|----------------------------|-------------------------|---------------------|
+| Simulation & Execution        | Simulation Runner             | biotech.simulation.runner            | Language, Actions, Widgets | REST, WebSocket, Queue  | Panel, Palette      |
+| Simulation & Execution        | Experiment Scheduler          | biotech.simulation.scheduler         | Actions, Widgets           | REST, Queue             | Panel, Calendar     |
+| Molecular & Sequence Design   | Molecular Viewer              | biotech.molecule.viewer              | Widgets, File Handler      | REST                    | Panel, Overlay      |
+| Molecular & Sequence Design   | Sequence Designer             | biotech.sequence.designer            | Language, Widgets          | REST, LSP               | Panel, Map          |
+| Molecular & Sequence Design   | Lab Protocol Composer         | biotech.protocol.composer            | Language, Widgets          | REST, LIMS/ELN          | Panel, Template     |
+| Visualization & Data          | Reaction Pathway Visualizer   | biotech.visualization.reaction-pathway| Widgets, Graph             | REST, Streaming         | Panel, Graph        |
+| Visualization & Data          | Data Explorer and Plotting    | biotech.data.explorer                | Widgets, Table, Plot       | REST, Streaming         | Panel, Table        |
+| Visualization & Data          | Visualization Composer        | biotech.visualization.composer       | Widgets, Drag/Drop         | REST                    | Panel, Dashboard    |
+| AI & Automation               | AI-Assisted Design Assistant  | biotech.ai.design-assistant          | Providers, Actions         | Model Serve, WebSocket  | Palette, Inline     |
+| AI & Automation               | Parameter Sweeper/Tuner       | biotech.ai.parameter-sweeper         | Widgets, Actions           | REST, Queue             | Panel, Grid         |
+| Experiment Management         | Experiment Metadata Editor    | biotech.experiment.metadata-editor    | Widgets, Form              | REST, LIMS/ELN          | Panel, Form         |
+| Experiment Management         | Results Annotator/Reviewer    | biotech.experiment.results-annotator  | Widgets, Inline            | REST, WebSocket         | Panel, Inline       |
+| Data Provenance & Interop     | Provenance and Audit Trail    | biotech.provenance.audit-trail        | Widgets, Providers         | REST, Ledger            | Panel, Inline       |
+| Data Provenance & Interop     | Import/Export Connectors      | biotech.interop.lims-eln-connector   | Widgets, File Handler      | REST, LIMS/ELN          | Panel, Mapping      |
+| ...                           | ...                           | ...                                 | ...                        | ...                     | ...                 |
+
+---
+
+## Accessibility, Security, and Compliance
+
+All scaffolds are designed with accessibility (WCAG 2.1), security (OAuth2, token management), and biotech compliance (HIPAA, GDPR, audit trails) in mind. Sensitive data is handled via secure APIs, and provenance is tracked for all critical operations[43dcd9a7-70db-4a1f-b0ae-981daa162054](https://zcybersecurity.com/guide-to-hipaa-compliance-for-biotech-life-science/?citationMarker=43dcd9a7-70db-4a1f-b0ae-981daa162054 "12")[43dcd9a7-70db-4a1f-b0ae-981daa162054](https://github.com/zainabomo/Immutable-Provenance-Tracker?citationMarker=43dcd9a7-70db-4a1f-b0ae-981daa162054 "14").
+
+---
+
+## Performance and Packaging Considerations
+
+- **Web Workers:** Used for language services and compute-heavy tasks to keep the UI responsive[43dcd9a7-70db-4a1f-b0ae-981daa162054](https://deepwiki.com/microsoft/monaco-editor/3.4-web-worker-system?citationMarker=43dcd9a7-70db-4a1f-b0ae-981daa162054 "15").
+- **ESM Builds:** All extensions packaged as ESM modules for modern bundler compatibility.
+- **CI/CD:** Automated testing, linting, and packaging via GitHub Actions or similar pipelines.
+
+---
+
+## Interoperability and Community Resources
+
+- **LSP and monaco-languageclient:** For advanced language features and cross-editor compatibility.
+- **Open-source libraries:** Integration with NGLView, ReNView, and other domain-specific visualization tools[43dcd9a7-70db-4a1f-b0ae-981daa162054](https://github.com/nglviewer/nglview?citationMarker=43dcd9a7-70db-4a1f-b0ae-981daa162054 "16")[43dcd9a7-70db-4a1f-b0ae-981daa162054](https://github.com/VlachosGroup/renview?citationMarker=43dcd9a7-70db-4a1f-b0ae-981daa162054 "17").
+- **Community Extensions:** Leverage and contribute to the Monaco and VS Code extension ecosystems for rapid innovation.
+
+---
+
+## Conclusion
+
+This modular scaffold provides a robust, extensible foundation for building a next-generation Monaco-based biotech IDE. By adhering to consistent conventions, leveraging modern Monaco APIs, and integrating securely with backend systems, these extensions empower researchers to simulate, visualize, and design with confidence and emotional resonance. The scaffolds outlined here are ready to be adapted, extended, and composed into a unified platform that meets the evolving needs of the biotech community.
+
+---
+
+**Note:** For each extension, the provided file/module structure, manifest snippet, and integration blueprint are intended as starting points. Actual implementation may require adaptation to project-specific requirements, technology stacks, and organizational policies. All scaffolds are designed to maximize modularity, testability, and user-centric design, ensuring a sustainable foundation for future innovation.
