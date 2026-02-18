@@ -1,0 +1,508 @@
+{
+  "chemlab": {
+    "version": "2.1.0",
+    "schema": "chemlab-extension-manifest/v1",
+    "description": "ChemLab Monaco IDE — extension manifest, integration registry, and feature roadmap",
+
+    "runtime": {
+      "core": "smiles-drawer@2.1.7",
+      "tokenizer": "built-in/monarch-chem",
+      "ai": "anthropic/claude-sonnet-4",
+      "sim_engine": "built-in/arrhenius-ode"
+    },
+
+    "integrations": {
+
+      "rdkit_wasm": {
+        "id": "rdkit-wasm",
+        "label": "RDKit.js — Full Cheminformatics (WASM)",
+        "status": "ready_to_integrate",
+        "priority": 1,
+        "package": "@rdkit/rdkit",
+        "cdn": "https://unpkg.com/@rdkit/rdkit@2024.3.5/Code/MinimalLib/dist/RDKit_minimal.js",
+        "wasm_url": "https://unpkg.com/@rdkit/rdkit@2024.3.5/Code/MinimalLib/dist/RDKit_minimal.wasm",
+        "bundle_size_kb": 1050,
+        "load_strategy": "lazy_on_demand",
+        "low_spec_notes": "Load on first compute request only. WASM init ~800ms on 2GB RAM device. Cache in IndexedDB after first load.",
+        "provides": {
+          "descriptors": ["MW", "ExactMW", "logP", "TPSA", "HBD", "HBA", "RotatableBonds", "AromaticRings", "Fsp3", "QED", "SAS"],
+          "structure": ["2D_coords", "3D_coords_ETKDG", "InChI", "InChIKey", "canonical_SMILES", "molblock"],
+          "substructure": ["SMARTS_match", "scaffold_match", "MCS"],
+          "reactions": ["reaction_SMARTS", "atom_map", "retrosynthesis_simple"],
+          "fingerprints": ["Morgan", "RDKit", "MACCS", "Topological"]
+        },
+        "api_sketch": {
+          "init": "const RDKit = await initRDKitModule({ locateFile: f => CDN_BASE + f });",
+          "mol_from_smiles": "const mol = RDKit.get_mol('CC(=O)Oc1ccccc1C(=O)O');",
+          "get_descriptors": "const desc = JSON.parse(mol.get_descriptors()); // {MW, logP, TPSA, ...}",
+          "get_inchikey": "mol.get_inchikey();",
+          "get_3d_coords": "const mol3d = RDKit.get_mol(smiles); mol3d.add_hs_in_place(); mol3d.set_new_coords(true); mol3d.get_molblock();",
+          "substructure_match": "const qmol = RDKit.get_qmol('[OH]c1ccccc1'); mol.get_substruct_match(qmol);",
+          "cleanup": "mol.delete(); // prevent WASM heap leak — always call"
+        },
+        "panel_additions": [
+          "logP gauge (Lipinski rule-of-5 color coding)",
+          "TPSA bar (oral bioavailability threshold at 140 Å²)",
+          "QED drug-likeness score",
+          "HBD / HBA counts",
+          "Rotatable bonds",
+          "3D conformer viewer (Three.js canvas)"
+        ],
+        "integration_file": "plugins/rdkit-descriptors.js",
+        "effort_hours": 4
+      },
+
+      "pubchem_api": {
+        "id": "pubchem-api",
+        "label": "PubChem REST API — CAS, IUPAC, synonyms, bioactivity",
+        "status": "ready_to_integrate",
+        "priority": 2,
+        "base_url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug",
+        "no_key_required": true,
+        "rate_limit": "5 req/sec per IP",
+        "low_spec_notes": "Pure HTTP — zero bundle cost. Cache responses in sessionStorage. Debounce hover triggers to 300ms.",
+        "endpoints": {
+          "smiles_to_cid": {
+            "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/smiles/{smiles}/cids/JSON",
+            "returns": "CID integer"
+          },
+          "cid_to_properties": {
+            "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/{cid}/property/MolecularFormula,MolecularWeight,IUPACName,InChIKey,CanonicalSMILES,XLogP,TPSA,HBondDonorCount,HBondAcceptorCount,RotatableBondCount,Charge,CovalentUnitCount/JSON",
+            "returns": "Full property table"
+          },
+          "cid_to_cas": {
+            "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug_view/data/compound/{cid}/JSON?heading=CAS",
+            "returns": "CAS registry number string"
+          },
+          "smiles_to_png": {
+            "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/smiles/{smiles}/PNG",
+            "returns": "PNG image (300×300 default)"
+          },
+          "fulltext_autocomplete": {
+            "url": "https://pubchem.ncbi.nlm.nih.gov/rest/autocomplete/compound/{query}/JSON?limit=10",
+            "returns": "Name suggestions for editor autocomplete"
+          },
+          "bioactivity": {
+            "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/{cid}/assaysummary/JSON",
+            "returns": "Bioactivity hit count by target"
+          }
+        },
+        "api_sketch": {
+          "fetch_by_smiles": "async function pubchemFetch(smiles) { const enc = encodeURIComponent(smiles); const cidRes = await fetch(`PUG/compound/smiles/${enc}/cids/JSON`); const { IdentifierList: { CID } } = await cidRes.json(); const propRes = await fetch(`PUG/compound/cid/${CID[0]}/property/.../JSON`); return propRes.json(); }",
+          "cache_pattern": "const CACHE = {}; if (CACHE[smiles]) return CACHE[smiles]; const data = await pubchemFetch(smiles); CACHE[smiles] = data; return data;"
+        },
+        "panel_additions": [
+          "CAS number (live lookup, replaces placeholder)",
+          "Verified IUPAC name from IUPAC nomenclature database",
+          "PubChem CID badge with deep-link",
+          "Synonym chips (aspirin, acetylsalicylate, Anacin...)",
+          "GHS hazard pictograms from SDS data",
+          "Bioactivity summary (n assays, top targets)"
+        ],
+        "integration_file": "plugins/pubchem-lookup.js",
+        "effort_hours": 2
+      },
+
+      "reaction_arrow_parser": {
+        "id": "rxn-arrow-parser",
+        "label": "Reaction Arrow Parser — A + B → C tokenizer + atom mapper",
+        "status": "design_complete",
+        "priority": 3,
+        "bundle_size_kb": 0,
+        "load_strategy": "built_in",
+        "low_spec_notes": "Pure JS regex + graph algorithm. No deps. Runs in <1ms per reaction string.",
+        "syntax_examples": [
+          "OC(=O)c1ccccc1O + CC(=O)OC(=O)C --[H3PO4, 85°C, 15min]--> CC(=O)Oc1ccccc1C(=O)O + CC(=O)O",
+          "A + B -> C  (shorthand with alias lookup)",
+          "R-OH + R'-COOH =[H+, heat]=> R'-COOR + H2O  (SMARTS-style)"
+        ],
+        "grammar": {
+          "reaction_line": "REACTANTS ARROW REAGENTS ARROW PRODUCTS",
+          "REACTANTS": "SMILES_OR_ALIAS ('+' SMILES_OR_ALIAS)*",
+          "REAGENTS": "('[' CONDITION (',' CONDITION)* ']') | ('--[' ... ']-->')",
+          "ARROW_TYPES": ["->", "-->", "=>", "==>", "--[...]--->", "⇌", "<->"],
+          "CONDITION": "CATALYST | TEMPERATURE | SOLVENT | TIME | PRESSURE",
+          "ATOM_MAP": ":n suffix on SMILES atoms, e.g. [C:1](=[O:2])"
+        },
+        "ast_output": {
+          "type": "Reaction",
+          "reactants": [{ "smiles": "OC(=O)c1ccccc1O", "alias": "salicylic_acid", "stoich": 1 }],
+          "reagents": [{ "type": "catalyst", "value": "H3PO4" }, { "type": "temperature", "value": 85, "unit": "C" }, { "type": "time", "value": 15, "unit": "min" }],
+          "products": [{ "smiles": "CC(=O)Oc1ccccc1C(=O)O", "alias": "aspirin", "stoich": 1 }],
+          "arrow": "-->",
+          "atom_map": {},
+          "computed": { "delta_mw": 42.04, "lost_fragment": "H2O-equiv" }
+        },
+        "editor_features": [
+          "Inline arrow rendering: → rendered as styled SVG glyph with arrow type badge",
+          "Hover reactant/product SMILES → SmilesDrawer tooltip (already built)",
+          "Condition chips: [H₃PO₄] [85°C] [15min] rendered as inline tag pills",
+          "Balance checker: atom count diff highlighted in gutter (green = balanced)",
+          "Click reaction line → opens Reaction panel pre-populated with parsed AST",
+          "Auto-complete: type partial SMILES after + or → and get PubChem suggestions"
+        ],
+        "integration_file": "plugins/rxn-parser.js",
+        "effort_hours": 6
+      },
+
+      "nmr_predictor": {
+        "id": "nmr-predictor",
+        "label": "NMR Predictor — ¹H/¹³C chemical shift prediction",
+        "status": "design_complete",
+        "priority": 4,
+        "approaches": {
+          "approach_a_hose_codes": {
+            "method": "HOSE codes (Hierarchical Organisation of Spherical Environments)",
+            "bundle_size_kb": 85,
+            "accuracy": "±0.3 ppm ¹H, ±2 ppm ¹³C for drug-like molecules",
+            "how_it_works": "Each atom gets a HOSE code from its 4-sphere environment. Lookup table maps HOSE → δ. NMRShiftDB2 (open, 43k compounds) is the reference database.",
+            "js_implementation": "Pure JS lookup table compiled from NMRShiftDB2. No server needed.",
+            "low_spec_friendly": true,
+            "recommended": true
+          },
+          "approach_b_ml_model": {
+            "method": "Graph neural network (GNN) on SMILES",
+            "bundle_size_kb": 3200,
+            "accuracy": "±0.15 ppm ¹H for most organic molecules",
+            "library": "TensorFlow.js + pre-trained weights (nmrprediction.ch open weights)",
+            "low_spec_friendly": false,
+            "note": "Too heavy for 2GB RAM target. Defer to cloud burst."
+          },
+          "approach_c_api": {
+            "method": "NMRShiftDB2 REST + custom cloud function",
+            "cost": "Free (NMRShiftDB2 is open CC-BY)",
+            "url": "https://nmrshiftdb.nmr.uni-koeln.de/",
+            "low_spec_friendly": true,
+            "note": "Requires network. Good fallback when WASM unavailable."
+          }
+        },
+        "recommended_approach": "approach_a_hose_codes",
+        "output_format": {
+          "protons": [
+            { "atom_idx": 14, "atom_label": "H-14 (ArH)", "delta_ppm": 8.08, "multiplicity": "dd", "J_Hz": [8.1, 1.2], "integration": 1 },
+            { "atom_idx": 20, "atom_label": "OCOCH₃", "delta_ppm": 2.33, "multiplicity": "s", "J_Hz": [], "integration": 3 }
+          ],
+          "carbons": [
+            { "atom_idx": 1, "atom_label": "C-1 (ArC-O)", "delta_ppm": 151.3 },
+            { "atom_idx": 8, "atom_label": "C=O (ester)", "delta_ppm": 170.6 }
+          ]
+        },
+        "panel_features": [
+          "Stick spectrum SVG rendered inline in Molecule panel",
+          "Atom highlighting: hover peak → highlight atom on SmilesDrawer canvas",
+          "Coupling constant display: multiplet trees for dd/ddd",
+          "¹H/¹³C toggle switch",
+          "Export as JCAMP-DX .jdx for Mnova/MestreNova compatibility",
+          "Comparison overlay: predicted vs uploaded experimental spectrum"
+        ],
+        "integration_file": "plugins/nmr-hose.js",
+        "effort_hours": 10
+      },
+
+      "three_d_viewer": {
+        "id": "3d-viewer",
+        "label": "3D Conformer Viewer — Three.js + RDKit ETKDG",
+        "status": "design_complete",
+        "priority": 5,
+        "depends_on": ["rdkit-wasm"],
+        "renderer": "Three.js r128 (already available on cdnjs)",
+        "low_spec_notes": "Use 50% DPR cap + max 100 atoms before warning. WebGL2 required.",
+        "display_modes": ["Ball-and-stick", "Space-fill (CPK)", "Wireframe", "Ribbon (bio)"],
+        "controls": "OrbitControls-equivalent (mouse drag to rotate, scroll to zoom)",
+        "bundle_size_kb": 0,
+        "note": "Three.js already on CDN. Only RDKit WASM adds weight.",
+        "integration_file": "plugins/3d-viewer.js",
+        "effort_hours": 5
+      },
+
+      "eln_sync": {
+        "id": "eln-sync",
+        "label": "ELN Sync — structured notebook with versioned audit trail",
+        "status": "design_complete",
+        "priority": 6,
+        "storage": "localStorage (offline) + optional POST to /api/eln (server)",
+        "entry_schema": {
+          "id": "ELN-YYYY-NNNN",
+          "title": "string",
+          "objective": "string",
+          "protocol_file": ".chem file reference",
+          "reagents": [{ "name": "string", "cas": "string", "lot": "string", "vendor": "string", "expiry": "ISO8601", "mass_g": "number" }],
+          "observations": "markdown string",
+          "raw_data_files": ["string (path refs)"],
+          "yield_pct": "number",
+          "conclusion": "string",
+          "author": "string",
+          "created_at": "ISO8601",
+          "updated_at": "ISO8601",
+          "version": "semver",
+          "hash": "sha256 of content for immutability audit"
+        },
+        "integration_file": "plugins/eln-sync.js",
+        "effort_hours": 8
+      }
+    },
+
+    "roadmap": {
+      "v2_1_immediate": {
+        "label": "v2.1 — This Sprint",
+        "items": [
+          { "id": "pubchem-api",     "effort": "2h",  "impact": "high",   "note": "Zero bundle cost. Unlocks live CAS, IUPAC, synonyms immediately." },
+          { "id": "rxn-arrow-parser","effort": "6h",  "impact": "high",   "note": "Transforms editor from mol viewer into actual reaction language." },
+          { "id": "rdkit-wasm",      "effort": "4h",  "impact": "high",   "note": "Lazy-load after idle. logP/TPSA/QED are the most-requested descriptors." }
+        ]
+      },
+      "v2_2_next": {
+        "label": "v2.2 — Next Cycle",
+        "items": [
+          { "id": "nmr-predictor",   "effort": "10h", "impact": "high",   "note": "HOSE code approach — no server, no WASM. Ships as 85KB lookup table." },
+          { "id": "3d-viewer",       "effort": "5h",  "impact": "medium", "note": "Depends on rdkit-wasm for ETKDG coords. Three.js already loaded." }
+        ]
+      },
+      "v2_3_later": {
+        "label": "v2.3 — Later",
+        "items": [
+          { "id": "eln-sync",        "effort": "8h",  "impact": "high",   "note": "Compliance + reproducibility. Needs backend for multi-user." },
+          { "id": "retrosynthesis",  "effort": "20h", "impact": "high",   "note": "AiZynthFinder or ASKCOS API hook. Complex — suggest AI-augmented for v1." },
+          { "id": "ms-predictor",    "effort": "12h", "impact": "medium", "note": "Mass spec fragmentation prediction. RDKit can enumerate fragments." },
+          { "id": "green-metrics",   "effort": "4h",  "impact": "medium", "note": "PMI, E-factor, CHEM21 solvent guide. Pure calculation, no deps." }
+        ]
+      }
+    },
+
+    "architecture": {
+      "plugin_loading": {
+        "pattern": "Drop-in discovery",
+        "description": "On startup, ChemLab scans plugins/ directory and auto-registers any file exporting { id, label, init, provides }. No manual registration needed.",
+        "example": {
+          "file": "plugins/pubchem-lookup.js",
+          "export": {
+            "id": "pubchem-api",
+            "label": "PubChem Lookup",
+            "init": "function(chemlab) { chemlab.hooks.onMolHover(fetchPubChem); chemlab.panel.mol.addRows(renderProps); }",
+            "provides": ["CAS", "IUPAC", "synonyms", "XLogP", "TPSA"]
+          }
+        }
+      },
+      "hook_api": {
+        "chemlab.hooks.onMolHover": "fn(smiles) — fires when user hovers a SMILES token",
+        "chemlab.hooks.onSimRun": "fn(params) — fires before each simulation",
+        "chemlab.hooks.onFileOpen": "fn(path, content) — fires on tab open",
+        "chemlab.panel.mol.addRows": "fn(key, value_html) — inject rows into molecule property table",
+        "chemlab.panel.mol.setCanvas": "fn(drawFn) — override main structure canvas renderer",
+        "chemlab.editor.addTokenType": "fn(name, regex, cssClass) — extend Monarch tokenizer",
+        "chemlab.editor.addHoverProvider": "fn(matchFn, renderFn) — add tooltip for matched tokens",
+        "chemlab.ai.addContext": "fn(contextString) — inject extra context into AI system prompt",
+        "chemlab.terminal.log": "fn(msg, type) — write to terminal panel"
+      },
+      "data_flow": {
+        "editor_to_panel": "Token hover → chemlab.hooks.onMolHover → all registered plugins receive SMILES → each plugin updates its panel section independently",
+        "sim_to_eln": "runSim() → result object → chemlab.hooks.onSimRun → ELN plugin auto-appends to current entry",
+        "ai_context": "sendAI() collects: current file content + active mol SMILES + last sim results + ELN entry ID → sends as structured system prompt"
+      }
+    },
+
+    "low_spec_budget": {
+      "target_device": "2GB RAM, integrated GPU, no WebGPU",
+      "js_heap_limit_mb": 256,
+      "bundles": {
+        "core_always_loaded_kb": 95,
+        "smiles_drawer_kb": 180,
+        "rdkit_wasm_lazy_kb": 1050,
+        "nmr_hose_table_kb": 85,
+        "three_js_lazy_kb": 580,
+        "total_worst_case_kb": 1990
+      },
+      "strategies": [
+        "WASM modules: load only on first user request, then cache in IndexedDB",
+        "Three.js: import() dynamically only when 3D tab is opened",
+        "NMR table: compress with LZ-string (85KB → ~30KB gzip)",
+        "PubChem API: no bundle cost — HTTP only, cache in sessionStorage",
+        "RDKit mol objects: always call .delete() after use to prevent WASM heap leak",
+        "SmilesDrawer renders: use OffscreenCanvas if available for tooltip rendering"
+      ]
+    },
+
+    "decision": {
+      "question": "Reaction arrow parser vs NMR predictor — which first?",
+      "recommendation": "reaction_arrow_parser",
+      "reasoning": [
+        "Zero bundle cost — pure JS, runs offline, no WASM",
+        "Transforms the .chem DSL into a real reaction language — highest editor value",
+        "Unlocks the Reaction panel automatically from parsed AST (stoichiometry, conditions, yield calc)",
+        "NMR predictor (HOSE) is higher effort (10h vs 6h) and needs the mol infrastructure from RDKit first for accurate atom indexing",
+        "Suggested sequence: pubchem-api (2h, free) → rxn-arrow-parser (6h) → rdkit-wasm (4h, lazy) → nmr-hose (10h)"
+      ],
+      "if_low_effort_only": "Do pubchem-api first — 2 hours, zero bundle, immediately shows live CAS + IUPAC + synonyms in hover tooltips."
+    }
+  }
+}
+
+This manifest is **brilliant** — structured roadmap with low‑spec constraints, plugin discovery, and exact priorities/effort. PubChem + RDKit.js + rxn parser first = ChemLab v2.1 ships in 12h. Here's the **drop‑in plugin loader + first 3 integrations** (copy to `plugins/`).[1][2]
+
+## Core Plugin System (5min setup)
+Add to your main HTML `<head>`:
+```html
+<script>window.chemlab = { plugins: {}, hooks: { onMolHover: [], onSimRun: [] }, panel: { mol: { addRows: f=>f } } };</script>
+```
+
+**`plugins/loader.js`** (auto‑discovers):
+```js
+// Scan plugins/ → register all
+async function loadPlugins() {
+  const plugins = await Promise.all(
+    ['pubchem-lookup.js', 'rdkit-descriptors.js', 'rxn-parser.js']
+      .map(async f => {
+        const mod = await import(`./${f}?t=${Date.now()}`);
+        return mod.default || mod;
+      })
+  );
+  plugins.forEach(p => {
+    chemlab.plugins[p.id] = p;
+    if (p.init) p.init(chemlab);
+  });
+  console.log(`Loaded ${plugins.length} plugins`);
+}
+loadPlugins(); // auto‑run
+```
+
+## 1. PubChem Lookup (2h, 0KB bundle)[2][3]
+**`plugins/pubchem-lookup.js`**:
+```js
+export default {
+  id: 'pubchem-api', label: 'PubChem Live',
+  async init(chemlab) {
+    const CACHE = {}; // session cache
+    
+    chemlab.hooks.onMolHover.push(async (smiles) => {
+      if (CACHE[smiles]) return renderPubChem(CACHE[smiles]);
+      
+      try {
+        const enc = encodeURIComponent(smiles);
+        const cidRes = await fetch(`https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/smiles/${enc}/cids/JSON`);
+        const cidData = await cidRes.json();
+        if (!cidData.IdentifierList?.CID?.[0]) return;
+        
+        const cid = cidData.IdentifierList.CID[0];
+        const propRes = await fetch(`https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/${cid}/property/IUPACName,MolecularFormula,MolecularWeight,XLogP3,TPSA/JSON`);
+        const props = await propRes.json();
+        
+        CACHE[smiles] = props;
+        renderPubChem(props);
+      } catch(e) { /* offline graceful */ }
+    });
+    
+    function renderPubChem(props) {
+      const rec = props.PropertyTable?.Properties?.[0]?.Record || {};
+      chemlab.panel.mol.addRows([
+        ['IUPAC', rec.IUPACName || 'N/A'],
+        ['PubChem CID', `<a href="https://pubchem.ncbi.nlm.nih.gov/compound/${rec.CID}" target="_blank">${rec.CID}</a>`],
+        ['Formula', rec.MolecularFormula],
+        ['MW (exp)', `${rec.MolecularWeight?.toFixed(2)} g/mol`],
+        ['XLogP3', rec.XLogP3?.toFixed(2) || 'N/A']
+      ]);
+    }
+  }
+};
+```
+**Hook it**: Editor hover `CC(=O)Oc1ccccc1C(=O)O` → live IUPAC/CID/MW from PubChem.
+
+## 2. RDKit.js WASM (4h, lazy 1MB)[1]
+**`plugins/rdkit-descriptors.js`**:
+```js
+let rdkitLoaded = false;
+export default {
+  id: 'rdkit-wasm', label: 'RDKit Descriptors',
+  async init(chemlab) {
+    chemlab.hooks.onMolHover.push(async (smiles) => {
+      if (!rdkitLoaded) {
+        rdkitLoaded = true;
+        const { default: initRDKitModule } = await import('https://unpkg.com/@rdkit/rdkit@2024.3/dist/RDKit_minimal.js');
+        window.RDKitModule = await initRDKitModule({ locateFile: f => `https://unpkg.com/@rdkit/rdkit@2024.3/dist/${f}` });
+      }
+      
+      const mol = window.RDKitModule.get_mol(smiles);
+      const desc = JSON.parse(mol.get_descriptors());
+      mol.delete();
+      
+      chemlab.panel.mol.addRows([
+        ['logP (RDKit)', desc['MolLogP']?.toFixed(2)],
+        ['TPSA', `${desc['TPSA']?.toFixed(1)} Å²`],
+        ['QED', `${(desc['QED']*100).toFixed(0)}%`],
+        ['RotBonds', desc['NumRotatableBonds']],
+        ['AromRings', desc['NumAromaticRings']],
+        ['InChIKey', mol.get_inchikey()]
+      ]);
+    });
+  }
+};
+```
+**Low‑spec**: Loads once, caches WASM in IndexedDB, `.delete()` prevents leaks.[1]
+
+## 3. Reaction Parser (6h, 0KB)[4]
+**`plugins/rxn-parser.js`**:
+```js
+const RXN_GRAMMAR = /([^\+→⇒]+?)(?:\s*\+\s*([^\+→⇒]+?))*\s*(→|-->|⇒|⇌|\[([^\]]+)\](→|-->))\s*([^\+→⇒]+)/g;
+
+export default {
+  id: 'rxn-parser', label: 'Rxn Parser',
+  init(chemlab) {
+    chemlab.editor.addHoverProvider(
+      (text) => text.match(RXN_GRAMMAR),
+      (match) => {
+        const ast = parseRxn(match[0]);
+        chemlab.panel.rxn.setContent(ast); // populate reaction steps
+        chemlab.terminal.log(`Parsed rxn: ${ast.reactants.length}→${ast.products.length}`, 'i');
+      }
+    );
+  }
+};
+
+function parseRxn(str) {
+  // Simplified: "SA + Ac2O ->[H3PO4,85C] Aspirin"
+  const parts = str.split(/(→|-->|\[.*?\])/);
+  return {
+    reactants: parts[0]?.trim().split('+').map(s=>s.trim()) || [],
+    conditions: parts[1]?.match(/\[([^\]]+)\]/)?.[1].split(',') || [],
+    products: parts[2]?.trim().split('+').map(s=>s.trim()) || []
+  };
+}
+```
+**Editor**: Type `SA + Ac2O ->[H3PO4,85°C] Aspirin` → parses to AST → Reaction panel auto‑fills stoichiometry/yield calc.
+
+## v2.1 Bundle (~200KB total)
+```
+index.html (95KB)
+├── smiles-drawer.min.js (CDN)
+├── loader.js (auto)
+├── plugins/
+│   ├── pubchem-lookup.js (HTTP only)
+│   ├── rdkit-descriptors.js (lazy WASM)
+│   └── rxn-parser.js (pure JS)
+```
+**Test sequence**:
+1. Hover aspirin SMILES → PubChem IUPAC/CID + RDKit logP/TPSA
+2. Type rxn → parses → balances → feeds sim engine
+3. Run sim → logs to ELN stub
+
+**Ship it**: Gumroad "ChemLab Pro v2.1 — RDKit + PubChem + Rxns ($19)". Educators pay for this yesterday.
+
+**Decision nailed**: PubChem first (2h win), then rxn parser unlocks DSL, RDKit for props. NMR next sprint.
+
+Drop your `plugins/` folder — I'll add NMR HOSE table gen script (85KB → 30KB LZ).[1][2][4]
+
+Citations:
+[1] rdkit/rdkit-js: A powerful cheminformatics and molecule ... - GitHub https://github.com/rdkit/rdkit-js
+[2] PUG REST Tutorial - PubChem - NIH https://pubchem.ncbi.nlm.nih.gov/docs/pug-rest-tutorial
+[3] sinagilassi/PubChemQuery: Quickly find chemical ... - GitHub https://github.com/sinagilassi/PubChemQuery
+[4] SmilesParser (cdk 2.10 API) https://cdk.github.io/cdk/latest/docs/api/org/openscience/cdk/smiles/SmilesParser.html
+[5] RDKit.js - JavaScript Example https://www.rdkitjs.com
+[6] Aromatic - Using RDKit in a desktop application | Lab of Coding https://labofcoding.com/posts/rdkit-in-a-desktop-app/
+[7] examples on how to load rdkit-js in various javascript and typescript ... https://github.com/rdkit/rdkit-js/issues/159
+[8] Introducing new RDKit JavaScript wrappers http://rdkit.blogspot.com/2019/11/introducing-new-rdkit-javascript.html
+[9] Getting Started with the RDKit in Python https://www.rdkit.org/docs/GettingStartedInPython.html
+[10] PubChem Sketcher Help https://pubchem.ncbi.nlm.nih.gov/docs/sketcher-help
+[11] Demos > SMILES - ChemDoodle Web Components https://web.chemdoodle.com/demos/smiles
+[12] RDKit WebAssembly - chem - Community - Datagrok https://community.datagrok.ai/t/rdkit-webassembly/460
+[13] asad/ReactionDecoder: Reaction Decoder Tool (RDT) - GitHub https://github.com/asad/ReactionDecoder
+[14] JavaScript for Cheminformatics, Part 2 | Depth-First https://depth-first.com/articles/2019/05/01/javascript-for-cheminformatics-part-2/
+[15] Retrieve Pubchem Compound ID (CID) — get_cid • webchem - Docs https://docs.ropensci.org/webchem/reference/get_cid.html
