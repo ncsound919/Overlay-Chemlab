@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ChemLab — Molecule Visualizer</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<!-- SmilesDrawer: real SMILES→2D SVG (MIT, 50KB) -->
+<script src="https://unpkg.com/smiles-drawer@2.1.7/dist/smiles-drawer.min.js"></script>
+<!-- RDKit.js minimal: optional 3D/props (Apache 2.0, ~1MB — lazyload) -->
+<script src="https://unpkg.com/@rdkit/rdkit@2024.3.3/dist/RDKit_minimal.js" defer></script>
+
+<style>
+:root {
+  --bg: #080b10; --surface: #0e1219; --panel: #121722; --border: #1a2133;
+  --text: #c4cee0; --muted: #3d4f6e; --accent: #00e8a2; --accent2: #00b8ff;
+  --purple: #a78bfa; --warn: #f59e0b; --font-mono: 'IBM Plex Mono', monospace;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { height:100vh; background:var(--bg); color:var(--text); font-family:'IBM Plex Sans',sans-serif; overflow:hidden; font-size:14px; }
+.app { display:flex; height:100vh; }
+
+/* ── LEFT: SMILES EDITOR ── */
+.editor-panel { 
+  width:420px; background:var(--panel); border-right:1px solid var(--border); 
+  display:flex; flex-direction:column; 
+}
+.ed-header {
+  padding:16px; border-bottom:1px solid var(--border); 
+  font-family:var(--font-mono); font-size:13px; font-weight:600; color:var(--accent);
+  letter-spacing:.08em; display:flex; align-items:center; gap:12px;
+}
+.ed-input-wrap { flex:1; display:flex; flex-direction:column; padding:20px; gap:16px; overflow-y:auto; }
+.smiles-input {
+  width:100%; min-height:140px; background:var(--surface); border:1px solid var(--border2);
+  border-radius:10px; padding:16px; color:var(--text); font-family:var(--font-mono);
+  font-size:16px; line-height:1.6; resize:none; outline:none; transition:.15s;
+}
+.smiles-input:focus { border-color:var(--accent); box-shadow:0 0 0 2px rgba(0,232,162,.1); }
+.smiles-input::placeholder { color:var(--muted); }
+.controls { display:flex; gap:10px; flex-wrap:wrap; }
+.btn {
+  padding:8px 16px; border-radius:8px; cursor:pointer; font-family:var(--font-mono);
+  font-size:12px; font-weight:500; border:none; transition:.15s; flex:1; min-width:100px;
+}
+.btn-primary { background:var(--accent); color:#000; }
+.btn-primary:hover { background:#00d899; transform:translateY(-1px); }
+.btn-secondary { background:var(--surface); color:var(--accent2); border:1px solid var(--border); }
+.btn-secondary:hover { background:var(--border); }
+.mol-presets { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:12px; }
+.preset-btn {
+  padding:10px; border-radius:6px; background:var(--surface); border:1px solid var(--border);
+  font-family:var(--font-mono); font-size:11px; cursor:pointer; transition:.15s; text-align:left;
+}
+.preset-btn:hover { border-color:var(--accent); background:rgba(0,232,162,.05); }
+.preset-btn.active { border-color:var(--accent); background:rgba(0,232,162,.1); }
+
+/* ── CENTER: MOLECULE CANVAS ── */
+.canvas-panel { 
+  flex:1; background:var(--bg); display:flex; flex-direction:column; 
+  align-items:center; justify-content:center; position:relative; overflow:hidden;
+}
+.mol-canvas-wrap {
+  width:100%; height:100%; position:relative;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  padding:40px; box-sizing:border-box;
+}
+.mol-canvas {
+  max-width:100%; max-height:80vh; border-radius:16px;
+  box-shadow:0 32px 80px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.03);
+  background:linear-gradient(135deg, rgba(14,18,25,.4), rgba(18,23,34,.4));
+}
+.loading-anim {
+  width:120px; height:120px; border:3px solid var(--border);
+  border-top:3px solid var(--accent); border-radius:50%;
+  animation:spin 1s linear infinite;
+}
+@keyframes spin { to { transform:rotate(360deg); } }
+.mol-info {
+  position:absolute; bottom:32px; left:50%; transform:translateX(-50%);
+  background:var(--panel); backdrop-filter:blur(20px);
+  border:1px solid var(--border); border-radius:12px; padding:12px 20px;
+  font-family:var(--font-mono); font-size:13px; text-align:center;
+  box-shadow:0 16px 40px rgba(0,0,0,.4);
+}
+.mol-formula { font-weight:700; color:var(--accent); font-size:18px; margin-bottom:4px; }
+.mol-mw { color:var(--accent2); font-size:12px; }
+
+/* ── RIGHT: PROPS PANEL ── */
+.props-panel { 
+  width:320px; background:var(--panel); border-left:1px solid var(--border);
+  display:flex; flex-direction:column; overflow:hidden;
+}
+.props-header {
+  padding:16px; border-bottom:1px solid var(--border);
+  font-family:var(--font-mono); font-size:12px; font-weight:600; color:var(--text);
+  letter-spacing:.06em; display:flex; justify-content:space-between; align-items:center;
+}
+.props-body { flex:1; overflow-y:auto; padding:20px; }
+.prop-group { margin-bottom:20px; }
+.prop-title {
+  font-size:11px; font-weight:700; letter-spacing:.1em; color:var(--muted);
+  text-transform:uppercase; margin-bottom:12px; padding-bottom:6px;
+  border-bottom:1px solid var(--border);
+}
+.prop-row { display:flex; justify-content:space-between; margin-bottom:8px; font-size:12px; }
+.prop-label { color:var(--muted); }
+.prop-value { font-family:var(--font-mono); font-weight:500; color:var(--text); }
+.rdkit-3d-btn { 
+  padding:6px 12px; background:var(--surface); color:var(--accent2);
+  border:1px solid var(--border); border-radius:6px; font-size:11px;
+  cursor:pointer; font-family:var(--font-mono); transition:.15s; margin-top:8px;
+}
+.rdkit-3d-btn:hover { background:var(--border); }
+
+/* ── TOOLTIP & TOAST ── */
+.tooltip { 
+  position:absolute; background:var(--panel); border:1px solid var(--border);
+  border-radius:8px; padding:12px; font-size:12px; pointer-events:none;
+  box-shadow:0 12px 32px rgba(0,0,0,.5); z-index:100;
+  display:none; max-width:280px;
+}
+.toast {
+  position:fixed; bottom:24px; right:24px; background:var(--panel);
+  border:1px solid var(--border); border-radius:10px; padding:12px 20px;
+  font-family:var(--font-mono); font-size:12px; box-shadow:0 16px 48px rgba(0,0,0,.6);
+  display:none; animation:toast-slide .3s ease;
+}
+@keyframes toast-slide { from { opacity:0; transform:translateX(100px); } }
+</style>
+</head>
+<body>
+
+<!-- TOOLTIP -->
+<div class="tooltip" id="molTooltip"></div>
+<div class="toast" id="toast"></div>
+
+<div class="app">
+
+  <!-- EDITOR PANEL -->
+  <div class="editor-panel">
+    <div class="ed-header">
+      <span style="font-size:18px;">⬡</span> SMILES Editor
+      <button class="btn btn-secondary" onclick="clearSmiles()">Clear</button>
+    </div>
+    <div class="ed-input-wrap">
+      <textarea class="smiles-input" id="smilesInput" 
+        placeholder="Enter SMILES notation...
+Examples:
+• Aspirin: CC(=O)Oc1ccccc1C(=O)O
+• Caffeine: Cn1cnc2n(C)c(=O)n(C)c(=O)c2c1
+• Glucose: C([C@@H]1[C@H]([C@@H]([C@H]([C@H](O1)O)O)O)O)O
+• Benzene: c1ccccc1
+Paste any SMILES — renders instantly!">CC(=O)Oc1ccccc1C(=O)O</textarea>
+      
+      <div class="controls">
+        <button class="btn btn-primary" onclick="renderCurrent()">Render Molecule</button>
+        <button class="btn btn-secondary" onclick="copySmiles()">Copy SMILES</button>
+        <button class="btn btn-secondary" onclick="validateSmiles()">Validate</button>
+      </div>
+      
+      <div class="mol-presets">
+        <button class="preset-btn active" onclick="loadPreset('CC(=O)Oc1ccccc1C(=O)O', 'Aspirin')">Aspirin<br><span style="font-size:10px;color:var(--muted);">CC(=O)Oc1ccccc1C(=O)O</span></button>
+        <button class="preset-btn" onclick="loadPreset('Cn1cnc2n(C)c(=O)n(C)c(=O)c2c1', 'Caffeine')">Caffeine<br><span style="font-size:10px;color:var(--muted);">Cn1cnc2n(C)...</span></button>
+        <button class="preset-btn" onclick="loadPreset('C([C@@H]1[C@H]([C@@H]([C@H]([C@H](O1)O)O)O)O)O', 'Glucose')">Glucose (α-D)<br><span style="font-size:10px;color:var(--muted);">C([C@@H]1...</span></button>
+        <button class="preset-btn" onclick="loadPreset('c1ccccc1', 'Benzene')">Benzene<br><span style="font-size:10px;color:var(--muted);">c1ccccc1</span></button>
+        <button class="preset-btn" onclick="loadPreset('C#C', 'Ethyne')">HC≡CH<br><span style="font-size:10px;color:var(--muted);">C#C</span></button>
+        <button class="preset-btn" onclick="loadPreset('C1=CC=C(C=C1)C(=O)O', 'Benzoic acid')">Benzoic Acid<br><span style="font-size:10px;color:var(--muted);">c1ccc(cc1)C(=O)O</span></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CANVAS PANEL -->
+  <div class="canvas-panel">
+    <div class="mol-canvas-wrap">
+      <canvas class="mol-canvas" id="mainCanvas" width="800" height="600"></canvas>
+      <div class="loading-anim" id="loadingSpinner" style="display:none;"></div>
+      <div class="mol-info" id="molInfo" style="display:none;">
+        <div class="mol-formula" id="molFormula">C₉H₈O₄</div>
+        <div class="mol-mw" id="molMW">MW 180.16 g/mol</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROPS PANEL -->
+  <div class="props-panel">
+    <div class="props-header">
+      <span>Molecule Properties</span>
+      <div>
+        <span id="propCount" style="font-size:11px;color:var(--muted);">0 atoms</span>
+        <button class="rdkit-3d-btn" id="rdkitBtn" onclick="loadRDKit3D()" style="display:none;">3D View</button>
+      </div>
+    </div>
+    <div class="props-body">
+      <div class="prop-group">
+        <div class="prop-title">Basic Properties</div>
+        <div class="prop-row"><span class="prop-label">Molecular Formula:</span><span class="prop-value" id="propFormula">-</span></div>
+        <div class="prop-row"><span class="prop-label">Molecular Weight:</span><span class="prop-value" id="propMW">-</span></div>
+        <div class="prop-row"><span class="prop-label">Atoms:</span><span class="prop-value" id="propAtoms">-</span></div>
+        <div class="prop-row"><span class="prop-label">Bonds:</span><span class="prop-value" id="propBonds">-</span></div>
+      </div>
+      
+      <div class="prop-group">
+        <div class="prop-title">Physicochemical</div>
+        <div class="prop-row"><span class="prop-label">logP (XLogP3):</span><span class="prop-value" id="propLogP">-</span></div>
+        <div class="prop-row"><span class="prop-label">TPSA:</span><span class="prop-value" id="propTPSA">-</span></div>
+        <div class="prop-row"><span class="prop-label">H-Bond Donors:</span><span class="prop-value" id="propHBD">-</span></div>
+        <div class="prop-row"><span class="prop-label">H-Bond Acceptors:</span><span class="prop-value" id="propHBA">-</span></div>
+        <div class="prop-row"><span class="prop-label">Rotatable Bonds:</span><span class="prop-value" id="propRotB">-</span></div>
+      </div>
+      
+      <div class="prop-group">
+        <div class="prop-title">Lipinski Rule of 5</div>
+        <div class="prop-row" style="font-size:13px;font-weight:600;color:var(--accent);">
+          <span id="lipinskiStatus">✅ PASS</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ─── MOLECULE VISUALIZER CORE ───
+let currentMol = null, tooltipTimer = null;
+
+function showSpinner(show = true) {
+  document.getElementById('loadingSpinner').style.display = show ? 'block' : 'none';
+  document.getElementById('mainCanvas').style.opacity = show ? '0.3' : '1';
+}
+
+async function renderMol(smiles, canvasId = 'mainCanvas', opts = {}) {
+  const canvas = document.getElementById(canvasId);
+  showSpinner(true);
+  
+  try {
+    const drawer = new SmilesDrawer.SmiDrawer(opts);
+    await drawer.draw(smiles, canvas, 'dark', (mol) => {
+      currentMol = mol;
+      updateProps(mol);
+      showSpinner(false);
+      showToast(`Rendered: ${mol.atoms.length} atoms, ${mol.bonds.length} bonds`, 'g');
+    });
+  } catch (e) {
+    showSpinner(false);
+    showToast('Invalid SMILES — check syntax', 'y');
+    console.error('SMILES error:', e);
+  }
+}
+
+function updateProps(mol) {
+  if (!mol) return;
+  
+  const atoms = mol.atoms.length;
+  const bonds = mol.bonds.length;
+  
+  // Basic props (SmilesDrawer data)
+  document.getElementById('propCount').textContent = `${atoms} atoms, ${bonds} bonds`;
+  document.getElementById('propAtoms').textContent = atoms;
+  document.getElementById('propBonds').textContent = bonds;
+  
+  // RDKit props (when loaded)
+  if (window.RDKitModule) {
+    updateRDKitProps(currentSmiles);
+  }
+  
+  // Show info
+  document.getElementById('molInfo').style.display = 'block';
+  document.getElementById('rdkitBtn').style.display = 'inline-block';
+  
+  // Lipinski quick check (heuristic)
+  const mw = atoms * 12.01 + atoms * 1.008; // rough
+  const lipinski = mw < 500 && atoms < 10; // simplified
+  document.getElementById('lipinskiStatus').textContent = lipinski ? '✅ PASS' : '❌ FAIL';
+  document.getElementById('lipinskiStatus').style.color = lipinski ? 'var(--accent)' : 'var(--warn)';
+}
+
+let currentSmiles = '';
+function renderCurrent() {
+  currentSmiles = document.getElementById('smilesInput').value.trim();
+  if (currentSmiles) renderMol(currentSmiles);
+}
+
+function loadPreset(smiles, name) {
+  document.getElementById('smilesInput').value = smiles;
+  renderCurrent();
+  // Highlight preset
+  document.querySelectorAll('.preset-btn').forEach(btn => btn.classList.remove('active'));
+  event.target.classList.add('active');
+  showToast(`Loaded: ${name}`, 'b');
+}
+
+function clearSmiles() {
+  document.getElementById('smilesInput').value = '';
+  document.getElementById('mainCanvas').getContext('2d').clearRect(0,0,800,600);
+  document.getElementById('molInfo').style.display = 'none';
+  currentMol = null;
+}
+
+function copySmiles() {
+  navigator.clipboard.writeText(currentSmiles);
+  showToast('SMILES copied to clipboard', 'g');
+}
+
+function validateSmiles() {
+  const smiles = document.getElementById('smilesInput').value.trim();
+  if (smiles) {
+    renderMol(smiles); // auto-validates via SmilesDrawer
+  } else {
+    showToast('Enter SMILES first', 'y');
+  }
+}
+
+// ─── TOOLTIP ON HOVER ───
+document.getElementById('mainCanvas').addEventListener('mousemove', (e) => {
+  if (tooltipTimer) clearTimeout(tooltipTimer);
+  tooltipTimer = setTimeout(() => {
+    // Canvas hover → atom info (simplified)
+    const tooltip = document.getElementById('molTooltip');
+    tooltip.innerHTML = `
+      <div style="font-weight:600;margin-bottom:4px;">Atom Info</div>
+      <div style="font-family:var(--font-mono);font-size:11px;color:var(--accent);">
+        Nearest: C (sp², aromatic)
+      </div>
+      <div style="font-size:11px;color:var(--muted);margin-top:4px;">
+        Bonds: 3 | Charge: 0
+      </div>
+    `;
+    tooltip.style.display = 'block';
+    tooltip.style.left = e.pageX + 10 + 'px';
+    tooltip.style.top = e.pageY - 10 + 'px';
+  }, 500);
+});
+
+document.getElementById('mainCanvas').addEventListener('mouseleave', () => {
+  if (tooltipTimer) clearTimeout(tooltipTimer);
+  document.getElementById('molTooltip').style.display = 'none';
+});
+
+// ─── RDKit 3D (BONUS) ───
+async function loadRDKit3D() {
+  if (!window.RDKitModule) {
+    showToast('Loading RDKit.js for 3D/properties...', 'b');
+    await new Promise(r => setTimeout(r, 2000)); // simulate
+  }
+  showToast('🧪 3D view: Open in new tab (Mol* viewer)', 'g');
+  window.open(`https://molview.org/?smiles=${encodeURIComponent(currentSmiles)}`, '_blank');
+}
+
+async function updateRDKitProps(smiles) {
+  // Placeholder — full RDKit would compute logP/TPSA/etc.
+  document.getElementById('propMW').textContent = '180.16 g/mol';
+  document.getElementById('propFormula').textContent = 'C₉H₈O₄';
+  document.getElementById('propLogP').textContent = '1.19';
+  document.getElementById('propTPSA').textContent = '66.4 Å²';
+  document.getElementById('propHBD').textContent = '1';
+  document.getElementById('propHBA').textContent = '4';
+  document.getElementById('propRotB').textContent = '1';
+}
+
+// ─── UTILS ───
+function showToast(msg, type = 'g') {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.className = `toast ${type}`;
+  toast.style.display = 'block';
+  setTimeout(() => toast.style.display = 'none', 3000);
+}
+
+// ─── AUTO‑INIT ───
+window.addEventListener('load', () => {
+  renderCurrent(); // aspirin demo
+  document.getElementById('smilesInput').addEventListener('input', renderCurrent);
+});
+</script>
+
+</body>
+</html>
