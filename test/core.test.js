@@ -201,10 +201,16 @@ describe('bayesian-risk', () => {
     assert.ok(bayesian.logistic(100) > 0.99);
   });
 
-  it('riskScore returns probability in [0,1]', () => {
-    const emb = new Array(128).fill(0).map((_, i) => i % 2 ? 1 : 0);
+  it('riskScore returns probability in [0,1] and matches expected value', () => {
+    const emb = new Array(128).fill(0).map((_, i) => (i % 2 ? 1 : 0));
+    const linear = emb.reduce(
+      (sum, val, idx) => sum + val * bayesian.DEFAULT_WEIGHTS[idx],
+      bayesian.DEFAULT_BIAS,
+    );
+    const expected = bayesian.logistic(linear);
     const score = bayesian.riskScore(emb, bayesian.DEFAULT_WEIGHTS, bayesian.DEFAULT_BIAS);
     assert.ok(score >= 0 && score <= 1);
+    assert.ok(Math.abs(score - expected) < 1e-12);
   });
 
   it('classifyRisk correctly classifies', () => {
