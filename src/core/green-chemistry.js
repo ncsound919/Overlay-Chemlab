@@ -263,7 +263,7 @@ function greenScore({ atomEconomyPct = 0, eFact = 0, yieldPct = 0, solvent } = {
   const aeScore = Math.min(100, Math.max(0, atomEconomyPct));
 
   // E-factor: 0 → 100 pts; ≥ 100 → 0 pts (linear interpolation)
-  const efScore = Math.max(0, 100 - eFact);
+  const efScore = Math.min(100, Math.max(0, 100 - eFact));
 
   // Yield: direct %
   const yScore = Math.min(100, Math.max(0, yieldPct));
