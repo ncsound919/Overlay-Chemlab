@@ -397,8 +397,8 @@ describe('drug-likeness', () => {
     // Instead use a synthetic high-MW molecule
     const largeSMILES = 'CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC'; // MW ~450, very high logP
     const result = drugLikeness.lipinskiRuleOfFive(largeSMILES);
-    assert.equal(typeof result.pass, 'boolean');
-    assert.ok(result.violations >= 0);
+    assert.ok(!result.pass);
+    assert.ok(result.violations > 0);
   });
 
   it('veberRules: aspirin passes', () => {
