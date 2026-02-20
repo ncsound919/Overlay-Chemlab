@@ -1,0 +1,26 @@
+{
+  "name": "overlay-chemlab",
+  "version": "2.1.0",
+  "description": "Full-stack digital chemical laboratory — Monaco-style IDE with live molecule rendering, Arrhenius kinetics simulation, Bayesian risk scoring, molecular embeddings, and PubChem integration",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "test": "node --test test/*.test.js"
+  },
+  "keywords": [
+    "chemistry",
+    "cheminformatics",
+    "smiles",
+    "molecular",
+    "kinetics",
+    "arrhenius",
+    "pubchem",
+    "ide"
+  ],
+  "author": "Overlay Eco",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}
