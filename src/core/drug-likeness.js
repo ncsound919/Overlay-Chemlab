@@ -107,7 +107,7 @@ function countHBA(smiles) {
  * Find the set of bond indices that are part of at least one ring.
  * Uses Tarjan bridge-finding (DFS) — O(V+E).
  * A bond is a ring bond iff it is NOT a bridge (i.e., its removal
- * leaves the graph connected).
+ * would disconnect the graph).
  *
  * @param {object[]} bonds  - Parsed bond array {from, to, order}
  * @param {number}   n      - Number of atoms
