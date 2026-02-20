@@ -6,6 +6,8 @@ const { molecularFormula, atomCount, bondCount } = require('../core/smiles-parse
 const { riskScore, classifyRisk, DEFAULT_WEIGHTS, DEFAULT_BIAS } = require('../core/bayesian-risk.js');
 const { simulateEsterification, runKineticsODE } = require('../core/arrhenius.js');
 const { parseReaction } = require('../core/reaction-parser.js');
+const { assessDruglikeness } = require('../core/drug-likeness.js');
+const greenChem = require('../core/green-chemistry.js');
 const pubchem = require('./pubchem.js');
 const { version } = require('../../package.json');
 
@@ -200,6 +202,81 @@ router.post('/reaction/parse', (req, res) => {
     }
 
     const result = parseReaction(reaction);
+    res.json(result);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+// GET /api/molecule/druglikeness?smiles=...
+// Returns Lipinski Rule of Five, Veber rules, Rule of Three, and all key descriptors.
+router.get('/molecule/druglikeness', (req, res) => {
+  try {
+    const { smiles } = req.query;
+    const err = validateSmiles(smiles);
+    if (err) return res.status(400).json({ error: err });
+
+    const result = assessDruglikeness(smiles);
+    res.json(result);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+// POST /api/green/metrics
+// Accepts productMW, reactantsMW, totalInputsKg, productKg, yieldFraction, solvent.
+router.post('/green/metrics', (req, res) => {
+  try {
+    const { productMW, reactantsMW, totalInputsKg, productKg, yieldFraction, solvent } = req.body;
+
+    const result = {};
+
+    if (productMW != null && reactantsMW != null) {
+      result.atomEconomy = greenChem.atomEconomy(Number(productMW), Number(reactantsMW));
+    }
+
+    if (totalInputsKg != null && productKg != null) {
+      result.pmi     = greenChem.pmi(Number(totalInputsKg), Number(productKg));
+      result.eFactor = greenChem.eFactorFromInputs(Number(totalInputsKg), Number(productKg));
+    }
+
+    if (yieldFraction != null && result.atomEconomy != null) {
+      result.rme = greenChem.reactionMassEfficiency(
+        Number(yieldFraction), result.atomEconomy
+      );
+    }
+
+    if (solvent) {
+      result.solventClassification = greenChem.classifySolvent(solvent);
+    }
+
+    if (Object.keys(result).length === 0) {
+      return res.status(400).json({
+        error: 'At least productMW+reactantsMW or totalInputsKg+productKg is required',
+      });
+    }
+
+    if (result.atomEconomy != null && result.eFactor != null && yieldFraction != null) {
+      result.greenScore = greenChem.greenScore({
+        atomEconomyPct: result.atomEconomy,
+        eFact:          result.eFactor,
+        yieldPct:       Number(yieldFraction) * 100,
+        solvent,
+      });
+    }
+
+    res.json(result);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+// GET /api/green/solvent?name=...
+router.get('/green/solvent', (req, res) => {
+  try {
+    const { name } = req.query;
+    if (!name) return res.status(400).json({ error: 'name query parameter is required' });
+    const result = greenChem.classifySolvent(name);
     res.json(result);
   } catch (err) {
     res.status(400).json({ error: err.message });
