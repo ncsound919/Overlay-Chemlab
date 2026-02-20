@@ -376,6 +376,11 @@ function bondCount(smiles) {
 
 /**
  * Simple substructure check via canonical substring matching.
+ *
+ * WARNING: This uses naive substring matching on canonicalized SMILES and can
+ * produce false positives (e.g., "C(=O)O" matches esters as well as free
+ * carboxylic acids). For accurate results, use a graph-based substructure
+ * matching algorithm such as the one provided by RDKit.
  */
 function hasSubstructure(smiles, pattern) {
   const canonical = canonicalize(smiles);

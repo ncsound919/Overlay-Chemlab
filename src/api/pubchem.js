@@ -3,6 +3,8 @@
 const https = require('https');
 
 const DEFAULT_TTL = 5 * 60 * 1000; // 5 minutes
+const MAX_CACHE_SIZE = 1000;
+const REQUEST_TIMEOUT_MS = 15000; // 15 seconds
 
 const cache = new Map();
 
@@ -13,10 +15,17 @@ function cacheGet(key) {
     cache.delete(key);
     return undefined;
   }
+  // LRU: move to end by reinserting
+  cache.delete(key);
+  cache.set(key, entry);
   return entry.value;
 }
 
 function cacheSet(key, value, ttl = DEFAULT_TTL) {
+  if (!cache.has(key) && cache.size >= MAX_CACHE_SIZE) {
+    const oldestKey = cache.keys().next().value;
+    if (oldestKey !== undefined) cache.delete(oldestKey);
+  }
   cache.set(key, { value, ts: Date.now(), ttl });
 }
 
@@ -25,7 +34,7 @@ function cacheSet(key, value, ttl = DEFAULT_TTL) {
  */
 function httpsGetJSON(url) {
   return new Promise((resolve, reject) => {
-    https.get(url, (res) => {
+    const req = https.get(url, (res) => {
       const chunks = [];
       res.on('data', (chunk) => chunks.push(chunk));
       res.on('end', () => {
@@ -43,7 +52,11 @@ function httpsGetJSON(url) {
         }
       });
       res.on('error', reject);
-    }).on('error', reject);
+    });
+    req.on('error', reject);
+    req.setTimeout(REQUEST_TIMEOUT_MS, () => {
+      req.destroy(new Error('PubChem request timed out'));
+    });
   });
 }
 

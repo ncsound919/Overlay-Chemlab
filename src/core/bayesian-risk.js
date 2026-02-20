@@ -45,7 +45,7 @@ function riskScore(embedding, weights, bias) {
  * @param {number}   [alpha=0.05] - Significance level (default 95% CI)
  * @returns {{ mean: number, lower: number, upper: number }}
  */
-function confidenceInterval(scores, alpha = 0.05) {
+function confidenceInterval(scores, alpha = 0.05, options = {}) {
   if (scores.length === 0) {
     return { mean: 0, lower: 0, upper: 0 };
   }
@@ -57,7 +57,7 @@ function confidenceInterval(scores, alpha = 0.05) {
   const means = [];
 
   // Seeded PRNG for reproducibility (simple LCG)
-  let seed = 42;
+  let seed = typeof options.seed === 'number' ? options.seed : 42;
   function nextRand() {
     seed = (seed * 1664525 + 1013904223) & 0x7fffffff;
     return seed / 0x7fffffff;

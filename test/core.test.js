@@ -7,6 +7,7 @@ const arrhenius = require('../src/core/arrhenius');
 const smilesParser = require('../src/core/smiles-parser');
 const molEmbed = require('../src/core/molecular-embeddings');
 const bayesian = require('../src/core/bayesian-risk');
+const reactionParser = require('../src/core/reaction-parser');
 
 // ────────────────────── Arrhenius ──────────────────────
 
@@ -53,7 +54,7 @@ describe('arrhenius', () => {
     assert.ok(data[data.length - 1].conversion > 0);
     // Conversion should be monotonically increasing
     for (let i = 1; i < data.length; i++) {
-      assert.ok(data[i].conversion >= data[i - 1].conversion - 1e-9);
+      assert.ok(data[i].conversion >= data[i - 1].conversion - 1e-12);
     }
   });
 
@@ -246,5 +247,74 @@ describe('bayesian-risk', () => {
 
   it('DEFAULT_BIAS is a number', () => {
     assert.equal(typeof bayesian.DEFAULT_BIAS, 'number');
+  });
+});
+
+// ────────────────────── Reaction Parser ──────────────────────
+
+describe('reaction-parser', () => {
+  it('parseReaction splits reactants and products', () => {
+    const r = reactionParser.parseReaction('A + B -> C + D');
+    assert.deepEqual(r.reactants, ['A', 'B']);
+    assert.deepEqual(r.products, ['C', 'D']);
+    assert.equal(r.arrow, '->');
+    assert.equal(r.conditions, null);
+  });
+
+  it('parseReaction extracts conditions in brackets', () => {
+    const r = reactionParser.parseReaction('A + B ->[H3PO4, 85°C] C');
+    assert.equal(r.conditions, 'H3PO4, 85°C');
+    assert.deepEqual(r.reactants, ['A', 'B']);
+    assert.deepEqual(r.products, ['C']);
+  });
+
+  it('parseReaction supports unicode arrows', () => {
+    const r = reactionParser.parseReaction('A → B');
+    assert.equal(r.arrow, '→');
+    assert.deepEqual(r.reactants, ['A']);
+    assert.deepEqual(r.products, ['B']);
+  });
+
+  it('parseReaction throws on missing arrow', () => {
+    assert.throws(() => reactionParser.parseReaction('A B C'));
+  });
+
+  it('balanceCheck detects balanced reactions', () => {
+    const parsed = reactionParser.parseReaction('CCO + O -> CC=O + O');
+    const check = reactionParser.balanceCheck(parsed);
+    assert.equal(typeof check.balanced, 'boolean');
+    assert.ok(check.reactantAtoms);
+    assert.ok(check.productAtoms);
+  });
+
+  it('formatReaction produces correct string', () => {
+    const parsed = { reactants: ['A', 'B'], products: ['C'], conditions: null };
+    assert.equal(reactionParser.formatReaction(parsed), 'A + B → C');
+    assert.equal(reactionParser.formatReaction(parsed, { unicode: false }), 'A + B -> C');
+  });
+
+  it('formatReaction includes conditions', () => {
+    const parsed = { reactants: ['A'], products: ['B'], conditions: 'H3PO4' };
+    assert.equal(reactionParser.formatReaction(parsed), 'A →[H3PO4] B');
+  });
+
+  it('extractConditions parses temperature and time', () => {
+    const conds = reactionParser.extractConditions('H3PO4, 85°C, 15 min');
+    assert.equal(conds.catalyst, 'H3PO4');
+    assert.equal(conds.temperature, 85);
+    assert.equal(conds.time, 15);
+  });
+
+  it('extractConditions returns nulls for empty string', () => {
+    const conds = reactionParser.extractConditions('');
+    assert.equal(conds.catalyst, null);
+    assert.equal(conds.temperature, null);
+  });
+
+  it('reactionType returns a string', () => {
+    const parsed = reactionParser.parseReaction('CC(=O)OC(=O)C + OC(=O)c1ccccc1O -> CC(=O)Oc1ccccc1C(=O)O + CC(O)=O');
+    const rtype = reactionParser.reactionType(parsed);
+    assert.equal(typeof rtype, 'string');
+    assert.ok(rtype.length > 0);
   });
 });

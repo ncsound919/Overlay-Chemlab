@@ -121,6 +121,11 @@ function runKineticsODE({
     return forward - reverse;
   }
 
+  // Precompute adaptive sub-stepping constants (kEff, equiv are fixed)
+  const maxStep = 0.5 / (kEff * (equiv + 1) + 1e-30);
+  const nSub = Math.max(1, Math.ceil(dt / maxStep));
+  const h = dt / nSub;
+
   for (let i = 0; i <= steps; i++) {
     const t = i * dt;
     const conc = 1 - x; // normalised reactant concentration
@@ -129,11 +134,6 @@ function runKineticsODE({
       conversion: Math.round(x * 1e6) / 1e6,
       concentration: Math.round(conc * 1e6) / 1e6,
     });
-
-    // Adaptive sub-stepping with RK4 to handle stiff kinetics
-    const maxStep = 0.5 / (kEff * (equiv + 1) + 1e-30);
-    const nSub = Math.max(1, Math.ceil(dt / maxStep));
-    const h = dt / nSub;
 
     for (let s = 0; s < nSub; s++) {
       const k1 = dxdt(x);

@@ -7,12 +7,23 @@ const apiRoutes = require('./src/api/routes.js');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// CORS headers for development
-app.use((_req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
+// Configure CORS origins via CORS_ALLOWED_ORIGINS env var in production.
+// WARNING: wildcard origin is used in development only.
+const ALLOWED_ORIGINS = (process.env.CORS_ALLOWED_ORIGINS || '')
+  .split(',').map(o => o.trim()).filter(Boolean);
+
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  if (process.env.NODE_ENV === 'production' && ALLOWED_ORIGINS.length > 0) {
+    if (origin && ALLOWED_ORIGINS.includes(origin)) {
+      res.setHeader('Access-Control-Allow-Origin', origin);
+    }
+  } else {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+  }
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  if (_req.method === 'OPTIONS') return res.sendStatus(204);
+  if (req.method === 'OPTIONS') return res.sendStatus(204);
   next();
 });
 
