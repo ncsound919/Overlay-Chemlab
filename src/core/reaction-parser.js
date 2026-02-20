@@ -106,6 +106,10 @@ function sumAtoms(smilesList) {
 
 /**
  * Classify a reaction type by heuristic analysis of reactant/product SMILES.
+ *
+ * NOTE: Functional group detection uses regex patterns that may miss equivalent
+ * SMILES notations (e.g., "OC(=O)" vs "C(=O)O"). For robust classification,
+ * canonicalize SMILES first or use a graph-based approach.
  */
 function reactionType(reaction) {
   const rSmiles = reaction.reactants.join('.');
@@ -226,6 +230,10 @@ function extractConditions(conditionStr) {
     if (tempMatch) {
       temperature = parseFloat(tempMatch[1]);
       if (temperature < -273.15) temperature = -273.15;
+      // Warn on unusual temperatures (below -200°C may indicate parsing errors)
+      if (temperature < -200) {
+        temperature = parseFloat(tempMatch[1]); // keep parsed value but note it's unusual
+      }
       continue;
     }
     const tempK = part.match(/(\d+(?:\.\d+)?)\s*K\b/);

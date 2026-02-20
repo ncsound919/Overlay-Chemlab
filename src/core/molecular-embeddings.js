@@ -176,6 +176,11 @@ function buildAdjacency(parsed) {
  * sorted list of neighbour environment hashes, concatenate with the atom's own
  * hash, re-hash, and set the corresponding bit in the fingerprint.
  *
+ * NOTE: Uses FNV-1a (32-bit) hash mapped via modulo to fingerprint bits.
+ * The default 128-bit length may produce significant hash collisions for
+ * large molecule sets. For production similarity searches, use nBits=2048
+ * or higher to reduce collision rates.
+ *
  * @param {string} smiles
  * @param {object} [options]
  * @param {number} [options.radius=2]

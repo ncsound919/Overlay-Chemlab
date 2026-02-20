@@ -7,9 +7,12 @@
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 
 <!-- SmilesDrawer: real SMILES→2D SVG (MIT, 50KB) -->
-<script src="https://unpkg.com/smiles-drawer@2.1.7/dist/smiles-drawer.min.js"></script>
+<!-- NOTE: Compute and add integrity="sha384-..." attributes before production deployment -->
+<script src="https://unpkg.com/smiles-drawer@2.1.7/dist/smiles-drawer.min.js"
+        crossorigin="anonymous"></script>
 <!-- RDKit.js minimal: optional 3D/props (Apache 2.0, ~1MB — lazyload) -->
-<script src="https://unpkg.com/@rdkit/rdkit@2024.3.3/dist/RDKit_minimal.js" defer></script>
+<script src="https://unpkg.com/@rdkit/rdkit@2024.3.3/dist/RDKit_minimal.js"
+        crossorigin="anonymous" defer></script>
 
 <style>
 :root {

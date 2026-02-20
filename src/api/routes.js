@@ -15,6 +15,39 @@ const startTime = Date.now();
 const MAX_SMILES_LENGTH = 1000;
 const MAX_SIM_STEPS = 10000;
 
+// Simple in-memory rate limiter (per IP, sliding window)
+const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1 minute
+const RATE_LIMIT_MAX = 100; // max requests per window
+const rateLimitStore = new Map();
+
+function rateLimit(req, res, next) {
+  const ip = req.ip || req.connection.remoteAddress || 'unknown';
+  const now = Date.now();
+  let entry = rateLimitStore.get(ip);
+
+  if (!entry || now - entry.windowStart > RATE_LIMIT_WINDOW_MS) {
+    entry = { windowStart: now, count: 0 };
+    rateLimitStore.set(ip, entry);
+  }
+
+  entry.count++;
+
+  if (entry.count > RATE_LIMIT_MAX) {
+    return res.status(429).json({ error: 'Too many requests. Please try again later.' });
+  }
+
+  // Periodic cleanup of stale entries
+  if (rateLimitStore.size > 10000) {
+    for (const [key, val] of rateLimitStore) {
+      if (now - val.windowStart > RATE_LIMIT_WINDOW_MS) rateLimitStore.delete(key);
+    }
+  }
+
+  next();
+}
+
+router.use(rateLimit);
+
 function validateSmiles(smiles) {
   if (!smiles) return 'smiles query parameter is required';
   if (smiles.length > MAX_SMILES_LENGTH) return `smiles exceeds maximum length of ${MAX_SMILES_LENGTH} characters`;
@@ -142,8 +175,6 @@ router.post('/simulate/kinetics', (req, res) => {
     const stepsVal = steps != null ? Number(steps) : 200;
     if (!Number.isFinite(stepsVal) || stepsVal <= 0 || stepsVal > MAX_SIM_STEPS) {
       return res.status(400).json({ error: `steps must be a number between 1 and ${MAX_SIM_STEPS}` });
-    }
-      return res.status(400).json({ error: `steps exceeds maximum of ${MAX_SIM_STEPS}` });
     }
 
     const result = runKineticsODE({
