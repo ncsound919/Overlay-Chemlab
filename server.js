@@ -18,7 +18,7 @@ app.use((req, res, next) => {
     if (origin && ALLOWED_ORIGINS.includes(origin)) {
       res.setHeader('Access-Control-Allow-Origin', origin);
     }
-  } else {
+  } else if (process.env.NODE_ENV !== 'production') {
     res.setHeader('Access-Control-Allow-Origin', '*');
   }
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
