@@ -392,8 +392,8 @@ describe('drug-likeness', () => {
   });
 
   it('lipinskiRuleOfFive: large lipophilic molecule fails', () => {
-    // n-dotriacontane (C32H66): MW ≈450, very high logP
-    const largeSMILES = 'CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC';
+    // n-hexatriacontane (C36H74): MW ≈507 Da (>500) and logP 6.3 (>5) → 2 violations → fails
+    const largeSMILES = 'CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC';
     const result = drugLikeness.lipinskiRuleOfFive(largeSMILES);
     assert.ok(!result.pass);
     assert.ok(result.violations > 0);
