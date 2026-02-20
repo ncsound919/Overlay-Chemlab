@@ -140,7 +140,9 @@ router.post('/simulate/kinetics', (req, res) => {
     }
 
     const stepsVal = steps != null ? Number(steps) : 200;
-    if (stepsVal > MAX_SIM_STEPS) {
+    if (!Number.isFinite(stepsVal) || stepsVal <= 0 || stepsVal > MAX_SIM_STEPS) {
+      return res.status(400).json({ error: `steps must be a number between 1 and ${MAX_SIM_STEPS}` });
+    }
       return res.status(400).json({ error: `steps exceeds maximum of ${MAX_SIM_STEPS}` });
     }
 
