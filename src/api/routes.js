@@ -256,11 +256,11 @@ router.post('/green/metrics', (req, res) => {
       });
     }
 
-    if (result.atomEconomy != null && result.eFactor != null) {
+    if (result.atomEconomy != null && result.eFactor != null && yieldFraction != null) {
       result.greenScore = greenChem.greenScore({
         atomEconomyPct: result.atomEconomy,
         eFact:          result.eFactor,
-        yieldPct:       yieldFraction != null ? Number(yieldFraction) * 100 : undefined,
+        yieldPct:       Number(yieldFraction) * 100,
         solvent,
       });
     }
