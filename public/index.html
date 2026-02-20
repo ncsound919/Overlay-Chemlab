@@ -1219,6 +1219,27 @@ function getLocalAnswer(msg) {
 }
 
 async function callClaudeAPI(userMsg) {
+  // Prefer backend API so the chemistry knowledge base can live server-side
+  try {
+    const response = await fetch('/api/chem-assistant', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: userMsg })
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      if (data && typeof data.answer === 'string') {
+        return data.answer;
+      }
+    } else {
+      console.error('Chem assistant API returned non-OK status:', response.status);
+    }
+  } catch (err) {
+    console.error('Error calling chem assistant API:', err);
+  }
+
+  // Fallback to local knowledge base if backend is unavailable or response invalid
   // Prefer backend API so knowledge base can be updated server-side
   try {
     const response = await fetch('/api/chem-assistant', {
