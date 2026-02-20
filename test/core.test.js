@@ -392,10 +392,8 @@ describe('drug-likeness', () => {
   });
 
   it('lipinskiRuleOfFive: large lipophilic molecule fails', () => {
-    // Cyclosporin A-like large MW lipophilic peptide — very high MW + logP
-    // Use a simple heavy large molecule: C60 fullerene skeleton (very high MW)
-    // Instead use a synthetic high-MW molecule
-    const largeSMILES = 'CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC'; // MW ~450, very high logP
+    // n-dotriacontane (C32H66): MW ≈450, very high logP
+    const largeSMILES = 'CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC';
     const result = drugLikeness.lipinskiRuleOfFive(largeSMILES);
     assert.ok(!result.pass);
     assert.ok(result.violations > 0);
