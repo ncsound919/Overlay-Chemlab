@@ -1,4 +1,4 @@
-# Overlay-ChemLab
+# Overlay-Chemlab
 
 **Professional-grade digital chemistry laboratory** — a full-stack scientific platform
 built on methodologies from leading research institutions including Pfizer, GSK,
