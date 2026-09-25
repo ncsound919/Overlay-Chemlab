@@ -1,14 +1,14 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ChemLab — Molecule Visualizer</title>
+<title>ChemLab ΓÇö Molecule Visualizer</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 
-<!-- SmilesDrawer: real SMILES→2D SVG (MIT, 50KB) -->
+<!-- SmilesDrawer: real SMILESΓåÆ2D SVG (MIT, 50KB) -->
 <script src="https://unpkg.com/smiles-drawer@2.1.7/dist/smiles-drawer.min.js"></script>
-<!-- RDKit.js minimal: optional 3D/props (Apache 2.0, ~1MB — lazyload) -->
+<!-- RDKit.js minimal: optional 3D/props (Apache 2.0, ~1MB ΓÇö lazyload) -->
 <script src="https://unpkg.com/@rdkit/rdkit@2024.3.3/dist/RDKit_minimal.js" defer></script>
 
 <style>
@@ -21,7 +21,7 @@
 body { height:100vh; background:var(--bg); color:var(--text); font-family:'IBM Plex Sans',sans-serif; overflow:hidden; font-size:14px; }
 .app { display:flex; height:100vh; }
 
-/* ── LEFT: SMILES EDITOR ── */
+/* ΓöÇΓöÇ LEFT: SMILES EDITOR ΓöÇΓöÇ */
 .editor-panel { 
   width:420px; background:var(--panel); border-right:1px solid var(--border); 
   display:flex; flex-direction:column; 
@@ -56,7 +56,7 @@ body { height:100vh; background:var(--bg); color:var(--text); font-family:'IBM P
 .preset-btn:hover { border-color:var(--accent); background:rgba(0,232,162,.05); }
 .preset-btn.active { border-color:var(--accent); background:rgba(0,232,162,.1); }
 
-/* ── CENTER: MOLECULE CANVAS ── */
+/* ΓöÇΓöÇ CENTER: MOLECULE CANVAS ΓöÇΓöÇ */
 .canvas-panel { 
   flex:1; background:var(--bg); display:flex; flex-direction:column; 
   align-items:center; justify-content:center; position:relative; overflow:hidden;
@@ -87,7 +87,7 @@ body { height:100vh; background:var(--bg); color:var(--text); font-family:'IBM P
 .mol-formula { font-weight:700; color:var(--accent); font-size:18px; margin-bottom:4px; }
 .mol-mw { color:var(--accent2); font-size:12px; }
 
-/* ── RIGHT: PROPS PANEL ── */
+/* ΓöÇΓöÇ RIGHT: PROPS PANEL ΓöÇΓöÇ */
 .props-panel { 
   width:320px; background:var(--panel); border-left:1px solid var(--border);
   display:flex; flex-direction:column; overflow:hidden;
@@ -114,7 +114,7 @@ body { height:100vh; background:var(--bg); color:var(--text); font-family:'IBM P
 }
 .rdkit-3d-btn:hover { background:var(--border); }
 
-/* ── TOOLTIP & TOAST ── */
+/* ΓöÇΓöÇ TOOLTIP & TOAST ΓöÇΓöÇ */
 .tooltip { 
   position:absolute; background:var(--panel); border:1px solid var(--border);
   border-radius:8px; padding:12px; font-size:12px; pointer-events:none;
@@ -141,18 +141,18 @@ body { height:100vh; background:var(--bg); color:var(--text); font-family:'IBM P
   <!-- EDITOR PANEL -->
   <div class="editor-panel">
     <div class="ed-header">
-      <span style="font-size:18px;">⬡</span> SMILES Editor
+      <span style="font-size:18px;">Γ¼í</span> SMILES Editor
       <button class="btn btn-secondary" onclick="clearSmiles()">Clear</button>
     </div>
     <div class="ed-input-wrap">
       <textarea class="smiles-input" id="smilesInput" 
         placeholder="Enter SMILES notation...
 Examples:
-• Aspirin: CC(=O)Oc1ccccc1C(=O)O
-• Caffeine: Cn1cnc2n(C)c(=O)n(C)c(=O)c2c1
-• Glucose: C([C@@H]1[C@H]([C@@H]([C@H]([C@H](O1)O)O)O)O)O
-• Benzene: c1ccccc1
-Paste any SMILES — renders instantly!">CC(=O)Oc1ccccc1C(=O)O</textarea>
+ΓÇó Aspirin: CC(=O)Oc1ccccc1C(=O)O
+ΓÇó Caffeine: Cn1cnc2n(C)c(=O)n(C)c(=O)c2c1
+ΓÇó Glucose: C([C@@H]1[C@H]([C@@H]([C@H]([C@H](O1)O)O)O)O)O
+ΓÇó Benzene: c1ccccc1
+Paste any SMILES ΓÇö renders instantly!">CC(=O)Oc1ccccc1C(=O)O</textarea>
       
       <div class="controls">
         <button class="btn btn-primary" onclick="renderCurrent()">Render Molecule</button>
@@ -163,9 +163,9 @@ Paste any SMILES — renders instantly!">CC(=O)Oc1ccccc1C(=O)O</textarea>
       <div class="mol-presets">
         <button class="preset-btn active" onclick="loadPreset('CC(=O)Oc1ccccc1C(=O)O', 'Aspirin')">Aspirin<br><span style="font-size:10px;color:var(--muted);">CC(=O)Oc1ccccc1C(=O)O</span></button>
         <button class="preset-btn" onclick="loadPreset('Cn1cnc2n(C)c(=O)n(C)c(=O)c2c1', 'Caffeine')">Caffeine<br><span style="font-size:10px;color:var(--muted);">Cn1cnc2n(C)...</span></button>
-        <button class="preset-btn" onclick="loadPreset('C([C@@H]1[C@H]([C@@H]([C@H]([C@H](O1)O)O)O)O)O', 'Glucose')">Glucose (α-D)<br><span style="font-size:10px;color:var(--muted);">C([C@@H]1...</span></button>
+        <button class="preset-btn" onclick="loadPreset('C([C@@H]1[C@H]([C@@H]([C@H]([C@H](O1)O)O)O)O)O', 'Glucose')">Glucose (╬▒-D)<br><span style="font-size:10px;color:var(--muted);">C([C@@H]1...</span></button>
         <button class="preset-btn" onclick="loadPreset('c1ccccc1', 'Benzene')">Benzene<br><span style="font-size:10px;color:var(--muted);">c1ccccc1</span></button>
-        <button class="preset-btn" onclick="loadPreset('C#C', 'Ethyne')">HC≡CH<br><span style="font-size:10px;color:var(--muted);">C#C</span></button>
+        <button class="preset-btn" onclick="loadPreset('C#C', 'Ethyne')">HCΓëíCH<br><span style="font-size:10px;color:var(--muted);">C#C</span></button>
         <button class="preset-btn" onclick="loadPreset('C1=CC=C(C=C1)C(=O)O', 'Benzoic acid')">Benzoic Acid<br><span style="font-size:10px;color:var(--muted);">c1ccc(cc1)C(=O)O</span></button>
       </div>
     </div>
@@ -177,7 +177,7 @@ Paste any SMILES — renders instantly!">CC(=O)Oc1ccccc1C(=O)O</textarea>
       <canvas class="mol-canvas" id="mainCanvas" width="800" height="600"></canvas>
       <div class="loading-anim" id="loadingSpinner" style="display:none;"></div>
       <div class="mol-info" id="molInfo" style="display:none;">
-        <div class="mol-formula" id="molFormula">C₉H₈O₄</div>
+        <div class="mol-formula" id="molFormula">CΓéëHΓéêOΓéä</div>
         <div class="mol-mw" id="molMW">MW 180.16 g/mol</div>
       </div>
     </div>
@@ -213,7 +213,7 @@ Paste any SMILES — renders instantly!">CC(=O)Oc1ccccc1C(=O)O</textarea>
       <div class="prop-group">
         <div class="prop-title">Lipinski Rule of 5</div>
         <div class="prop-row" style="font-size:13px;font-weight:600;color:var(--accent);">
-          <span id="lipinskiStatus">✅ PASS</span>
+          <span id="lipinskiStatus">Γ£à PASS</span>
         </div>
       </div>
     </div>
@@ -222,7 +222,7 @@ Paste any SMILES — renders instantly!">CC(=O)Oc1ccccc1C(=O)O</textarea>
 </div>
 
 <script>
-// ─── MOLECULE VISUALIZER CORE ───
+// ΓöÇΓöÇΓöÇ MOLECULE VISUALIZER CORE ΓöÇΓöÇΓöÇ
 let currentMol = null, tooltipTimer = null;
 
 function showSpinner(show = true) {
@@ -244,7 +244,7 @@ async function renderMol(smiles, canvasId = 'mainCanvas', opts = {}) {
     });
   } catch (e) {
     showSpinner(false);
-    showToast('Invalid SMILES — check syntax', 'y');
+    showToast('Invalid SMILES ΓÇö check syntax', 'y');
     console.error('SMILES error:', e);
   }
 }
@@ -272,7 +272,7 @@ function updateProps(mol) {
   // Lipinski quick check (heuristic)
   const mw = atoms * 12.01 + atoms * 1.008; // rough
   const lipinski = mw < 500 && atoms < 10; // simplified
-  document.getElementById('lipinskiStatus').textContent = lipinski ? '✅ PASS' : '❌ FAIL';
+  document.getElementById('lipinskiStatus').textContent = lipinski ? 'Γ£à PASS' : 'Γ¥î FAIL';
   document.getElementById('lipinskiStatus').style.color = lipinski ? 'var(--accent)' : 'var(--warn)';
 }
 
@@ -312,16 +312,16 @@ function validateSmiles() {
   }
 }
 
-// ─── TOOLTIP ON HOVER ───
+// ΓöÇΓöÇΓöÇ TOOLTIP ON HOVER ΓöÇΓöÇΓöÇ
 document.getElementById('mainCanvas').addEventListener('mousemove', (e) => {
   if (tooltipTimer) clearTimeout(tooltipTimer);
   tooltipTimer = setTimeout(() => {
-    // Canvas hover → atom info (simplified)
+    // Canvas hover ΓåÆ atom info (simplified)
     const tooltip = document.getElementById('molTooltip');
     tooltip.innerHTML = `
       <div style="font-weight:600;margin-bottom:4px;">Atom Info</div>
       <div style="font-family:var(--font-mono);font-size:11px;color:var(--accent);">
-        Nearest: C (sp², aromatic)
+        Nearest: C (sp┬▓, aromatic)
       </div>
       <div style="font-size:11px;color:var(--muted);margin-top:4px;">
         Bonds: 3 | Charge: 0
@@ -338,28 +338,28 @@ document.getElementById('mainCanvas').addEventListener('mouseleave', () => {
   document.getElementById('molTooltip').style.display = 'none';
 });
 
-// ─── RDKit 3D (BONUS) ───
+// ΓöÇΓöÇΓöÇ RDKit 3D (BONUS) ΓöÇΓöÇΓöÇ
 async function loadRDKit3D() {
   if (!window.RDKitModule) {
     showToast('Loading RDKit.js for 3D/properties...', 'b');
     await new Promise(r => setTimeout(r, 2000)); // simulate
   }
-  showToast('🧪 3D view: Open in new tab (Mol* viewer)', 'g');
+  showToast('≡ƒº¬ 3D view: Open in new tab (Mol* viewer)', 'g');
   window.open(`https://molview.org/?smiles=${encodeURIComponent(currentSmiles)}`, '_blank');
 }
 
 async function updateRDKitProps(smiles) {
-  // Placeholder — full RDKit would compute logP/TPSA/etc.
+  // Placeholder ΓÇö full RDKit would compute logP/TPSA/etc.
   document.getElementById('propMW').textContent = '180.16 g/mol';
-  document.getElementById('propFormula').textContent = 'C₉H₈O₄';
+  document.getElementById('propFormula').textContent = 'CΓéëHΓéêOΓéä';
   document.getElementById('propLogP').textContent = '1.19';
-  document.getElementById('propTPSA').textContent = '66.4 Å²';
+  document.getElementById('propTPSA').textContent = '66.4 ├à┬▓';
   document.getElementById('propHBD').textContent = '1';
   document.getElementById('propHBA').textContent = '4';
   document.getElementById('propRotB').textContent = '1';
 }
 
-// ─── UTILS ───
+// ΓöÇΓöÇΓöÇ UTILS ΓöÇΓöÇΓöÇ
 function showToast(msg, type = 'g') {
   const toast = document.getElementById('toast');
   toast.textContent = msg;
@@ -368,7 +368,7 @@ function showToast(msg, type = 'g') {
   setTimeout(() => toast.style.display = 'none', 3000);
 }
 
-// ─── AUTO‑INIT ───
+// ΓöÇΓöÇΓöÇ AUTOΓÇæINIT ΓöÇΓöÇΓöÇ
 window.addEventListener('load', () => {
   renderCurrent(); // aspirin demo
   document.getElementById('smilesInput').addEventListener('input', renderCurrent);

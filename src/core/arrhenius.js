@@ -1,15 +1,15 @@
-'use strict';
+﻿'use strict';
 
-const R = 8.314;           // J/(mol·K)
-const DEFAULT_Ea = 65300;  // J/mol — Fischer esterification activation energy
-const DEFAULT_A = 4.2e9;   // Pre-exponential factor (s⁻¹)
+const R = 8.314;           // J/(mol┬╖K)
+const DEFAULT_Ea = 65300;  // J/mol ΓÇö Fischer esterification activation energy
+const DEFAULT_A = 4.2e9;   // Pre-exponential factor (sΓü╗┬╣)
 
 /**
  * Calculate rate constant k from the Arrhenius equation: k = A * exp(-Ea / (R * T))
  * @param {number} Ea  - Activation energy in J/mol
- * @param {number} A   - Pre-exponential factor (s⁻¹)
- * @param {number} T_celsius - Temperature in °C
- * @returns {number} Rate constant k (s⁻¹)
+ * @param {number} A   - Pre-exponential factor (sΓü╗┬╣)
+ * @param {number} T_celsius - Temperature in ┬░C
+ * @returns {number} Rate constant k (sΓü╗┬╣)
  */
 function arrheniusRate(Ea, A, T_celsius) {
   const T = T_celsius + 273.15;
@@ -19,13 +19,13 @@ function arrheniusRate(Ea, A, T_celsius) {
 
 /**
  * Simulate Fischer-Speier esterification.
- * Alcohol + carboxylic acid  ⇌  ester + water  (acid-catalysed)
+ * Alcohol + carboxylic acid  Γçî  ester + water  (acid-catalysed)
  *
  * @param {object} params
- * @param {number} params.temperature - °C
+ * @param {number} params.temperature - ┬░C
  * @param {number} params.time        - reaction time in seconds
- * @param {number} params.equiv       - molar equivalents of alcohol to acid (≥1)
- * @param {number} params.catalystDrops - drops of H₂SO₄ catalyst (0–10)
+ * @param {number} params.equiv       - molar equivalents of alcohol to acid (ΓëÑ1)
+ * @param {number} params.catalystDrops - drops of HΓééSOΓéä catalyst (0ΓÇô10)
  * @param {number} [params.Ea]        - activation energy (J/mol)
  * @param {number} [params.A]         - pre-exponential factor
  * @returns {{ conversion: number, yield: number, pH: number, sideProducts: string[], rateConstant: number }}
@@ -46,7 +46,7 @@ function simulateEsterification({
   const kEff = k * catalystFactor;
 
   // Second-order reversible kinetics simplified to pseudo-first-order
-  // with excess alcohol acting as solvent. Equilibrium constant Keq ≈ 4 for
+  // with excess alcohol acting as solvent. Equilibrium constant Keq Γëê 4 for
   // Fischer esterification. conversion = Keq*equiv / (Keq*equiv + 1) at equilibrium.
   const Keq = 4.0;
   const eqConversion = (Keq * equiv) / (Keq * equiv + 1);
@@ -67,7 +67,7 @@ function simulateEsterification({
   const rawYield = Math.max(0, conversion * (1 - sideLoss));
 
   // pH estimate: strong acid catalyst diluted into reaction mixture
-  // More catalyst → lower pH. Base line ~2–4.
+  // More catalyst ΓåÆ lower pH. Base line ~2ΓÇô4.
   const pH = catalystDrops > 0
     ? Math.max(0.5, 4.0 - Math.log10(catalystDrops + 1) * 2)
     : 7.0;
@@ -86,7 +86,7 @@ function simulateEsterification({
  * Uses Euler integration of  dx/dt = kEff*(1-x)*(equiv - x) - (kEff/Keq)*x^2
  *
  * @param {object} params
- * @param {number} params.temperature   - °C
+ * @param {number} params.temperature   - ┬░C
  * @param {number} params.totalTime     - total time in seconds
  * @param {number} [params.steps=200]   - number of integration steps
  * @param {number} [params.Ea]          - activation energy (J/mol)
@@ -152,7 +152,7 @@ function runKineticsODE({
  * Calculate final isolated yield accounting for work-up losses.
  *
  * @param {object} params
- * @param {number} params.conversion          - fractional conversion (0–1)
+ * @param {number} params.conversion          - fractional conversion (0ΓÇô1)
  * @param {number} [params.equiv=1]           - molar equivalents
  * @param {number} [params.crystallizationLoss=0.05] - fractional loss during crystallization
  * @param {number} [params.filtrationLoss=0.02]      - fractional loss during filtration

@@ -1,4 +1,4 @@
-'use strict';
+﻿'use strict';
 
 const ATOMIC_WEIGHTS = {
   H: 1.008, C: 12.011, N: 14.007, O: 15.999,
@@ -98,7 +98,7 @@ function resolveElement(token) {
     raw = raw.replace(/@+/g, '');               // chirality
     if (raw.length === 0) return 'H';           // e.g. [H]
   }
-  // Aromatic atoms: lowercase → title-case
+  // Aromatic atoms: lowercase ΓåÆ title-case
   const aromaticMap = { c: 'C', n: 'N', o: 'O', s: 'S', p: 'P' };
   if (aromaticMap[raw]) return aromaticMap[raw];
   if (raw.length >= 2) {
@@ -173,8 +173,8 @@ function validate(smiles) {
 }
 
 /**
- * Basic canonicalization: normalise aromatic notation to Kekulé-style uppercase.
- * This is a simplified canonicalizer — it normalises atom case and removes
+ * Basic canonicalization: normalise aromatic notation to Kekul├⌐-style uppercase.
+ * This is a simplified canonicalizer ΓÇö it normalises atom case and removes
  * stereochemistry markers (/, \\, @).
  */
 function canonicalize(smiles) {
@@ -239,7 +239,7 @@ function atomCount(smiles) {
     } else if (tok.type === 'branch_close') {
       prevAtomIdx = atomStack.pop();
     } else if (tok.type === 'ring') {
-      // Ring closure adds a bond to a previous atom — handled below
+      // Ring closure adds a bond to a previous atom ΓÇö handled below
     }
   }
 
@@ -358,7 +358,7 @@ function bondCount(smiles) {
       if (ringOpens.has(tok.value)) {
         const openAtom = ringOpens.get(tok.value);
         ringOpens.delete(tok.value);
-        // Ring closure bond — default single unless there's a pending bond
+        // Ring closure bond ΓÇö default single unless there's a pending bond
         if (pendingBond === '=') result.double++;
         else if (pendingBond === '#') result.triple++;
         else if (pendingBond === ':') result.aromatic++;

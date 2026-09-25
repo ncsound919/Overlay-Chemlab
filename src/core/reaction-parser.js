@@ -1,10 +1,10 @@
-'use strict';
+﻿'use strict';
 
 const { atomCount } = require('./smiles-parser.js');
 
 const ARROW_PATTERNS = [
-  { re: /⟶/, symbol: '⟶' },
-  { re: /→/, symbol: '→' },
+  { re: /Γƒ╢/, symbol: 'Γƒ╢' },
+  { re: /ΓåÆ/, symbol: 'ΓåÆ' },
   { re: /=>/, symbol: '=>' },
   { re: /->/, symbol: '->' },
 ];
@@ -12,7 +12,7 @@ const ARROW_PATTERNS = [
 /**
  * Parse a reaction string with arrow notation.
  * Supports optional conditions in square brackets after the arrow.
- * Example: "A + B ->[H3PO4, 85°C] C + D"
+ * Example: "A + B ->[H3PO4, 85┬░C] C + D"
  */
 function parseReaction(reactionStr) {
   if (typeof reactionStr !== 'string' || !reactionStr.trim()) {
@@ -35,7 +35,7 @@ function parseReaction(reactionStr) {
   }
 
   if (arrowIndex === -1) {
-    throw new Error('No reaction arrow found. Use ->, =>, →, or ⟶');
+    throw new Error('No reaction arrow found. Use ->, =>, ΓåÆ, or Γƒ╢');
   }
 
   const lhs = str.slice(0, arrowIndex).trim();
@@ -115,10 +115,10 @@ function reactionType(reaction) {
   const rSmiles = reaction.reactants.join('.');
   const pSmiles = reaction.products.join('.');
 
-  // Esterification: carboxylic acid + alcohol → ester + water
+  // Esterification: carboxylic acid + alcohol ΓåÆ ester + water
   if (hasEsterFormation(rSmiles, pSmiles)) return 'esterification';
 
-  // Hydrolysis: ester + water → acid + alcohol
+  // Hydrolysis: ester + water ΓåÆ acid + alcohol
   if (hasHydrolysis(rSmiles, pSmiles)) return 'hydrolysis';
 
   // Condensation: two molecules combine, small molecule (H2O) lost
@@ -185,10 +185,10 @@ function hasSmallMolecule(smiles) {
  * Format a parsed reaction back to a string.
  * @param {object} parsed - Parsed reaction object from parseReaction
  * @param {object} [options]
- * @param {boolean} [options.unicode=true] - Use unicode arrow (→) vs ASCII (->)
+ * @param {boolean} [options.unicode=true] - Use unicode arrow (ΓåÆ) vs ASCII (->)
  */
 function formatReaction(parsed, { unicode = true } = {}) {
-  const arrow = unicode ? '→' : '->';
+  const arrow = unicode ? 'ΓåÆ' : '->';
   const lhs = parsed.reactants.join(' + ');
   const rhs = parsed.products.join(' + ');
 
@@ -202,7 +202,7 @@ function formatReaction(parsed, { unicode = true } = {}) {
 
 /**
  * Parse a condition string into structured data.
- * Example: "H3PO4, 85°C, 15 min" →
+ * Example: "H3PO4, 85┬░C, 15 min" ΓåÆ
  *   { catalyst: 'H3PO4', temperature: 85, time: 15, solvent: null }
  */
 function extractConditions(conditionStr) {
@@ -225,12 +225,12 @@ function extractConditions(conditionStr) {
   ];
 
   for (const part of parts) {
-    // Temperature: match patterns like 85°C, 85 °C, 85C, 300K, 85 degC
-    const tempMatch = part.match(/(-?\d+(?:\.\d+)?)\s*(?:°\s*C|degC|℃)/i);
+    // Temperature: match patterns like 85┬░C, 85 ┬░C, 85C, 300K, 85 degC
+    const tempMatch = part.match(/(-?\d+(?:\.\d+)?)\s*(?:┬░\s*C|degC|Γäâ)/i);
     if (tempMatch) {
       temperature = parseFloat(tempMatch[1]);
       if (temperature < -273.15) temperature = -273.15;
-      // Warn on unusual temperatures (below -200°C may indicate parsing errors)
+      // Warn on unusual temperatures (below -200┬░C may indicate parsing errors)
       if (temperature < -200) {
         temperature = parseFloat(tempMatch[1]); // keep parsed value but note it's unusual
       }

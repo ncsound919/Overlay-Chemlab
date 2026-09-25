@@ -1,4 +1,4 @@
-'use strict';
+﻿'use strict';
 
 const { describe, it } = require('node:test');
 const assert = require('node:assert/strict');
@@ -11,10 +11,10 @@ const reactionParser = require('../src/core/reaction-parser');
 const drugLikeness = require('../src/core/drug-likeness');
 const greenChem = require('../src/core/green-chemistry');
 
-// ────────────────────── Arrhenius ──────────────────────
+// ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ Arrhenius ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
 describe('arrhenius', () => {
-  it('arrheniusRate returns correct k at 25°C', () => {
+  it('arrheniusRate returns correct k at 25┬░C', () => {
     const k = arrhenius.arrheniusRate(65300, 4.2e9, 25);
     assert.ok(k > 0, 'rate constant must be positive');
     // k = 4.2e9 * exp(-65300 / (8.314 * 298.15))
@@ -70,7 +70,7 @@ describe('arrhenius', () => {
   });
 });
 
-// ────────────────────── SMILES Parser ──────────────────────
+// ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ SMILES Parser ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
 describe('smiles-parser', () => {
   it('tokenize parses ethanol', () => {
@@ -92,7 +92,7 @@ describe('smiles-parser', () => {
   });
 
   it('molecularFormula for aspirin', () => {
-    // Aspirin: CC(=O)Oc1ccccc1C(=O)O → C9H8O4
+    // Aspirin: CC(=O)Oc1ccccc1C(=O)O ΓåÆ C9H8O4
     const formula = smilesParser.molecularFormula('CC(=O)Oc1ccccc1C(=O)O');
     assert.equal(formula, 'C9H8O4');
   });
@@ -121,7 +121,7 @@ describe('smiles-parser', () => {
   });
 });
 
-// ────────────────────── Molecular Embeddings ──────────────────────
+// ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ Molecular Embeddings ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
 describe('molecular-embeddings', () => {
   it('parseSMILES parses benzene', () => {
@@ -178,19 +178,19 @@ describe('molecular-embeddings', () => {
   });
 
   it('molecularWeight for water', () => {
-    // H2O: O with 2 implicit H → 15.999 + 2*1.008 = 18.015
+    // H2O: O with 2 implicit H ΓåÆ 15.999 + 2*1.008 = 18.015
     const mw = molEmbed.molecularWeight('O');
     assert.ok(Math.abs(mw - 18.015) < 0.01);
   });
 
   it('molecularWeight for methane', () => {
-    // CH4: C with 4 implicit H → 12.011 + 4*1.008 = 16.043
+    // CH4: C with 4 implicit H ΓåÆ 12.011 + 4*1.008 = 16.043
     const mw = molEmbed.molecularWeight('C');
     assert.ok(Math.abs(mw - 16.043) < 0.01);
   });
 });
 
-// ────────────────────── Bayesian Risk ──────────────────────
+// ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ Bayesian Risk ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
 describe('bayesian-risk', () => {
   it('logistic(0) = 0.5', () => {
@@ -252,7 +252,7 @@ describe('bayesian-risk', () => {
   });
 });
 
-// ────────────────────── Reaction Parser ──────────────────────
+// ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ Reaction Parser ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
 describe('reaction-parser', () => {
   it('parseReaction splits reactants and products', () => {
@@ -264,15 +264,15 @@ describe('reaction-parser', () => {
   });
 
   it('parseReaction extracts conditions in brackets', () => {
-    const r = reactionParser.parseReaction('A + B ->[H3PO4, 85°C] C');
-    assert.equal(r.conditions, 'H3PO4, 85°C');
+    const r = reactionParser.parseReaction('A + B ->[H3PO4, 85┬░C] C');
+    assert.equal(r.conditions, 'H3PO4, 85┬░C');
     assert.deepEqual(r.reactants, ['A', 'B']);
     assert.deepEqual(r.products, ['C']);
   });
 
   it('parseReaction supports unicode arrows', () => {
-    const r = reactionParser.parseReaction('A → B');
-    assert.equal(r.arrow, '→');
+    const r = reactionParser.parseReaction('A ΓåÆ B');
+    assert.equal(r.arrow, 'ΓåÆ');
     assert.deepEqual(r.reactants, ['A']);
     assert.deepEqual(r.products, ['B']);
   });
@@ -291,17 +291,17 @@ describe('reaction-parser', () => {
 
   it('formatReaction produces correct string', () => {
     const parsed = { reactants: ['A', 'B'], products: ['C'], conditions: null };
-    assert.equal(reactionParser.formatReaction(parsed), 'A + B → C');
+    assert.equal(reactionParser.formatReaction(parsed), 'A + B ΓåÆ C');
     assert.equal(reactionParser.formatReaction(parsed, { unicode: false }), 'A + B -> C');
   });
 
   it('formatReaction includes conditions', () => {
     const parsed = { reactants: ['A'], products: ['B'], conditions: 'H3PO4' };
-    assert.equal(reactionParser.formatReaction(parsed), 'A →[H3PO4] B');
+    assert.equal(reactionParser.formatReaction(parsed), 'A ΓåÆ[H3PO4] B');
   });
 
   it('extractConditions parses temperature and time', () => {
-    const conds = reactionParser.extractConditions('H3PO4, 85°C, 15 min');
+    const conds = reactionParser.extractConditions('H3PO4, 85┬░C, 15 min');
     assert.equal(conds.catalyst, 'H3PO4');
     assert.equal(conds.temperature, 85);
     assert.equal(conds.time, 15);
@@ -321,10 +321,10 @@ describe('reaction-parser', () => {
   });
 });
 
-// ────────────────────── Drug-Likeness ──────────────────────
+// ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ Drug-Likeness ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
 describe('drug-likeness', () => {
-  // Aspirin: CC(=O)Oc1ccccc1C(=O)O — a well-characterised drug molecule
+  // Aspirin: CC(=O)Oc1ccccc1C(=O)O ΓÇö a well-characterised drug molecule
   const aspirinSMILES = 'CC(=O)Oc1ccccc1C(=O)O';
 
   it('countHBD for aspirin returns 1', () => {
@@ -360,7 +360,7 @@ describe('drug-likeness', () => {
     assert.equal(drugLikeness.countRotatableBonds('CCCC'), 1);
   });
 
-  it('estimateTPSA for aspirin matches PubChem (63.6 Å²)', () => {
+  it('estimateTPSA for aspirin matches PubChem (63.6 ├à┬▓)', () => {
     const tpsa = drugLikeness.estimateTPSA(aspirinSMILES);
     assert.ok(Math.abs(tpsa - 63.6) < 1, `Expected ~63.6, got ${tpsa}`);
   });
@@ -379,7 +379,7 @@ describe('drug-likeness', () => {
   });
 
   it('estimateLogP for ethanol is negative', () => {
-    // Ethanol logP = −0.31; our model should give a negative value
+    // Ethanol logP = ΓêÆ0.31; our model should give a negative value
     assert.ok(drugLikeness.estimateLogP('CCO') < 0);
   });
 
@@ -392,7 +392,7 @@ describe('drug-likeness', () => {
   });
 
   it('lipinskiRuleOfFive: large lipophilic molecule fails', () => {
-    // n-hexatriacontane (C36H74): MW ≈507 Da (>500) and logP 6.3 (>5) → 2 violations → fails
+    // n-hexatriacontane (C36H74): MW Γëê507 Da (>500) and logP 6.3 (>5) ΓåÆ 2 violations ΓåÆ fails
     const largeSMILES = 'CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC';
     const result = drugLikeness.lipinskiRuleOfFive(largeSMILES);
     assert.ok(!result.pass);
@@ -407,7 +407,7 @@ describe('drug-likeness', () => {
   });
 
   it('ruleOfThree: aspirin passes with one tolerated HBA violation', () => {
-    // Aspirin MW=180.16, logP≈0.45, HBD=1, HBA=4 → HBA violates (>3) but one violation is tolerated
+    // Aspirin MW=180.16, logPΓëê0.45, HBD=1, HBA=4 ΓåÆ HBA violates (>3) but one violation is tolerated
     const result = drugLikeness.ruleOfThree(aspirinSMILES);
     assert.ok(result.pass);
     assert.equal(result.violations, 1);
@@ -429,11 +429,11 @@ describe('drug-likeness', () => {
   });
 });
 
-// ────────────────────── Green Chemistry ──────────────────────
+// ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ Green Chemistry ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
 describe('green-chemistry', () => {
   // Aspirin synthesis: salicylic acid (MW 138.12) + acetic anhydride (MW 102.09)
-  // → aspirin (MW 180.16) + acetic acid (MW 60.05)
+  // ΓåÆ aspirin (MW 180.16) + acetic acid (MW 60.05)
   const reactantsMW = 138.12 + 102.09; // 240.21
   const productMW   = 180.16;
 
@@ -445,7 +445,7 @@ describe('green-chemistry', () => {
   });
 
   it('atomEconomy for addition reaction is 100%', () => {
-    // ethene + H2 → ethane: all atoms conserved
+    // ethene + H2 ΓåÆ ethane: all atoms conserved
     const ae = greenChem.atomEconomy(30, 30);
     assert.equal(ae, 100);
   });
@@ -489,7 +489,7 @@ describe('green-chemistry', () => {
   });
 
   it('reactionMassEfficiency combines yield and AE', () => {
-    // 80% yield, 75% AE, SF=1 → RME = 0.80 × 0.75 = 0.60
+    // 80% yield, 75% AE, SF=1 ΓåÆ RME = 0.80 ├ù 0.75 = 0.60
     const rme = greenChem.reactionMassEfficiency(0.80, 75, 1.0);
     assert.ok(Math.abs(rme - 0.60) < 1e-6);
   });
@@ -503,8 +503,8 @@ describe('green-chemistry', () => {
   });
 
   it('carbonEfficiency calculates correctly', () => {
-    // Aspirin (9 C) from salicylic acid (7 C) + acetic anhydride (4 C of 2×Ac)
-    // CE = 9 / (7 + 4) × 100 = 81.8%
+    // Aspirin (9 C) from salicylic acid (7 C) + acetic anhydride (4 C of 2├ùAc)
+    // CE = 9 / (7 + 4) ├ù 100 = 81.8%
     const ce = greenChem.carbonEfficiency(9, 11);
     assert.ok(Math.abs(ce - 81.82) < 0.1);
   });

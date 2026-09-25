@@ -1,8 +1,8 @@
-{
+﻿{
   "overlay365Extension": {
     "name": "overlay365-bioos-chemlab",
     "version": "3.0.0",
-    "description": "Immersive Bio-OS chemistry and biotech lab inside VS Code — powered by Monaco, PixiJS, RDKit, and a full math/logic analysis engine grounded in predicate logic, probabilistic scoring, linear-algebra embeddings, information-theoretic ranking, and gradient-descent optimization. Extended with first‑principles catalysis data for NO+CO on Pd surfaces.",
+    "description": "Immersive Bio-OS chemistry and biotech lab inside VS Code ΓÇö powered by Monaco, PixiJS, RDKit, and a full math/logic analysis engine grounded in predicate logic, probabilistic scoring, linear-algebra embeddings, information-theoretic ranking, and gradient-descent optimization. Extended with firstΓÇæprinciples catalysis data for NO+CO on Pd surfaces.",
     "publisher": "overlay365",
     "main": "dist/extension.js",
 
@@ -43,7 +43,7 @@
         { "command": "overlay365.showEnergyDiagram",     "title": "Show Energy Diagram (NO+CO)" },
         { "command": "overlay365.runMicrokinetic",       "title": "Run Microkinetic Simulation" },
         { "command": "overlay365.compareFacets",         "title": "Compare Pd(111) vs Pd(100)" },
-        { "command": "overlay365.dopingEffect",          "title": "Estimate Ti‑Doping Effect" },
+        { "command": "overlay365.dopingEffect",          "title": "Estimate TiΓÇæDoping Effect" },
         { "command": "overlay365.suddenModelPlot",       "title": "Plot Reaction Probability vs Temperature" }
       ],
       "configuration": {
@@ -66,41 +66,41 @@
           "overlay365.privacy.disableExternalCalls":       { "type": "boolean", "default": false },
           "overlay365.math.riskScoreThreshold":            { "type": "number",  "default": 0.65, "description": "Bayesian posterior risk threshold above which a compound is flagged." },
           "overlay365.math.embeddingDimension":            { "type": "number",  "default": 128,  "description": "Dimensionality d of Morgan-fingerprint embedding vectors." },
-          "overlay365.math.gradientDescentLR":             { "type": "number",  "default": 0.01, "description": "Learning rate η for the local property-optimization step." }
+          "overlay365.math.gradientDescentLR":             { "type": "number",  "default": 0.01, "description": "Learning rate ╬╖ for the local property-optimization step." }
         }
       }
     },
 
     "logicFoundation": {
-      "_rationale": "Every pipeline decision is a predicate over typed sets. Contracts (precondition ⟹ postcondition) guard every external call. De Morgan rewriting and quantifier duality drive code-path simplification inside the LSP watcher.",
+      "_rationale": "Every pipeline decision is a predicate over typed sets. Contracts (precondition Γƒ╣ postcondition) guard every external call. De Morgan rewriting and quantifier duality drive code-path simplification inside the LSP watcher.",
       "corePredicates": {
-        "ValidFormula(s)":     "s ∈ String  ∧  regex_enhanced matches s  ∧  RDKit.get_mol(s) ≠ null",
-        "SafeCompound(c)":     "ValidFormula(c)  ∧  RiskScore(c) < threshold  ∧  ¬Restricted(c)",
-        "APIReachable(url)":   "¬disableExternalCalls  ∧  lastPingLatency(url) < 5000ms",
-        "CacheHit(key)":       "∃ entry ∈ inMemoryMap : entry.key = normalize(key)  ∧  entry.ttl > now()",
-        "HardwareAdequate()":  "navigator.hardwareConcurrency ≥ 4  ∧  WebGLSupported()",
-        "AnalysisComplete(e)": "∀ mol ∈ e.molecules : ValidFormula(mol)  ∧  ∃ result ∈ e.results : result.cid = mol.cid"
+        "ValidFormula(s)":     "s Γêê String  Γêº  regex_enhanced matches s  Γêº  RDKit.get_mol(s) Γëá null",
+        "SafeCompound(c)":     "ValidFormula(c)  Γêº  RiskScore(c) < threshold  Γêº  ┬¼Restricted(c)",
+        "APIReachable(url)":   "┬¼disableExternalCalls  Γêº  lastPingLatency(url) < 5000ms",
+        "CacheHit(key)":       "Γêâ entry Γêê inMemoryMap : entry.key = normalize(key)  Γêº  entry.ttl > now()",
+        "HardwareAdequate()":  "navigator.hardwareConcurrency ΓëÑ 4  Γêº  WebGLSupported()",
+        "AnalysisComplete(e)": "ΓêÇ mol Γêê e.molecules : ValidFormula(mol)  Γêº  Γêâ result Γêê e.results : result.cid = mol.cid"
       },
       "contracts": {
         "analyzeSelectionCommand": {
-          "requires": "ValidFormula(selection)  ∧  (CacheHit(selection)  ∨  APIReachable(pubchemBaseUrl))",
-          "ensures":  "∃ report : report.smiles = canonical(selection)  ∧  report.riskScore ∈ [0,1]"
+          "requires": "ValidFormula(selection)  Γêº  (CacheHit(selection)  Γê¿  APIReachable(pubchemBaseUrl))",
+          "ensures":  "Γêâ report : report.smiles = canonical(selection)  Γêº  report.riskScore Γêê [0,1]"
         },
         "deepExperimentCommand": {
-          "requires": "∀ mol ∈ parsedMolecules : ValidFormula(mol)  ∧  APIReachable(cheminformaticsUrl)  ∧  APIReachable(bioinformaticsUrl)",
-          "ensures":  "AnalysisComplete(experiment)  ∧  experiment.persistedInSupabase = true"
+          "requires": "ΓêÇ mol Γêê parsedMolecules : ValidFormula(mol)  Γêº  APIReachable(cheminformaticsUrl)  Γêº  APIReachable(bioinformaticsUrl)",
+          "ensures":  "AnalysisComplete(experiment)  Γêº  experiment.persistedInSupabase = true"
         },
         "renderTier": {
-          "requires": "∃ asset : CacheHit(asset.key)  ∧  (HardwareAdequate()  ∨  asset.tier = 'basic')",
-          "ensures":  "pixiCanvas.children contains newSprite  ∧  newSprite.zIndex ≥ 100"
+          "requires": "Γêâ asset : CacheHit(asset.key)  Γêº  (HardwareAdequate()  Γê¿  asset.tier = 'basic')",
+          "ensures":  "pixiCanvas.children contains newSprite  Γêº  newSprite.zIndex ΓëÑ 100"
         },
         "suddenModelPlot": {
-          "requires": "metal ∈ Object.keys(catalysisDFT.datasets)  ∧  reaction ∈ catalysisDFT.reactions  ∧  T ∈ [300,800]",
-          "ensures":  "∃ plot : plot.title = `Reaction probability for ${reaction} on ${metal}`  ∧  plot.data.length ≥ 20"
+          "requires": "metal Γêê Object.keys(catalysisDFT.datasets)  Γêº  reaction Γêê catalysisDFT.reactions  Γêº  T Γêê [300,800]",
+          "ensures":  "Γêâ plot : plot.title = `Reaction probability for ${reaction} on ${metal}`  Γêº  plot.data.length ΓëÑ 20"
         }
       },
       "decisionTable": {
-        "_description": "Maps (cacheHit, apiReachable, hardwareAdequate) → rendering action. Exhaustive via truth-table (2³ = 8 rows), verified to be non-redundant.",
+        "_description": "Maps (cacheHit, apiReachable, hardwareAdequate) ΓåÆ rendering action. Exhaustive via truth-table (2┬│ = 8 rows), verified to be non-redundant.",
         "columns": ["CacheHit", "APIReachable", "HardwareAdequate", "Action"],
         "rows": [
           [true,  true,  true,  "renderComplex + fetchFreshBackground"],
@@ -114,7 +114,7 @@
         ]
       },
       "rewriteRules": {
-        "_source": "Wayne – Logic for Programmers §3.2 (De Morgan, quantifier duality)",
+        "_source": "Wayne ΓÇô Logic for Programmers ┬º3.2 (De Morgan, quantifier duality)",
         "shouldSkipMolecule": {
           "original":  "!all(mol => ValidFormula(mol)) || any(mol => Restricted(mol))",
           "step1_deMorgan": "some(mol => !ValidFormula(mol)) || any(mol => Restricted(mol))",
@@ -125,7 +125,7 @@
     },
 
     "catalysisDFT": {
-      "_rationale": "First‑principles data and models for heterogeneous catalysis, starting with the NO+CO reaction on Pd surfaces.",
+      "_rationale": "FirstΓÇæprinciples data and models for heterogeneous catalysis, starting with the NO+CO reaction on Pd surfaces.",
       "defaultMetal": "Pd",
       "defaultFacet": "111",
       "reactions": [
@@ -180,18 +180,18 @@
     },
 
     "mathEngine": {
-      "_rationale": "Hinton – Essential Math for AI: linear algebra for molecular embeddings, probability for risk scoring, calculus/gradient-descent for property optimization, information theory for API result ranking, plus new catalysis modules.",
+      "_rationale": "Hinton ΓÇô Essential Math for AI: linear algebra for molecular embeddings, probability for risk scoring, calculus/gradient-descent for property optimization, information theory for API result ranking, plus new catalysis modules.",
       "molecularEmbedding": {
-        "_theory": "Represent each molecule as a d-dimensional real vector via Morgan fingerprints. Similarity = cosine(v₁, v₂) = (v₁·v₂)/(‖v₁‖·‖v₂‖). Eigendecomposition of the similarity matrix surfaces molecular clusters without labels.",
+        "_theory": "Represent each molecule as a d-dimensional real vector via Morgan fingerprints. Similarity = cosine(vΓéü, vΓéé) = (vΓéü┬╖vΓéé)/(ΓÇûvΓéüΓÇû┬╖ΓÇûvΓééΓÇû). Eigendecomposition of the similarity matrix surfaces molecular clusters without labels.",
         "dimension": 128,
         "fingerprintRadius": 2,
         "similarityMetric": "cosine",
         "clusteringMethod": "spectralClustering",
         "spectralClustering": {
           "steps": [
-            "Build n×n similarity matrix S where S[i][j] = cosine(embed(molᵢ), embed(molⱼ))",
-            "Compute normalized Laplacian L = I − D^(-½) S D^(-½)",
-            "Take top-k eigenvectors of L → form n×k matrix U",
+            "Build n├ùn similarity matrix S where S[i][j] = cosine(embed(molß╡ó), embed(molΓ▒╝))",
+            "Compute normalized Laplacian L = I ΓêÆ D^(-┬╜) S D^(-┬╜)",
+            "Take top-k eigenvectors of L ΓåÆ form n├ùk matrix U",
             "Run k-means on rows of U to assign cluster labels"
           ],
           "outputSchema": {
@@ -202,8 +202,8 @@
         }
       },
       "bayesianRiskScoring": {
-        "_theory": "P(toxic | features) via Bayes: posterior ∝ likelihood × prior. Features are the embedding vector. Prior from ChEMBL toxicity prevalence. Likelihood from a logistic regression trained on PubChem BioAssay outcomes.",
-        "formula": "P(toxic|x) = σ(wᵀx + b)  where σ(z) = 1/(1+e^(-z))",
+        "_theory": "P(toxic | features) via Bayes: posterior Γê¥ likelihood ├ù prior. Features are the embedding vector. Prior from ChEMBL toxicity prevalence. Likelihood from a logistic regression trained on PubChem BioAssay outcomes.",
+        "formula": "P(toxic|x) = ╧â(wß╡Çx + b)  where ╧â(z) = 1/(1+e^(-z))",
         "priorSource": "ChEMBL compound toxicity base rates",
         "likelihoodModel": "logisticRegression",
         "threshold": 0.65,
@@ -211,62 +211,62 @@
         "outputFields": {
           "posteriorRisk": "float [0,1]",
           "confidence95CI": "[float, float]",
-          "dominantFeatures": "top-5 embedding dimensions by |wᵢ|",
-          "flagged": "boolean — true if posteriorRisk ≥ threshold"
+          "dominantFeatures": "top-5 embedding dimensions by |wß╡ó|",
+          "flagged": "boolean ΓÇö true if posteriorRisk ΓëÑ threshold"
         }
       },
       "propertyOptimization": {
-        "_theory": "Gradient descent (Hinton §Optimization) on a differentiable scoring function f(x) = −desirability(x). Starting from the parsed molecule's embedding, take steps xₙ₊₁ = xₙ − η∇f(xₙ) to suggest structurally similar but higher-scoring analogues.",
+        "_theory": "Gradient descent (Hinton ┬ºOptimization) on a differentiable scoring function f(x) = ΓêÆdesirability(x). Starting from the parsed molecule's embedding, take steps xΓéÖΓéèΓéü = xΓéÖ ΓêÆ ╬╖Γêçf(xΓéÖ) to suggest structurally similar but higher-scoring analogues.",
         "algorithm": "AdamW",
         "learningRate": 0.01,
         "beta1": 0.9,
         "beta2": 0.999,
         "epsilon": 1e-8,
         "maxIterations": 200,
-        "convergenceCriterion": "‖∇f(x)‖ < 1e-4",
-        "scoringFunction": "desirability(x) = α·druglikeness(x) + β·(1−toxicity(x)) + γ·selectivity(x)",
+        "convergenceCriterion": "ΓÇûΓêçf(x)ΓÇû < 1e-4",
+        "scoringFunction": "desirability(x) = ╬▒┬╖druglikeness(x) + ╬▓┬╖(1ΓêÆtoxicity(x)) + ╬│┬╖selectivity(x)",
         "weights": { "alpha": 0.5, "beta": 0.35, "gamma": 0.15 },
-        "output": "Top-3 optimized SMILES with Δdesirability vs. input"
+        "output": "Top-3 optimized SMILES with ╬ödesirability vs. input"
       },
       "informationTheoreticRanking": {
-        "_theory": "Rank API results by mutual information I(result ; query) = H(query) − H(query|result). Higher I means the result resolves more uncertainty about the query molecule. Used to sort multi-source results from PubChem, ChEMBL, and UniProt.",
+        "_theory": "Rank API results by mutual information I(result ; query) = H(query) ΓêÆ H(query|result). Higher I means the result resolves more uncertainty about the query molecule. Used to sort multi-source results from PubChem, ChEMBL, and UniProt.",
         "entropyEstimation": "plugin estimator on fingerprint bit-vector distributions",
         "rankingMetric": "normalizedMutualInformation",
-        "formula": "NMI(X;Y) = I(X;Y) / sqrt(H(X)·H(Y))",
+        "formula": "NMI(X;Y) = I(X;Y) / sqrt(H(X)┬╖H(Y))",
         "appliedTo": ["pubchemAssayResults", "chemblActivities", "uniprotTargets"],
-        "outputOrder": "descending NMI — most informative result first"
+        "outputOrder": "descending NMI ΓÇö most informative result first"
       },
       "loopInvariantVerification": {
-        "_theory": "Wayne §6.2.1 — every batch-processing loop carries a formally checked invariant to guarantee termination and correctness.",
+        "_theory": "Wayne ┬º6.2.1 ΓÇö every batch-processing loop carries a formally checked invariant to guarantee termination and correctness.",
         "batchMoleculeLoop": {
-          "invariant": "∀ i ∈ 0..<processed : ValidFormula(molecules[i])  ∧  results[i].cid ≠ null",
+          "invariant": "ΓêÇ i Γêê 0..<processed : ValidFormula(molecules[i])  Γêº  results[i].cid Γëá null",
           "terminationArgument": "processed strictly increases each iteration; bounded above by |molecules|",
           "onViolation": "abort batch, surface failing molecule index, emit structured error"
         }
       },
       "microkinetics": {
-        "_theory": "Solve mean‑field rate equations for surface coverage using DFT‑derived barriers and pre‑factors.",
-        "solver": "CVODE (via wasm) or embedded Runge‑Kutta",
-        "odeSystem": "dθ_i/dt = Σ (rate of formation) - Σ (rate of consumption)",
+        "_theory": "Solve meanΓÇæfield rate equations for surface coverage using DFTΓÇæderived barriers and preΓÇæfactors.",
+        "solver": "CVODE (via wasm) or embedded RungeΓÇæKutta",
+        "odeSystem": "d╬╕_i/dt = ╬ú (rate of formation) - ╬ú (rate of consumption)",
         "temperatureRange": [300, 800],
         "pressureRange": [1e-6, 1],
-        "output": "Coverage vs time, turnover frequency, rate‑determining degree of rate control"
+        "output": "Coverage vs time, turnover frequency, rateΓÇædetermining degree of rate control"
       },
       "suddenModel": {
-        "_theory": "Electronic (β) and mechanical (α) coupling parameters correct activation barrier for surface motion (equations 7‑10 from paper).",
+        "_theory": "Electronic (╬▓) and mechanical (╬▒) coupling parameters correct activation barrier for surface motion (equations 7ΓÇæ10 from paper).",
         "parameters": {
-          "Pd_111": { "β": 0.37, "α": 0.12 },
-          "Ti_Pd_111": { "β": 0.42, "α": 0.15 }
+          "Pd_111": { "╬▓": 0.37, "╬▒": 0.12 },
+          "Ti_Pd_111": { "╬▓": 0.42, "╬▒": 0.15 }
         },
-        "reactionProbability": "P(E;T) = ∫ ... (equation 9)",
+        "reactionProbability": "P(E;T) = Γê½ ... (equation 9)",
         "temperatureDependence": "Equation 10 with recoil effect",
         "plot": "Reaction probability vs incident energy at selectable T"
       },
       "dBandCenter": {
-        "_theory": "Center of d‑projected density of states relative to Fermi level. Higher (less negative) → stronger adsorption.",
-        "computeFromDOS": "∫ E·ρ_d(E) dE / ∫ ρ_d(E) dE",
+        "_theory": "Center of dΓÇæprojected density of states relative to Fermi level. Higher (less negative) ΓåÆ stronger adsorption.",
+        "computeFromDOS": "Γê½ E┬╖╧ü_d(E) dE / Γê½ ╧ü_d(E) dE",
         "inputFormat": "Array of {energy, dos} pairs",
-        "output": "d‑band center value in eV",
+        "output": "dΓÇæband center value in eV",
         "correlation": "Linear scaling with NO dissociation barrier (empirical)"
       }
     },
@@ -276,14 +276,14 @@
         "debounceMs": 500,
         "regex": {
           "formula":  "\\b([A-Z][a-z]?\\d*)+\\b",
-          "enhanced": "\\b(?:[A-Z][a-z]?[⁰-⁹+*‑⁻()]+|\\[[A-Za-z0-9+‑⁻()]+\\]|C[HRF]?|N[OP]?|O[S]?|P[OS]?|S[ei]?|(?:[A-Z][a-z]?)=?[0-9*+‑]*|\\([^()]*\\)[0-9+]*)\\b",
+          "enhanced": "\\b(?:[A-Z][a-z]?[Γü░-Γü╣+*ΓÇæΓü╗()]+|\\[[A-Za-z0-9+ΓÇæΓü╗()]+\\]|C[HRF]?|N[OP]?|O[S]?|P[OS]?|S[ei]?|(?:[A-Z][a-z]?)=?[0-9*+ΓÇæ]*|\\([^()]*\\)[0-9+]*)\\b",
           "smiles":   "[A-Za-z0-9@+\\-\\[\\]()=#$:/\\.]{6,}"
         },
         "lspContextAwareness": {
           "enabled": true,
           "ignoreZones": ["comments","stringLiterals","importPaths"],
           "triggerZones": ["functionCalls:Simulation.run","annotations:@overlay365Experiment","cells:analysis"],
-          "logicGate": "IsValidToken(t) = InTriggerZone(t) ∧ ¬InIgnoreZone(t) ∧ ValidFormula(t.text)"
+          "logicGate": "IsValidToken(t) = InTriggerZone(t) Γêº ┬¼InIgnoreZone(t) Γêº ValidFormula(t.text)"
         }
       },
 
@@ -297,7 +297,7 @@
               "H2O": {
                 "id": "water_v1", "tier": "basic",
                 "visuals": { "videoSrc": "assets/vids/h2o_alpha.webm", "loop": true, "playbackRate": 1.0 },
-                "mathAnnotations": { "molecularWeight": 18.015, "dipoleMoment_D": 1.85, "embeddingVector": "float32[128] — precomputed" }
+                "mathAnnotations": { "molecularWeight": 18.015, "dipoleMoment_D": 1.85, "embeddingVector": "float32[128] ΓÇö precomputed" }
               },
               "C6H12O6": {
                 "id": "glucose_struc", "tier": "complex",
@@ -314,8 +314,8 @@
             "k": 3,
             "fallbackThreshold": 0.80,
             "contract": {
-              "requires": "embed(query) ≠ null  ∧  |assetIndex| > 0",
-              "ensures":  "∀ result ∈ kNearest : cosine(embed(query), result.vector) ≥ fallbackThreshold"
+              "requires": "embed(query) Γëá null  Γêº  |assetIndex| > 0",
+              "ensures":  "ΓêÇ result Γêê kNearest : cosine(embed(query), result.vector) ΓëÑ fallbackThreshold"
             }
           },
           "normalization": { "stripWhitespace": true, "stripHyphensUnderscores": true, "uppercase": true },
@@ -346,16 +346,16 @@
           "generic": { "type": "particleOnly",                  "engine": "ParticleContainer",                        "effects": ["genericBurst"] }
         },
         "mathOverlays": {
-          "riskGauge":        "SVG arc chart — arc length proportional to posteriorRisk ∈ [0,1]",
-          "similarityRadar":  "Radar chart — axes = top-6 molecular properties; polygon area = desirability score",
+          "riskGauge":        "SVG arc chart ΓÇö arc length proportional to posteriorRisk Γêê [0,1]",
+          "similarityRadar":  "Radar chart ΓÇö axes = top-6 molecular properties; polygon area = desirability score",
           "clusterMap":       "2D UMAP projection of embedding vectors; color = cluster label",
-          "entropyBar":       "Horizontal bar — height = H(bits) of each property distribution"
+          "entropyBar":       "Horizontal bar ΓÇö height = H(bits) of each property distribution"
         },
         "catalysisVisuals": {
           "energyDiagram":   { "type": "Chart.js", "data": "from catalysisDFT.datasets" },
           "surface3D":       { "type": "three.js", "models": "slab+adsorbates" },
-          "reactionPath":    { "type": "Lottie/WebM", "frames": "pre‑computed" },
-          "dosPlot":         { "type": "Plotly.js", "layout": "with d‑band marker" }
+          "reactionPath":    { "type": "Lottie/WebM", "frames": "preΓÇæcomputed" },
+          "dosPlot":         { "type": "Plotly.js", "layout": "with dΓÇæband marker" }
         }
       },
 
@@ -366,12 +366,12 @@
         "apis": {
           "smilesToMol":       "get_mol(smiles)",
           "molToSvg":          "get_svg_for_mol(mol)",
-          "getMorganFP":       "get_morgan_fp(mol, radius=2, nBits=128)  → Float32Array[128]",
-          "computeDescriptors":"get_descriptors(mol)  → {MW, LogP, TPSA, HBD, HBA, RotBonds}"
+          "getMorganFP":       "get_morgan_fp(mol, radius=2, nBits=128)  ΓåÆ Float32Array[128]",
+          "computeDescriptors":"get_descriptors(mol)  ΓåÆ {MW, LogP, TPSA, HBD, HBA, RotBonds}"
         },
         "performance": { "expectedLatencyMs": "10-30", "lazyLoad": true, "loadOnIdle": true },
         "pixiIntegration": {
-          "svgToTexture": "Blob(SVG) → Image → PIXI.Texture.from(image)",
+          "svgToTexture": "Blob(SVG) ΓåÆ Image ΓåÆ PIXI.Texture.from(image)",
           "spriteProperties": { "anchor": 0.5, "scale": 0.8, "zIndex": 100 }
         }
       },
@@ -385,8 +385,8 @@
             "bioassays":      "/compound/cid/{cid}/assaysummary/JSON"
           },
           "contract": {
-            "requires": "APIReachable('https://pubchem.ncbi.nlm.nih.gov')  ∧  ValidFormula(smiles)",
-            "ensures":  "response.MW > 0  ∧  response.InChIKey matches /^[A-Z]{14}-[A-Z]{10}-[A-Z]$/"
+            "requires": "APIReachable('https://pubchem.ncbi.nlm.nih.gov')  Γêº  ValidFormula(smiles)",
+            "ensures":  "response.MW > 0  Γêº  response.InChIKey matches /^[A-Z]{14}-[A-Z]{10}-[A-Z]$/"
           }
         },
         "chembl": {
@@ -425,7 +425,7 @@
         "opentargets": {
           "baseUrl": "https://api.platform.opentargets.org/api/v4/graphql",
           "queryTemplate": "{ disease(efoId: \"{efoId}\") { associatedTargets { rows { target { id approvedSymbol } score } } } }",
-          "purpose": "Disease–gene association scores used as priors in Bayesian risk model."
+          "purpose": "DiseaseΓÇôgene association scores used as priors in Bayesian risk model."
         },
         "openFDA": {
           "baseUrl": "https://api.fda.gov/drug",
@@ -445,9 +445,9 @@
           "baseUrl": "https://bioinformatics.yourdomain.com",
           "capabilities": ["multiOmicsIntegration","variantAnnotation","diseaseAssociationLookup","pathwayDifferentialExpression"],
           "graphTheoryIntegration": {
-            "description": "Build a directed graph G=(V,E) where V = {genes ∪ pathways ∪ compounds}, E = {interaction edges weighted by Open Targets score}. Run PageRank to surface highest-influence nodes.",
-            "adjacencyRepresentation": "sparse CSR matrix — O(|V|+|E|) memory",
-            "pageRankFormula": "PR(u) = (1−d)/|V|  +  d · Σᵥ PR(v)/out_degree(v)",
+            "description": "Build a directed graph G=(V,E) where V = {genes Γê¬ pathways Γê¬ compounds}, E = {interaction edges weighted by Open Targets score}. Run PageRank to surface highest-influence nodes.",
+            "adjacencyRepresentation": "sparse CSR matrix ΓÇö O(|V|+|E|) memory",
+            "pageRankFormula": "PR(u) = (1ΓêÆd)/|V|  +  d ┬╖ ╬úß╡Ñ PR(v)/out_degree(v)",
             "dampingFactor": 0.85
           }
         },
@@ -476,21 +476,21 @@
             "surfaceProperties": "/surfaces/core?material_id={mpid}",
             "dos": "/electronic_structure/dos?material_id={mpid}"
           },
-          "purpose": "Retrieve bulk and surface DOS for d‑band center calculations."
+          "purpose": "Retrieve bulk and surface DOS for dΓÇæband center calculations."
         }
       },
 
       "analysisPipelines": {
         "chemlabQuickView": {
           "trigger": "overlay365.analyzeSelection",
-          "logicGuard": "ValidFormula(selection)  ∧  (CacheHit(selection)  ∨  APIReachable(pubchemBaseUrl))",
+          "logicGuard": "ValidFormula(selection)  Γêº  (CacheHit(selection)  Γê¿  APIReachable(pubchemBaseUrl))",
           "steps": [
             "1. Read selection or formula under cursor",
             "2. Run enhanced regex + RDKit validation (contract: ValidFormula)",
             "3. Compute 128-dim Morgan fingerprint embedding via RDKit WASM",
-            "4. Check embedding k-NN cache (cosine ≥ 0.80 → cache hit)",
+            "4. Check embedding k-NN cache (cosine ΓëÑ 0.80 ΓåÆ cache hit)",
             "5. If miss: query PubChem for MW, LogP, TPSA, HBD, HBA",
-            "6. Score Bayesian risk: P(toxic|x) = σ(wᵀx + b)",
+            "6. Score Bayesian risk: P(toxic|x) = ╧â(wß╡Çx + b)",
             "7. Render PixiJS visual at tier chosen by HardwareAdequate()",
             "8. Show Math Overlay: risk gauge + property radar",
             "9. Emit JSON summary to Output Channel"
@@ -506,27 +506,27 @@
 
         "deepBioOsAnalysis": {
           "trigger": "@overlay365Experiment annotation  OR  Simulation.run() call",
-          "logicGuard": "∀ mol ∈ parsedMolecules : ValidFormula(mol)  ∧  APIReachable(cheminformaticsUrl)  ∧  APIReachable(bioinformaticsUrl)",
+          "logicGuard": "ΓêÇ mol Γêê parsedMolecules : ValidFormula(mol)  Γêº  APIReachable(cheminformaticsUrl)  Γêº  APIReachable(bioinformaticsUrl)",
           "steps": [
-            "1. Parse code block via LSP → extract all formulas/SMILES",
-            "2. Loop-invariant check: ∀ i processed: ValidFormula(molecules[i])",
+            "1. Parse code block via LSP ΓåÆ extract all formulas/SMILES",
+            "2. Loop-invariant check: ΓêÇ i processed: ValidFormula(molecules[i])",
             "3. Batch-send to cheminformatics microservice: standardize + descriptors",
-            "4. Build n×n molecular similarity matrix (cosine on 128-dim embeddings)",
-            "5. Spectral clustering: eigendecompose Laplacian → k-means → cluster labels",
-            "6. Fetch ChEMBL bioactivities + Open Targets disease scores → Bayesian prior update",
-            "7. Run AdamW property optimization (200 iter, η=0.01) → top-3 analogues per molecule",
+            "4. Build n├ùn molecular similarity matrix (cosine on 128-dim embeddings)",
+            "5. Spectral clustering: eigendecompose Laplacian ΓåÆ k-means ΓåÆ cluster labels",
+            "6. Fetch ChEMBL bioactivities + Open Targets disease scores ΓåÆ Bayesian prior update",
+            "7. Run AdamW property optimization (200 iter, ╬╖=0.01) ΓåÆ top-3 analogues per molecule",
             "8. Query Reactome pathway enrichment + Ensembl variant consequences",
-            "9. Build directed gene–pathway–compound graph; run PageRank (d=0.85)",
+            "9. Build directed geneΓÇôpathwayΓÇôcompound graph; run PageRank (d=0.85)",
             "10. Rank all API results by Normalized Mutual Information (NMI)",
             "11. Persist experiment JSON to Supabase with version timestamp",
             "12. Return ranked analysis summary + interactive overlays"
           ],
-          "loopInvariant": "∀ i ∈ 0..<processed : molecules[i].standardized = true  ∧  results[i].riskScore ∈ [0,1]",
+          "loopInvariant": "ΓêÇ i Γêê 0..<processed : molecules[i].standardized = true  Γêº  results[i].riskScore Γêê [0,1]",
           "outputs": [
             "Interactive HUD: per-molecule overlays with risk gauge + cluster badge",
             "2D UMAP cluster map (Math Dashboard panel)",
             "PageRank influence chart for pathway graph",
-            "Optimized-analogue suggestions (top-3 per compound, SMILES + Δdesirability)",
+            "Optimized-analogue suggestions (top-3 per compound, SMILES + ╬ödesirability)",
             "Structured JSON for downstream pipelines",
             "Links to Supabase experiment record + Cloudflare dashboard"
           ]
@@ -535,14 +535,14 @@
         "propertyOptimizationPipeline": {
           "trigger": "overlay365.scoreRisk",
           "description": "Gradient-descent traversal of the molecular embedding space toward higher desirability.",
-          "inputContract": "ValidFormula(smiles)  ∧  embed(smiles) ≠ null",
+          "inputContract": "ValidFormula(smiles)  Γêº  embed(smiles) Γëá null",
           "algorithm": {
-            "init": "x₀ = embed(smiles)  ∈ ℝ¹²⁸",
-            "step": "xₙ₊₁ = xₙ − η · ∇desirability(xₙ)   via AdamW",
+            "init": "xΓéÇ = embed(smiles)  Γêê Γä¥┬╣┬▓Γü╕",
+            "step": "xΓéÖΓéèΓéü = xΓéÖ ΓêÆ ╬╖ ┬╖ Γêçdesirability(xΓéÖ)   via AdamW",
             "project": "After each step, find nearest real molecule in index by cosine similarity",
-            "stop": "‖∇desirability(xₙ)‖ < 1e-4  OR  n = 200"
+            "stop": "ΓÇûΓêçdesirability(xΓéÖ)ΓÇû < 1e-4  OR  n = 200"
           },
-          "outputContract": "∀ analogue ∈ top3 : ValidFormula(analogue.smiles)  ∧  analogue.desirability > input.desirability"
+          "outputContract": "ΓêÇ analogue Γêê top3 : ValidFormula(analogue.smiles)  Γêº  analogue.desirability > input.desirability"
         },
 
         "logicProofTrace": {
@@ -554,7 +554,7 @@
             { "step": 2, "rule": "deMorgan",    "expression": "some(mol => !ValidFormula(mol)) || any(mol => Restricted(mol))" },
             { "step": 3, "rule": "simplify",    "expression": "some(mol => !ValidFormula(mol) || Restricted(mol))" },
             { "step": 4, "rule": "definition",  "expression": "some(mol => !SafeCompound(mol))" },
-            { "step": 5, "rule": "conclusion",  "expression": "→ abort batch, surface failing molecule" }
+            { "step": 5, "rule": "conclusion",  "expression": "ΓåÆ abort batch, surface failing molecule" }
           ]
         }
       },
@@ -602,13 +602,13 @@
       },
       "testing": {
         "propertyBasedTests": {
-          "_source": "Wayne §4.2 Property-Based Testing",
+          "_source": "Wayne ┬º4.2 Property-Based Testing",
           "framework": "fast-check (TypeScript)",
           "properties": [
-            "∀ smiles ∈ ValidSMILES : RDKit.get_mol(smiles) ≠ null",
-            "∀ x ∈ embeddings : ‖x‖₂ > 0  (no zero vectors in index)",
-            "∀ risk ∈ riskScores : risk ∈ [0,1]",
-            "∀ analogue ∈ optimizationOutput : analogue.desirability ≥ input.desirability − ε"
+            "ΓêÇ smiles Γêê ValidSMILES : RDKit.get_mol(smiles) Γëá null",
+            "ΓêÇ x Γêê embeddings : ΓÇûxΓÇûΓéé > 0  (no zero vectors in index)",
+            "ΓêÇ risk Γêê riskScores : risk Γêê [0,1]",
+            "ΓêÇ analogue Γêê optimizationOutput : analogue.desirability ΓëÑ input.desirability ΓêÆ ╬╡"
           ]
         },
         "contractTests": {

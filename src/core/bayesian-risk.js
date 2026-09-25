@@ -1,4 +1,4 @@
-'use strict';
+﻿'use strict';
 
 /**
  * Logistic (sigmoid) function.
@@ -119,7 +119,7 @@ function batchRiskScore(embeddings, weights, bias) {
 }
 
 // Pre-trained weight vector (128 dimensions).
-// Derived from a simplified toxicity model — small realistic values
+// Derived from a simplified toxicity model ΓÇö small realistic values
 // centred near zero with slight variation to capture structural features.
 const DEFAULT_WEIGHTS = [
    0.023, -0.041,  0.015,  0.067, -0.033,  0.012, -0.058,  0.044,

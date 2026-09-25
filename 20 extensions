@@ -1,4 +1,4 @@
-# Modular Scaffold for 20 Monaco-Based Biotech IDE Extensions
+﻿# Modular Scaffold for 20 Monaco-Based Biotech IDE Extensions
 
 ---
 
@@ -199,20 +199,20 @@ Below, each extension is presented with a detailed scaffold, grouped by category
 **Suggested File/Module Structure**
 ```plaintext
 simulation-runner/
-  ├── src/
-  │   ├── index.ts
-  │   ├── commands.ts
-  │   ├── panel/
-  │   │   └── SimulationPanel.tsx
-  │   ├── language/
-  │   │   ├── dsl.ts
-  │   │   └── monarch.ts
-  │   └── services/
-  │       └── simulationService.ts
-  ├── test/
-  │   └── simulationRunner.test.ts
-  ├── manifest.json
-  └── package.json
+  Γö£ΓöÇΓöÇ src/
+  Γöé   Γö£ΓöÇΓöÇ index.ts
+  Γöé   Γö£ΓöÇΓöÇ commands.ts
+  Γöé   Γö£ΓöÇΓöÇ panel/
+  Γöé   Γöé   ΓööΓöÇΓöÇ SimulationPanel.tsx
+  Γöé   Γö£ΓöÇΓöÇ language/
+  Γöé   Γöé   Γö£ΓöÇΓöÇ dsl.ts
+  Γöé   Γöé   ΓööΓöÇΓöÇ monarch.ts
+  Γöé   ΓööΓöÇΓöÇ services/
+  Γöé       ΓööΓöÇΓöÇ simulationService.ts
+  Γö£ΓöÇΓöÇ test/
+  Γöé   ΓööΓöÇΓöÇ simulationRunner.test.ts
+  Γö£ΓöÇΓöÇ manifest.json
+  ΓööΓöÇΓöÇ package.json
 ```
 
 **Backend Integration Notes**
@@ -264,16 +264,16 @@ simulation-runner/
 **Suggested File/Module Structure**
 ```plaintext
 experiment-scheduler/
-  ├── src/
-  │   ├── index.ts
-  │   ├── dashboard/
-  │   │   └── SchedulerPanel.tsx
-  │   └── services/
-  │       └── schedulerService.ts
-  ├── test/
-  │   └── scheduler.test.ts
-  ├── manifest.json
-  └── package.json
+  Γö£ΓöÇΓöÇ src/
+  Γöé   Γö£ΓöÇΓöÇ index.ts
+  Γöé   Γö£ΓöÇΓöÇ dashboard/
+  Γöé   Γöé   ΓööΓöÇΓöÇ SchedulerPanel.tsx
+  Γöé   ΓööΓöÇΓöÇ services/
+  Γöé       ΓööΓöÇΓöÇ schedulerService.ts
+  Γö£ΓöÇΓöÇ test/
+  Γöé   ΓööΓöÇΓöÇ scheduler.test.ts
+  Γö£ΓöÇΓöÇ manifest.json
+  ΓööΓöÇΓöÇ package.json
 ```
 
 **Backend Integration Notes**
@@ -326,16 +326,16 @@ experiment-scheduler/
 **Suggested File/Module Structure**
 ```plaintext
 molecular-viewer/
-  ├── src/
-  │   ├── index.ts
-  │   ├── viewer/
-  │   │   └── MolecularViewer.tsx
-  │   └── services/
-  │       └── structureService.ts
-  ├── test/
-  │   └── viewer.test.ts
-  ├── manifest.json
-  └── package.json
+  Γö£ΓöÇΓöÇ src/
+  Γöé   Γö£ΓöÇΓöÇ index.ts
+  Γöé   Γö£ΓöÇΓöÇ viewer/
+  Γöé   Γöé   ΓööΓöÇΓöÇ MolecularViewer.tsx
+  Γöé   ΓööΓöÇΓöÇ services/
+  Γöé       ΓööΓöÇΓöÇ structureService.ts
+  Γö£ΓöÇΓöÇ test/
+  Γöé   ΓööΓöÇΓöÇ viewer.test.ts
+  Γö£ΓöÇΓöÇ manifest.json
+  ΓööΓöÇΓöÇ package.json
 ```
 
 **Backend Integration Notes**
@@ -385,18 +385,18 @@ molecular-viewer/
 **Suggested File/Module Structure**
 ```plaintext
 sequence-designer/
-  ├── src/
-  │   ├── index.ts
-  │   ├── editor/
-  │   │   └── SequenceEditor.tsx
-  │   ├── language/
-  │   │   └── sequenceDsl.ts
-  │   └── services/
-  │       └── sequenceService.ts
-  ├── test/
-  │   └── sequenceDesigner.test.ts
-  ├── manifest.json
-  └── package.json
+  Γö£ΓöÇΓöÇ src/
+  Γöé   Γö£ΓöÇΓöÇ index.ts
+  Γöé   Γö£ΓöÇΓöÇ editor/
+  Γöé   Γöé   ΓööΓöÇΓöÇ SequenceEditor.tsx
+  Γöé   Γö£ΓöÇΓöÇ language/
+  Γöé   Γöé   ΓööΓöÇΓöÇ sequenceDsl.ts
+  Γöé   ΓööΓöÇΓöÇ services/
+  Γöé       ΓööΓöÇΓöÇ sequenceService.ts
+  Γö£ΓöÇΓöÇ test/
+  Γöé   ΓööΓöÇΓöÇ sequenceDesigner.test.ts
+  Γö£ΓöÇΓöÇ manifest.json
+  ΓööΓöÇΓöÇ package.json
 ```
 
 **Backend Integration Notes**
@@ -446,16 +446,16 @@ sequence-designer/
 **Suggested File/Module Structure**
 ```plaintext
 lab-protocol-composer/
-  ├── src/
-  │   ├── index.ts
-  │   ├── editor/
-  │   │   └── ProtocolEditor.tsx
-  │   └── services/
-  │       └── protocolService.ts
-  ├── test/
-  │   └── protocolComposer.test.ts
-  ├── manifest.json
-  └── package.json
+  Γö£ΓöÇΓöÇ src/
+  Γöé   Γö£ΓöÇΓöÇ index.ts
+  Γöé   Γö£ΓöÇΓöÇ editor/
+  Γöé   Γöé   ΓööΓöÇΓöÇ ProtocolEditor.tsx
+  Γöé   ΓööΓöÇΓöÇ services/
+  Γöé       ΓööΓöÇΓöÇ protocolService.ts
+  Γö£ΓöÇΓöÇ test/
+  Γöé   ΓööΓöÇΓöÇ protocolComposer.test.ts
+  Γö£ΓöÇΓöÇ manifest.json
+  ΓööΓöÇΓöÇ package.json
 ```
 
 **Backend Integration Notes**
@@ -506,16 +506,16 @@ lab-protocol-composer/
 **Suggested File/Module Structure**
 ```plaintext
 reaction-pathway-visualizer/
-  ├── src/
-  │   ├── index.ts
-  │   ├── viewer/
-  │   │   └── PathwayViewer.tsx
-  │   └── services/
-  │       └── pathwayService.ts
-  ├── test/
-  │   └── pathwayVisualizer.test.ts
-  ├── manifest.json
-  └── package.json
+  Γö£ΓöÇΓöÇ src/
+  Γöé   Γö£ΓöÇΓöÇ index.ts
+  Γöé   Γö£ΓöÇΓöÇ viewer/
+  Γöé   Γöé   ΓööΓöÇΓöÇ PathwayViewer.tsx
+  Γöé   ΓööΓöÇΓöÇ services/
+  Γöé       ΓööΓöÇΓöÇ pathwayService.ts
+  Γö£ΓöÇΓöÇ test/
+  Γöé   ΓööΓöÇΓöÇ pathwayVisualizer.test.ts
+  Γö£ΓöÇΓöÇ manifest.json
+  ΓööΓöÇΓöÇ package.json
 ```
 
 **Backend Integration Notes**
@@ -564,16 +564,16 @@ reaction-pathway-visualizer/
 **Suggested File/Module Structure**
 ```plaintext
 data-explorer/
-  ├── src/
-  │   ├── index.ts
-  │   ├── explorer/
-  │   │   └── DataExplorerPanel.tsx
-  │   └── services/
-  │       └── dataService.ts
-  ├── test/
-  │   └── dataExplorer.test.ts
-  ├── manifest.json
-  └── package.json
+  Γö£ΓöÇΓöÇ src/
+  Γöé   Γö£ΓöÇΓöÇ index.ts
+  Γöé   Γö£ΓöÇΓöÇ explorer/
+  Γöé   Γöé   ΓööΓöÇΓöÇ DataExplorerPanel.tsx
+  Γöé   ΓööΓöÇΓöÇ services/
+  Γöé       ΓööΓöÇΓöÇ dataService.ts
+  Γö£ΓöÇΓöÇ test/
+  Γöé   ΓööΓöÇΓöÇ dataExplorer.test.ts
+  Γö£ΓöÇΓöÇ manifest.json
+  ΓööΓöÇΓöÇ package.json
 ```
 
 **Backend Integration Notes**
@@ -622,16 +622,16 @@ data-explorer/
 **Suggested File/Module Structure**
 ```plaintext
 visualization-composer/
-  ├── src/
-  │   ├── index.ts
-  │   ├── composer/
-  │   │   └── DashboardComposer.tsx
-  │   └── services/
-  │       └── dashboardService.ts
-  ├── test/
-  │   └── composer.test.ts
-  ├── manifest.json
-  └── package.json
+  Γö£ΓöÇΓöÇ src/
+  Γöé   Γö£ΓöÇΓöÇ index.ts
+  Γöé   Γö£ΓöÇΓöÇ composer/
+  Γöé   Γöé   ΓööΓöÇΓöÇ DashboardComposer.tsx
+  Γöé   ΓööΓöÇΓöÇ services/
+  Γöé       ΓööΓöÇΓöÇ dashboardService.ts
+  Γö£ΓöÇΓöÇ test/
+  Γöé   ΓööΓöÇΓöÇ composer.test.ts
+  Γö£ΓöÇΓöÇ manifest.json
+  ΓööΓöÇΓöÇ package.json
 ```
 
 **Backend Integration Notes**
@@ -683,16 +683,16 @@ visualization-composer/
 **Suggested File/Module Structure**
 ```plaintext
 ai-design-assistant/
-  ├── src/
-  │   ├── index.ts
-  │   ├── providers/
-  │   │   └── aiCompletionProvider.ts
-  │   └── services/
-  │       └── aiService.ts
-  ├── test/
-  │   └── aiAssistant.test.ts
-  ├── manifest.json
-  └── package.json
+  Γö£ΓöÇΓöÇ src/
+  Γöé   Γö£ΓöÇΓöÇ index.ts
+  Γöé   Γö£ΓöÇΓöÇ providers/
+  Γöé   Γöé   ΓööΓöÇΓöÇ aiCompletionProvider.ts
+  Γöé   ΓööΓöÇΓöÇ services/
+  Γöé       ΓööΓöÇΓöÇ aiService.ts
+  Γö£ΓöÇΓöÇ test/
+  Γöé   ΓööΓöÇΓöÇ aiAssistant.test.ts
+  Γö£ΓöÇΓöÇ manifest.json
+  ΓööΓöÇΓöÇ package.json
 ```
 
 **Backend Integration Notes**
@@ -742,16 +742,16 @@ ai-design-assistant/
 **Suggested File/Module Structure**
 ```plaintext
 parameter-sweeper/
-  ├── src/
-  │   ├── index.ts
-  │   ├── panel/
-  │   │   └── SweeperPanel.tsx
-  │   └── services/
-  │       └── sweeperService.ts
-  ├── test/
-  │   └── sweeper.test.ts
-  ├── manifest.json
-  └── package.json
+  Γö£ΓöÇΓöÇ src/
+  Γöé   Γö£ΓöÇΓöÇ index.ts
+  Γöé   Γö£ΓöÇΓöÇ panel/
+  Γöé   Γöé   ΓööΓöÇΓöÇ SweeperPanel.tsx
+  Γöé   ΓööΓöÇΓöÇ services/
+  Γöé       ΓööΓöÇΓöÇ sweeperService.ts
+  Γö£ΓöÇΓöÇ test/
+  Γöé   ΓööΓöÇΓöÇ sweeper.test.ts
+  Γö£ΓöÇΓöÇ manifest.json
+  ΓööΓöÇΓöÇ package.json
 ```
 
 **Backend Integration Notes**
@@ -802,16 +802,16 @@ parameter-sweeper/
 **Suggested File/Module Structure**
 ```plaintext
 experiment-metadata-editor/
-  ├── src/
-  │   ├── index.ts
-  │   ├── editor/
-  │   │   └── MetadataEditor.tsx
-  │   └── services/
-  │       └── metadataService.ts
-  ├── test/
-  │   └── metadataEditor.test.ts
-  ├── manifest.json
-  └── package.json
+  Γö£ΓöÇΓöÇ src/
+  Γöé   Γö£ΓöÇΓöÇ index.ts
+  Γöé   Γö£ΓöÇΓöÇ editor/
+  Γöé   Γöé   ΓööΓöÇΓöÇ MetadataEditor.tsx
+  Γöé   ΓööΓöÇΓöÇ services/
+  Γöé       ΓööΓöÇΓöÇ metadataService.ts
+  Γö£ΓöÇΓöÇ test/
+  Γöé   ΓööΓöÇΓöÇ metadataEditor.test.ts
+  Γö£ΓöÇΓöÇ manifest.json
+  ΓööΓöÇΓöÇ package.json
 ```
 
 **Backend Integration Notes**
@@ -860,16 +860,16 @@ experiment-metadata-editor/
 **Suggested File/Module Structure**
 ```plaintext
 results-annotator/
-  ├── src/
-  │   ├── index.ts
-  │   ├── panel/
-  │   │   └── AnnotatorPanel.tsx
-  │   └── services/
-  │       └── annotationService.ts
-  ├── test/
-  │   └── annotator.test.ts
-  ├── manifest.json
-  └── package.json
+  Γö£ΓöÇΓöÇ src/
+  Γöé   Γö£ΓöÇΓöÇ index.ts
+  Γöé   Γö£ΓöÇΓöÇ panel/
+  Γöé   Γöé   ΓööΓöÇΓöÇ AnnotatorPanel.tsx
+  Γöé   ΓööΓöÇΓöÇ services/
+  Γöé       ΓööΓöÇΓöÇ annotationService.ts
+  Γö£ΓöÇΓöÇ test/
+  Γöé   ΓööΓöÇΓöÇ annotator.test.ts
+  Γö£ΓöÇΓöÇ manifest.json
+  ΓööΓöÇΓöÇ package.json
 ```
 
 **Backend Integration Notes**
@@ -922,16 +922,16 @@ results-annotator/
 **Suggested File/Module Structure**
 ```plaintext
 provenance-audit-trail/
-  ├── src/
-  │   ├── index.ts
-  │   ├── explorer/
-  │   │   └── ProvenanceExplorer.tsx
-  │   └── services/
-  │       └── provenanceService.ts
-  ├── test/
-  │   └── provenance.test.ts
-  ├── manifest.json
-  └── package.json
+  Γö£ΓöÇΓöÇ src/
+  Γöé   Γö£ΓöÇΓöÇ index.ts
+  Γöé   Γö£ΓöÇΓöÇ explorer/
+  Γöé   Γöé   ΓööΓöÇΓöÇ ProvenanceExplorer.tsx
+  Γöé   ΓööΓöÇΓöÇ services/
+  Γöé       ΓööΓöÇΓöÇ provenanceService.ts
+  Γö£ΓöÇΓöÇ test/
+  Γöé   ΓööΓöÇΓöÇ provenance.test.ts
+  Γö£ΓöÇΓöÇ manifest.json
+  ΓööΓöÇΓöÇ package.json
 ```
 
 **Backend Integration Notes**
@@ -982,16 +982,16 @@ provenance-audit-trail/
 **Suggested File/Module Structure**
 ```plaintext
 import-export-connector/
-  ├── src/
-  │   ├── index.ts
-  │   ├── panel/
-  │   │   └── ConnectorPanel.tsx
-  │   └── services/
-  │       └── connectorService.ts
-  ├── test/
-  │   └── connector.test.ts
-  ├── manifest.json
-  └── package.json
+  Γö£ΓöÇΓöÇ src/
+  Γöé   Γö£ΓöÇΓöÇ index.ts
+  Γöé   Γö£ΓöÇΓöÇ panel/
+  Γöé   Γöé   ΓööΓöÇΓöÇ ConnectorPanel.tsx
+  Γöé   ΓööΓöÇΓöÇ services/
+  Γöé       ΓööΓöÇΓöÇ connectorService.ts
+  Γö£ΓöÇΓöÇ test/
+  Γöé   ΓööΓöÇΓöÇ connector.test.ts
+  Γö£ΓöÇΓöÇ manifest.json
+  ΓööΓöÇΓöÇ package.json
 ```
 
 **Backend Integration Notes**

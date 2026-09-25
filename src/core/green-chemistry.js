@@ -1,4 +1,4 @@
-'use strict';
+﻿'use strict';
 
 /**
  * Green Chemistry Metrics module.
@@ -7,21 +7,21 @@
  * Roundtable toolkit and CHEM21 metrics for evaluating reaction sustainability.
  *
  * References:
- *   - Trost, B.M. Science 254, 1471–1477 (1991)             — Atom Economy
- *   - Sheldon, R.A. Chem. Ind. (London) 903–906 (1992)       — E-Factor
- *   - Curzons, A.D. et al. Green Chem. 3, 7–9 (2001)         — RME
- *   - Jiménez-González, C. et al. Org. Process Res. Dev. 15, 912–917 (2011) — PMI
- *   - Henderson, R.K. et al. Green Chem. 13, 854–862 (2011)  — CHEM21 Solvent Guide
+ *   - Trost, B.M. Science 254, 1471ΓÇô1477 (1991)             ΓÇö Atom Economy
+ *   - Sheldon, R.A. Chem. Ind. (London) 903ΓÇô906 (1992)       ΓÇö E-Factor
+ *   - Curzons, A.D. et al. Green Chem. 3, 7ΓÇô9 (2001)         ΓÇö RME
+ *   - Jim├⌐nez-Gonz├ílez, C. et al. Org. Process Res. Dev. 15, 912ΓÇô917 (2011) ΓÇö PMI
+ *   - Henderson, R.K. et al. Green Chem. 13, 854ΓÇô862 (2011)  ΓÇö CHEM21 Solvent Guide
  */
 
-// ─────────────────────────────────────────────────────────────
+// ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 // Atom Economy  (Trost, 1991)
-// ─────────────────────────────────────────────────────────────
+// ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
 /**
  * Calculate Atom Economy.
  *
- * AE = MW(desired product) / Σ MW(all reactants) × 100
+ * AE = MW(desired product) / ╬ú MW(all reactants) ├ù 100
  *
  * Measures the fraction of reactant atoms that end up in the desired product.
  * A 100% AE means no atoms are wasted (e.g. addition reactions).
@@ -29,7 +29,7 @@
  * @param {number} productMW   - Molecular weight of the desired product (g/mol)
  * @param {number} reactantsMW - Sum of MW of all stoichiometric reactants (g/mol)
  *                               (excludes catalysts, solvents)
- * @returns {number} Atom economy as a percentage (0–100)
+ * @returns {number} Atom economy as a percentage (0ΓÇô100)
  */
 function atomEconomy(productMW, reactantsMW) {
   if (typeof productMW  !== 'number' || !isFinite(productMW))  throw new Error('productMW must be a finite number');
@@ -39,9 +39,9 @@ function atomEconomy(productMW, reactantsMW) {
   return Math.min(100, Math.round((productMW / reactantsMW) * 10000) / 100);
 }
 
-// ─────────────────────────────────────────────────────────────
+// ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 // E-Factor  (Sheldon, 1992)
-// ─────────────────────────────────────────────────────────────
+// ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
 /**
  * Calculate the E-Factor (Environmental Factor).
@@ -49,9 +49,9 @@ function atomEconomy(productMW, reactantsMW) {
  * E = mass_waste_kg / mass_product_kg
  *
  * Sheldon benchmark values:
- *   Bulk chemicals       E <  1–5
- *   Fine chemicals       E =  5–50
- *   Active pharma APIs   E = 25–100  (can exceed 100)
+ *   Bulk chemicals       E <  1ΓÇô5
+ *   Fine chemicals       E =  5ΓÇô50
+ *   Active pharma APIs   E = 25ΓÇô100  (can exceed 100)
  *
  * @param {number} wasteKg   - Total mass of all waste streams (kg)
  * @param {number} productKg - Mass of isolated product (kg)
@@ -66,7 +66,7 @@ function eFactor(wasteKg, productKg) {
 /**
  * Calculate E-factor from total inputs and product mass.
  *
- * E = (Σ mass_inputs − mass_product) / mass_product  =  PMI − 1
+ * E = (╬ú mass_inputs ΓêÆ mass_product) / mass_product  =  PMI ΓêÆ 1
  *
  * @param {number} totalInputsKg - Sum of all inputs: reactants + solvents + catalysts (kg)
  * @param {number} productKg     - Mass of isolated product (kg)
@@ -79,9 +79,9 @@ function eFactorFromInputs(totalInputsKg, productKg) {
   return Math.round(((totalInputsKg - productKg) / productKg) * 1e6) / 1e6;
 }
 
-// ─────────────────────────────────────────────────────────────
+// ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 // Process Mass Intensity  (ACS GCI Pharmaceutical Roundtable, 2011)
-// ─────────────────────────────────────────────────────────────
+// ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
 /**
  * Calculate Process Mass Intensity (PMI).
@@ -90,7 +90,7 @@ function eFactorFromInputs(totalInputsKg, productKg) {
  *     = E-factor + 1    (minimum possible PMI = 1, i.e. perfect reaction)
  *
  * ACS GCI Pharmaceutical Roundtable 2011 benchmark:
- *   New molecular entities (full synthesis): PMI median ≈ 200 kg/kg
+ *   New molecular entities (full synthesis): PMI median Γëê 200 kg/kg
  *   Target for API synthesis step: PMI < 100 kg/kg
  *
  * @param {number} totalMassKg - Total mass of all inputs incl. solvents (kg)
@@ -104,24 +104,24 @@ function pmi(totalMassKg, productKg) {
   return Math.round((totalMassKg / productKg) * 1e6) / 1e6;
 }
 
-// ─────────────────────────────────────────────────────────────
+// ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 // Reaction Mass Efficiency  (Curzons et al., 2001)
-// ─────────────────────────────────────────────────────────────
+// ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
 /**
  * Calculate Reaction Mass Efficiency (RME).
  *
  * Combined metric that incorporates yield, atom economy and reagent excess:
- *   RME = yield_fraction × (AE / 100) / stoichiometricFactor
+ *   RME = yield_fraction ├ù (AE / 100) / stoichiometricFactor
  *
  * Ideal RME = 1 (100 % yield, 100 % AE, no excess reagents).
- * Typical pharmaceutical reactions: RME = 0.2–0.5.
+ * Typical pharmaceutical reactions: RME = 0.2ΓÇô0.5.
  *
- * @param {number} yieldFraction         - Fractional isolated yield (0–1)
- * @param {number} atomEconomyPct        - Atom economy in % (0–100)
+ * @param {number} yieldFraction         - Fractional isolated yield (0ΓÇô1)
+ * @param {number} atomEconomyPct        - Atom economy in % (0ΓÇô100)
  * @param {number} [stoichiometricFactor=1] - Ratio of actual reagent mass used
  *                                           to the theoretical stoichiometric mass
- * @returns {number} RME as a fraction (0–1)
+ * @returns {number} RME as a fraction (0ΓÇô1)
  */
 function reactionMassEfficiency(yieldFraction, atomEconomyPct, stoichiometricFactor = 1) {
   if (yieldFraction < 0 || yieldFraction > 1)   throw new Error('yieldFraction must be in [0, 1]');
@@ -130,20 +130,20 @@ function reactionMassEfficiency(yieldFraction, atomEconomyPct, stoichiometricFac
   return Math.round((yieldFraction * atomEconomyPct / 100 / stoichiometricFactor) * 1e6) / 1e6;
 }
 
-// ─────────────────────────────────────────────────────────────
+// ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 // Carbon Efficiency
-// ─────────────────────────────────────────────────────────────
+// ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
 /**
  * Calculate Carbon Efficiency.
  *
- * CE = (moles C in product / moles C in all C-containing reactants) × 100
+ * CE = (moles C in product / moles C in all C-containing reactants) ├ù 100
  *
  * Measures how effectively carbon feedstock atoms end up in the product.
  *
  * @param {number} carbonInProduct   - C atoms (or moles) in the product
  * @param {number} carbonInFeedstock - Total C atoms in all C-containing reactants
- * @returns {number} Carbon efficiency as a percentage (0–100)
+ * @returns {number} Carbon efficiency as a percentage (0ΓÇô100)
  */
 function carbonEfficiency(carbonInProduct, carbonInFeedstock) {
   if (carbonInFeedstock <= 0) throw new Error('carbonInFeedstock must be > 0');
@@ -151,20 +151,20 @@ function carbonEfficiency(carbonInProduct, carbonInFeedstock) {
   return Math.min(100, Math.round((carbonInProduct / carbonInFeedstock) * 10000) / 100);
 }
 
-// ─────────────────────────────────────────────────────────────
+// ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 // CHEM21 Solvent Classification
-// ─────────────────────────────────────────────────────────────
+// ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
 /**
  * CHEM21 / ACS GCI Pharmaceutical Roundtable solvent selection guide.
  *
- * Based on: Henderson et al. Green Chem. 13, 854–862 (2011) and the
+ * Based on: Henderson et al. Green Chem. 13, 854ΓÇô862 (2011) and the
  * updated CHEM21 Green Metrics Toolkit solvent selection guide.
  *
  * Lookup key is the solvent common name, lower-cased.
  */
 const SOLVENT_CLASSIFICATION = {
-  // ── Recommended ─────────────────────────────────────────────
+  // ΓöÇΓöÇ Recommended ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
   'water':                    { score: 'recommended', concern: null },
   'ethanol':                  { score: 'recommended', concern: null },
   'isopropanol':              { score: 'recommended', concern: null },
@@ -178,7 +178,7 @@ const SOLVENT_CLASSIFICATION = {
   'dimethyl isosorbide':      { score: 'recommended', concern: null },
   'cyrene':                   { score: 'recommended', concern: null },
 
-  // ── Usable ───────────────────────────────────────────────────
+  // ΓöÇΓöÇ Usable ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
   'methanol':                 { score: 'usable', concern: 'toxic' },
   'tert-butanol':             { score: 'usable', concern: null },
   'isobutanol':               { score: 'usable', concern: null },
@@ -194,7 +194,7 @@ const SOLVENT_CLASSIFICATION = {
   'acetic acid':              { score: 'usable', concern: 'corrosive' },
   'propylene glycol':         { score: 'usable', concern: null },
 
-  // ── Problematic ──────────────────────────────────────────────
+  // ΓöÇΓöÇ Problematic ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
   'acetonitrile':             { score: 'problematic', concern: 'toxic_manufacturing' },
   'dcm':                      { score: 'problematic', concern: 'carcinogen_suspect' },
   'dichloromethane':          { score: 'problematic', concern: 'carcinogen_suspect' },
@@ -207,7 +207,7 @@ const SOLVENT_CLASSIFICATION = {
   'pyridine':                 { score: 'problematic', concern: 'toxic' },
   'nitrobenzene':             { score: 'problematic', concern: 'toxic' },
 
-  // ── Hazardous ────────────────────────────────────────────────
+  // ΓöÇΓöÇ Hazardous ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
   'benzene':                  { score: 'hazardous', concern: 'carcinogen' },
   'chloroform':               { score: 'hazardous', concern: 'carcinogen_suspect' },
   'chcl3':                    { score: 'hazardous', concern: 'carcinogen_suspect' },
@@ -236,25 +236,25 @@ function classifySolvent(solventName) {
   return { name: solventName, score: entry.score, concern: entry.concern };
 }
 
-// ─────────────────────────────────────────────────────────────
+// ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 // Composite Green Score
-// ─────────────────────────────────────────────────────────────
+// ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
 /**
  * Calculate a composite green chemistry score for a reaction step.
  *
- * Each sub-score is normalised to 0–100 and combined with weights:
+ * Each sub-score is normalised to 0ΓÇô100 and combined with weights:
  *   Atom Economy  30 %
  *   E-Factor      25 %  (inverse: lower E = higher score)
  *   Yield         30 %
  *   Solvent       15 %  (CHEM21 classification)
  *
- * Grade scale: A ≥ 80, B ≥ 60, C ≥ 40, D ≥ 20, F < 20.
+ * Grade scale: A ΓëÑ 80, B ΓëÑ 60, C ΓëÑ 40, D ΓëÑ 20, F < 20.
  *
  * @param {object} params
- * @param {number} params.atomEconomyPct  - Atom economy (0–100)
+ * @param {number} params.atomEconomyPct  - Atom economy (0ΓÇô100)
  * @param {number} params.eFact          - E-factor (lower = greener)
- * @param {number} params.yieldPct       - Isolated yield percentage (0–100)
+ * @param {number} params.yieldPct       - Isolated yield percentage (0ΓÇô100)
  * @param {string} [params.solvent]      - Solvent name for CHEM21 lookup
  * @returns {{ score: number, grade: string, details: object }}
  */
@@ -262,7 +262,7 @@ function greenScore({ atomEconomyPct = 0, eFact = 0, yieldPct = 0, solvent } = {
   // Atom economy: direct %
   const aeScore = Math.min(100, Math.max(0, atomEconomyPct));
 
-  // E-factor: 0 → 100 pts; ≥ 100 → 0 pts (linear interpolation)
+  // E-factor: 0 ΓåÆ 100 pts; ΓëÑ 100 ΓåÆ 0 pts (linear interpolation)
   const efScore = Math.min(100, Math.max(0, 100 - eFact));
 
   // Yield: direct %

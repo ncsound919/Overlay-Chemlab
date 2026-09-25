@@ -1,4 +1,4 @@
-'use strict';
+﻿'use strict';
 
 const ATOMIC_WEIGHTS = {
   H: 1.008, C: 12.011, N: 14.007, O: 15.999,
@@ -60,7 +60,7 @@ function parseSMILES(smiles) {
     if (ch === '#') { pendingBondOrder = 3; i++; continue; }
     if (ch === ':') { pendingBondOrder = 1; i++; continue; } // aromatic
 
-    // Stereochemistry markers — skip
+    // Stereochemistry markers ΓÇö skip
     if (ch === '/' || ch === '\\') { i++; continue; }
 
     // Ring closure
@@ -236,7 +236,7 @@ function cosineSimilarity(fp1, fp2) {
 }
 
 /**
- * Tanimoto coefficient for binary fingerprints: |A∩B| / |A∪B|
+ * Tanimoto coefficient for binary fingerprints: |AΓê⌐B| / |AΓê¬B|
  */
 function tanimotoSimilarity(fp1, fp2) {
   const len = Math.min(fp1.length, fp2.length);

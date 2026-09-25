@@ -1,12 +1,12 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ChemLab IDE v2 — Live Edition</title>
+<title>ChemLab IDE v2 ΓÇö Live Edition</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;0,600;1,400&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 
-<!-- SmilesDrawer: real SMILES → 2D structure renderer (MIT) -->
+<!-- SmilesDrawer: real SMILES ΓåÆ 2D structure renderer (MIT) -->
 <script src="https://unpkg.com/smiles-drawer@2.1.7/dist/smiles-drawer.min.js"></script>
 
 <style>
@@ -32,7 +32,7 @@
   *{margin:0;padding:0;box-sizing:border-box;}
   html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size:13px;overflow:hidden;}
 
-  /* ── TOPBAR ── */
+  /* ΓöÇΓöÇ TOPBAR ΓöÇΓöÇ */
   .topbar{
     height:38px;background:var(--surface);border-bottom:1px solid var(--border);
     display:flex;align-items:center;padding:0 14px;gap:0;position:relative;z-index:200;
@@ -72,10 +72,10 @@
     font-size:10px;font-weight:700;color:#000;
   }
 
-  /* ── APP SHELL ── */
+  /* ΓöÇΓöÇ APP SHELL ΓöÇΓöÇ */
   .app{display:flex;height:calc(100vh - 38px);}
 
-  /* ── ACTIVITY BAR ── */
+  /* ΓöÇΓöÇ ACTIVITY BAR ΓöÇΓöÇ */
   .actbar{
     width:48px;background:var(--surface);border-right:1px solid var(--border);
     display:flex;flex-direction:column;align-items:center;padding:8px 0;gap:2px;flex-shrink:0;
@@ -95,7 +95,7 @@
   }
   .ab-sp{flex:1;}
 
-  /* ── SIDEBAR ── */
+  /* ΓöÇΓöÇ SIDEBAR ΓöÇΓöÇ */
   .sidebar{
     width:255px;background:var(--panel);border-right:1px solid var(--border);
     display:flex;flex-direction:column;flex-shrink:0;overflow:hidden;
@@ -136,7 +136,7 @@
   .ti .lb{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
   .ti .bx{font-size:9px;padding:1px 5px;border-radius:7px;font-family:var(--font-mono);}
 
-  /* ── EDITOR AREA ── */
+  /* ΓöÇΓöÇ EDITOR AREA ΓöÇΓöÇ */
   .ed-area{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;}
 
   .tabs{
@@ -159,7 +159,7 @@
   .tab .tc:hover{opacity:1;background:var(--border2);}
   .tab .dot-m{width:6px;height:6px;border-radius:50%;background:var(--warn);flex-shrink:0;}
 
-  /* ── PANE ── */
+  /* ΓöÇΓöÇ PANE ΓöÇΓöÇ */
   .pane{flex:1;display:flex;overflow:hidden;}
 
   /* editor */
@@ -227,7 +227,7 @@
     text-align:center;margin-bottom:4px;
   }
 
-  /* ── RIGHT PANEL ── */
+  /* ΓöÇΓöÇ RIGHT PANEL ΓöÇΓöÇ */
   .rp{
     width:308px;background:var(--panel);border-left:1px solid var(--border);
     display:flex;flex-direction:column;flex-shrink:0;overflow:hidden;
@@ -334,7 +334,7 @@
   .sim-result.running{border-color:rgba(0,232,162,.3);animation:blink-border 1s ease infinite;}
   @keyframes blink-border{0%,100%{border-color:rgba(0,232,162,.3)}50%{border-color:rgba(0,232,162,.6)}}
 
-  /* ── AI PANEL ── */
+  /* ΓöÇΓöÇ AI PANEL ΓöÇΓöÇ */
   .ai-wrap{display:flex;flex-direction:column;height:100%;}
   .ai-msgs{flex:1;overflow-y:auto;margin-bottom:8px;}
   .ai-msgs::-webkit-scrollbar{width:3px;}
@@ -401,7 +401,7 @@
   .tog::after{content:'';position:absolute;top:2.5px;left:2.5px;width:11px;height:11px;border-radius:50%;background:var(--muted);transition:.2s;}
   .tog.on::after{left:16.5px;background:var(--accent);}
 
-  /* ── BOTTOM PANEL ── */
+  /* ΓöÇΓöÇ BOTTOM PANEL ΓöÇΓöÇ */
   .bot{
     height:158px;background:var(--surface);border-top:1px solid var(--border);
     display:flex;flex-direction:column;flex-shrink:0;
@@ -421,7 +421,7 @@
   .tl .s{color:var(--green2);}
   .tl .w{color:var(--warn);}
 
-  /* ── STATUS BAR ── */
+  /* ΓöÇΓöÇ STATUS BAR ΓöÇΓöÇ */
   .sbar{
     height:22px;background:#070a0f;border-top:1px solid var(--border);
     display:flex;align-items:center;padding:0 10px;gap:0;flex-shrink:0;
@@ -439,7 +439,7 @@
   .cursor-blink{display:inline-block;width:2px;height:13px;background:var(--accent);vertical-align:middle;animation:cb 1s step-end infinite;}
   @keyframes cb{0%,100%{opacity:1}50%{opacity:0}}
 
-  /* ── COMMAND PALETTE ── */
+  /* ΓöÇΓöÇ COMMAND PALETTE ΓöÇΓöÇ */
   .cmd-ov{
     display:none;position:fixed;inset:0;z-index:1000;
     background:rgba(0,0,0,.65);backdrop-filter:blur(6px);
@@ -510,7 +510,7 @@
 <!-- Toast -->
 <div class="toast" id="toast"></div>
 
-<!-- ═══ TOPBAR ═══ -->
+<!-- ΓòÉΓòÉΓòÉ TOPBAR ΓòÉΓòÉΓòÉ -->
 <div class="topbar">
   <div class="logo">
     <div class="logo-hex"></div>
@@ -527,29 +527,29 @@
     <div class="menu-item">Help</div>
   </div>
   <div class="tb-right">
-    <span class="tb-badge g">⬡ ELN #2024-0412</span>
-    <span class="tb-badge b">⬥ Sim Engine 2.4</span>
-    <span class="tb-badge y" id="safetyBadge">⚠ 2 Alerts</span>
+    <span class="tb-badge g">Γ¼í ELN #2024-0412</span>
+    <span class="tb-badge b">Γ¼Ñ Sim Engine 2.4</span>
+    <span class="tb-badge y" id="safetyBadge">ΓÜá 2 Alerts</span>
     <div class="avatar">RK</div>
   </div>
 </div>
 
-<!-- ═══ APP ═══ -->
+<!-- ΓòÉΓòÉΓòÉ APP ΓòÉΓòÉΓòÉ -->
 <div class="app">
 
   <!-- ACTIVITY BAR -->
   <div class="actbar">
-    <div class="ab on" title="Explorer">📁</div>
-    <div class="ab" title="Molecule Library" onclick="showToast('Molecule Library — 2,847 compounds loaded','b')">⬡</div>
-    <div class="ab" title="Simulations" onclick="showToast('Simulation Engine ready','g')">🔬</div>
-    <div class="ab" title="ELN Notebook" onclick="showToast('ELN: Entry #2024-0412 loaded','g')">📓</div>
+    <div class="ab on" title="Explorer">≡ƒôü</div>
+    <div class="ab" title="Molecule Library" onclick="showToast('Molecule Library ΓÇö 2,847 compounds loaded','b')">Γ¼í</div>
+    <div class="ab" title="Simulations" onclick="showToast('Simulation Engine ready','g')">≡ƒö¼</div>
+    <div class="ab" title="ELN Notebook" onclick="showToast('ELN: Entry #2024-0412 loaded','g')">≡ƒôô</div>
     <div class="ab" title="Source Control" style="position:relative" onclick="showToast('3 uncommitted changes','y')">
-      ⎇<span class="dot"></span>
+      ΓÄç<span class="dot"></span>
     </div>
-    <div class="ab" title="AI Assistant" onclick="rpSwitch('ai')">✦</div>
+    <div class="ab" title="AI Assistant" onclick="rpSwitch('ai')">Γ£ª</div>
     <div class="ab-sp"></div>
-    <div class="ab" title="Extensions" onclick="openCmd()">⊞</div>
-    <div class="ab" title="Settings">⚙</div>
+    <div class="ab" title="Extensions" onclick="openCmd()">Γè₧</div>
+    <div class="ab" title="Settings">ΓÜÖ</div>
   </div>
 
   <!-- SIDEBAR -->
@@ -558,60 +558,60 @@
       Explorer
       <div class="sb-acts">
         <div class="ib" title="New File" onclick="showToast('New .chem file created','g')">+</div>
-        <div class="ib" title="Refresh">↺</div>
-        <div class="ib" title="Collapse">⊟</div>
+        <div class="ib" title="Refresh">Γå║</div>
+        <div class="ib" title="Collapse">Γèƒ</div>
       </div>
     </div>
     <div class="tree">
 
       <div class="ts">
         <div class="tsh open" onclick="toggleSection(this)">
-          <span class="arr">▶</span> ASPIRIN-SYNTHESIS-V3
+          <span class="arr">Γû╢</span> ASPIRIN-SYNTHESIS-V3
         </div>
         <div class="ti" onclick="setActive(this);loadFile('protocol')">
-          <span class="ic">📄</span><span class="lb">synthesis_protocol.chem</span>
+          <span class="ic">≡ƒôä</span><span class="lb">synthesis_protocol.chem</span>
           <span class="bx tb-badge g" style="font-size:9px">CL</span>
         </div>
         <div class="ti on" onclick="setActive(this);loadFile('aspirin')">
-          <span class="ic">⬡</span><span class="lb">aspirin.mol</span>
+          <span class="ic">Γ¼í</span><span class="lb">aspirin.mol</span>
         </div>
-        <div class="ti" onclick="setActive(this);showToast('NMR viewer loading…','b')">
-          <span class="ic">📊</span><span class="lb">nmr_1h_spectrum.jdx</span>
+        <div class="ti" onclick="setActive(this);showToast('NMR viewer loadingΓÇª','b')">
+          <span class="ic">≡ƒôè</span><span class="lb">nmr_1h_spectrum.jdx</span>
         </div>
-        <div class="ti" onclick="setActive(this);showToast('IR viewer loading…','b')">
-          <span class="ic">📊</span><span class="lb">ir_spectrum.jdx</span>
+        <div class="ti" onclick="setActive(this);showToast('IR viewer loadingΓÇª','b')">
+          <span class="ic">≡ƒôè</span><span class="lb">ir_spectrum.jdx</span>
         </div>
         <div class="ti" onclick="setActive(this)">
-          <span class="ic">📓</span><span class="lb">eln_entry.md</span>
+          <span class="ic">≡ƒôô</span><span class="lb">eln_entry.md</span>
           <span class="bx tb-badge b" style="font-size:9px">ELN</span>
         </div>
         <div class="ti" onclick="setActive(this);rpSwitch('sim')">
-          <span class="ic">⚗</span><span class="lb">simulation.sim</span>
+          <span class="ic">ΓÜù</span><span class="lb">simulation.sim</span>
         </div>
         <div class="ti" onclick="setActive(this);rpSwitch('safe')">
-          <span class="ic">📋</span><span class="lb">safety_report.pdf</span>
-          <span class="bx tb-badge y" style="font-size:9px">⚠2</span>
+          <span class="ic">≡ƒôï</span><span class="lb">safety_report.pdf</span>
+          <span class="bx tb-badge y" style="font-size:9px">ΓÜá2</span>
         </div>
       </div>
 
       <div class="ts">
         <div class="tsh open" onclick="toggleSection(this)">
-          <span class="arr">▶</span> REAGENTS
+          <span class="arr">Γû╢</span> REAGENTS
         </div>
         <div class="ti" onclick="setActive(this);previewMol(this,'OC(=O)c1ccccc1O','Salicylic acid')">
-          <span class="ic">🧪</span><span class="lb">salicylic_acid.chem</span>
+          <span class="ic">≡ƒº¬</span><span class="lb">salicylic_acid.chem</span>
         </div>
         <div class="ti" onclick="setActive(this);previewMol(this,'CC(=O)OC(=O)C','Acetic anhydride')">
-          <span class="ic">🧪</span><span class="lb">acetic_anhydride.chem</span>
+          <span class="ic">≡ƒº¬</span><span class="lb">acetic_anhydride.chem</span>
         </div>
         <div class="ti" onclick="setActive(this);previewMol(this,'OP(=O)(O)O','Phosphoric acid')">
-          <span class="ic">🧪</span><span class="lb">phosphoric_acid.chem</span>
+          <span class="ic">≡ƒº¬</span><span class="lb">phosphoric_acid.chem</span>
         </div>
       </div>
 
       <div class="ts">
         <div class="tsh" onclick="toggleSection(this)">
-          <span class="arr">▶</span> ANALYSIS
+          <span class="arr">Γû╢</span> ANALYSIS
         </div>
       </div>
 
@@ -622,16 +622,16 @@
   <div class="ed-area">
     <div class="tabs">
       <div class="tab" onclick="setTab(this)">
-        <span>📄</span> synthesis_protocol.chem <span class="dot-m"></span><span class="tc">✕</span>
+        <span>≡ƒôä</span> synthesis_protocol.chem <span class="dot-m"></span><span class="tc">Γ£ò</span>
       </div>
       <div class="tab on" onclick="setTab(this)">
-        <span>⬡</span> aspirin.mol <span class="tc">✕</span>
+        <span>Γ¼í</span> aspirin.mol <span class="tc">Γ£ò</span>
       </div>
       <div class="tab" onclick="setTab(this)">
-        <span>📊</span> nmr_1h.jdx <span class="tc">✕</span>
+        <span>≡ƒôè</span> nmr_1h.jdx <span class="tc">Γ£ò</span>
       </div>
       <div class="tab" onclick="setTab(this)">
-        <span>📓</span> eln_entry.md <span class="tc">✕</span>
+        <span>≡ƒôô</span> eln_entry.md <span class="tc">Γ£ò</span>
       </div>
     </div>
 
@@ -646,8 +646,8 @@
         <div class="rp-tabs">
           <div class="rp-t on" onclick="rpSwitch('mol',this)">Molecule</div>
           <div class="rp-t" onclick="rpSwitch('rxn',this)">Reaction</div>
-          <div class="rp-t" onclick="rpSwitch('ai',this)">AI ✦</div>
-          <div class="rp-t" onclick="rpSwitch('safe',this)">Safety ⚠</div>
+          <div class="rp-t" onclick="rpSwitch('ai',this)">AI Γ£ª</div>
+          <div class="rp-t" onclick="rpSwitch('safe',this)">Safety ΓÜá</div>
           <div class="rp-t" onclick="rpSwitch('sim',this)">Sim</div>
         </div>
 
@@ -656,65 +656,65 @@
           <div class="mol-card">
             <div class="mol-hdr">
               <div>
-                <div class="mol-formula">C₉H₈O₄</div>
+                <div class="mol-formula">CΓéëHΓéêOΓéä</div>
                 <div class="mol-iupac">2-acetoxybenzoic acid</div>
               </div>
               <div class="mol-mw">180.16 g/mol</div>
             </div>
             <div class="mol-canvas-wrap">
               <canvas id="mainMolCanvas" width="270" height="155"></canvas>
-              <div class="mol-canvas-label">SmilesDrawer · CC(=O)Oc1ccccc1C(=O)O</div>
+              <div class="mol-canvas-label">SmilesDrawer ┬╖ CC(=O)Oc1ccccc1C(=O)O</div>
             </div>
             <table class="prop-tbl">
               <tr><td>CAS</td><td>50-78-2</td></tr>
-              <tr><td>InChIKey</td><td>BSYNRYMUTXBXSQ-U…</td></tr>
-              <tr><td>MP</td><td>136 °C</td></tr>
-              <tr><td>pKₐ</td><td>3.49</td></tr>
+              <tr><td>InChIKey</td><td>BSYNRYMUTXBXSQ-UΓÇª</td></tr>
+              <tr><td>MP</td><td>136 ┬░C</td></tr>
+              <tr><td>pKΓéÉ</td><td>3.49</td></tr>
               <tr><td>logP</td><td>1.19</td></tr>
-              <tr><td>Solubility</td><td>3.3 g/L (20°C)</td></tr>
+              <tr><td>Solubility</td><td>3.3 g/L (20┬░C)</td></tr>
             </table>
           </div>
           <div class="sec">
             <div class="sec-t">Predicted Spectra</div>
             <div class="sb-row">
-              <div class="sb-lbl"><span>¹H NMR — 7 signals</span><span style="color:var(--accent)">δ 7.2–8.1, 2.3</span></div>
+              <div class="sb-lbl"><span>┬╣H NMR ΓÇö 7 signals</span><span style="color:var(--accent)">╬┤ 7.2ΓÇô8.1, 2.3</span></div>
               <div class="sb-bar"><div class="sb-fill" style="width:0;background:var(--accent)" id="sb1"></div></div>
             </div>
             <div class="sb-row">
-              <div class="sb-lbl"><span>IR — C=O ester stretch</span><span style="color:var(--accent2)">1754 cm⁻¹</span></div>
+              <div class="sb-lbl"><span>IR ΓÇö C=O ester stretch</span><span style="color:var(--accent2)">1754 cmΓü╗┬╣</span></div>
               <div class="sb-bar"><div class="sb-fill" style="width:0;background:var(--accent2)" id="sb2"></div></div>
             </div>
             <div class="sb-row">
-              <div class="sb-lbl"><span>UV-Vis — π→π*</span><span style="color:var(--purple)">λmax 228 nm</span></div>
+              <div class="sb-lbl"><span>UV-Vis ΓÇö ╧ÇΓåÆ╧Ç*</span><span style="color:var(--purple)">╬╗max 228 nm</span></div>
               <div class="sb-bar"><div class="sb-fill" style="width:0;background:var(--purple)" id="sb3"></div></div>
             </div>
           </div>
           <div class="sec">
             <div class="sec-t">Scaffold Neighbors</div>
             <div style="display:flex;gap:5px;flex-wrap:wrap">
-              <span class="t-mol" onclick="renderMolInPanel('OC(=O)c1ccccc1O','Salicylic acid')">⬡ Salicylic acid</span>
-              <span class="t-mol" onclick="renderMolInPanel('CC(=O)OC(=O)C','Acetic anhydride')">⬡ Ac₂O</span>
-              <span class="t-mol" onclick="renderMolInPanel('OC(=O)c1ccc(F)cc1O','Diflunisal')">⬡ Diflunisal</span>
+              <span class="t-mol" onclick="renderMolInPanel('OC(=O)c1ccccc1O','Salicylic acid')">Γ¼í Salicylic acid</span>
+              <span class="t-mol" onclick="renderMolInPanel('CC(=O)OC(=O)C','Acetic anhydride')">Γ¼í AcΓééO</span>
+              <span class="t-mol" onclick="renderMolInPanel('OC(=O)c1ccc(F)cc1O','Diflunisal')">Γ¼í Diflunisal</span>
             </div>
           </div>
         </div>
 
         <!-- RXN -->
         <div class="rp-body" id="rp-rxn" style="display:none">
-          <div class="sec"><div class="sec-t">Fischer–Speier Esterification</div></div>
+          <div class="sec"><div class="sec-t">FischerΓÇôSpeier Esterification</div></div>
           <div class="rxn-step" onclick="showToast('Step 1: kinetics curve available in Sim tab','b')">
             <div class="rxn-n">1</div>
-            <div><div style="font-weight:600;margin-bottom:2px">SA + Ac₂O → Aspirin + AcOH</div><div style="color:var(--muted)">H₃PO₄ cat · 85°C · 15 min</div></div>
+            <div><div style="font-weight:600;margin-bottom:2px">SA + AcΓééO ΓåÆ Aspirin + AcOH</div><div style="color:var(--muted)">HΓéâPOΓéä cat ┬╖ 85┬░C ┬╖ 15 min</div></div>
             <div class="rxn-yi">~95%</div>
           </div>
           <div class="rxn-step">
             <div class="rxn-n">2</div>
-            <div><div style="font-weight:600;margin-bottom:2px">Ice-water crystallization</div><div style="color:var(--muted)">0°C quench · vacuum filtration</div></div>
+            <div><div style="font-weight:600;margin-bottom:2px">Ice-water crystallization</div><div style="color:var(--muted)">0┬░C quench ┬╖ vacuum filtration</div></div>
             <div class="rxn-yi">~88%</div>
           </div>
           <div class="rxn-step">
             <div class="rxn-n">3</div>
-            <div><div style="font-weight:600;margin-bottom:2px">Recrystallization</div><div style="color:var(--muted)">EtOH/H₂O · vacuum dry 50°C</div></div>
+            <div><div style="font-weight:600;margin-bottom:2px">Recrystallization</div><div style="color:var(--muted)">EtOH/HΓééO ┬╖ vacuum dry 50┬░C</div></div>
             <div class="rxn-yi">~82%</div>
           </div>
           <div class="sec" style="margin-top:12px"><div class="sec-t">Stoichiometry</div></div>
@@ -733,18 +733,18 @@
             <div class="ai-msgs" id="aiMsgs">
               <div class="ai-msg a">
                 <div class="ai-lbl a">CHEMLAB AI</div>
-                <div class="ai-body">I can see you're working on <strong>aspirin synthesis</strong> via Fischer–Speier esterification. Your protocol looks solid — H₃PO₄ catalysis at 85°C with 15 min is near-optimal for this substrate.<br><br>I can help optimize conditions, predict spectra, explain mechanisms, or suggest greener alternatives.</div>
+                <div class="ai-body">I can see you're working on <strong>aspirin synthesis</strong> via FischerΓÇôSpeier esterification. Your protocol looks solid ΓÇö HΓéâPOΓéä catalysis at 85┬░C with 15 min is near-optimal for this substrate.<br><br>I can help optimize conditions, predict spectra, explain mechanisms, or suggest greener alternatives.</div>
                 <div class="ai-chips">
-                  <div class="ai-chip" onclick="askAI('Why does H₃PO₄ outperform H₂SO₄ as catalyst here?')">Why H₃PO₄ vs H₂SO₄?</div>
+                  <div class="ai-chip" onclick="askAI('Why does HΓéâPOΓéä outperform HΓééSOΓéä as catalyst here?')">Why HΓéâPOΓéä vs HΓééSOΓéä?</div>
                   <div class="ai-chip" onclick="askAI('What greener solvent alternatives exist for aspirin synthesis?')">Green alternatives</div>
-                  <div class="ai-chip" onclick="askAI('Explain the ¹H NMR shifts for aspirin')">Explain NMR shifts</div>
-                  <div class="ai-chip" onclick="askAI('What side products form at temperatures above 95°C?')">High-temp side products</div>
+                  <div class="ai-chip" onclick="askAI('Explain the ┬╣H NMR shifts for aspirin')">Explain NMR shifts</div>
+                  <div class="ai-chip" onclick="askAI('What side products form at temperatures above 95┬░C?')">High-temp side products</div>
                 </div>
               </div>
             </div>
             <div class="ai-input-row">
-              <textarea class="ai-input" id="aiInput" rows="2" placeholder="Ask about this experiment…" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendAI();}"></textarea>
-              <button class="ai-send" id="aiSendBtn" onclick="sendAI()">↵</button>
+              <textarea class="ai-input" id="aiInput" rows="2" placeholder="Ask about this experimentΓÇª" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendAI();}"></textarea>
+              <button class="ai-send" id="aiSendBtn" onclick="sendAI()">Γå╡</button>
             </div>
           </div>
         </div>
@@ -753,12 +753,12 @@
         <div class="rp-body" id="rp-safe" style="display:none">
           <div class="sec"><div class="sec-t">Hazard Assessment</div></div>
           <div class="sal d">
-            <div class="si">🔥</div>
-            <div><div class="sl d">Acetic Anhydride · GHS02 Flammable</div><div class="st">Flash point 49°C. Corrosive. Reacts vigorously with water releasing acetic acid. Work exclusively in fume hood. No open flames.</div></div>
+            <div class="si">≡ƒöÑ</div>
+            <div><div class="sl d">Acetic Anhydride ┬╖ GHS02 Flammable</div><div class="st">Flash point 49┬░C. Corrosive. Reacts vigorously with water releasing acetic acid. Work exclusively in fume hood. No open flames.</div></div>
           </div>
           <div class="sal w">
-            <div class="si">⚠</div>
-            <div><div class="sl w">Phosphoric Acid · GHS05 Corrosive</div><div class="st">Concentrated form. Nitrile gloves, chemical goggles, and lab coat mandatory. Neutralize spills with sodium bicarbonate.</div></div>
+            <div class="si">ΓÜá</div>
+            <div><div class="sl w">Phosphoric Acid ┬╖ GHS05 Corrosive</div><div class="st">Concentrated form. Nitrile gloves, chemical goggles, and lab coat mandatory. Neutralize spills with sodium bicarbonate.</div></div>
           </div>
           <div class="sec" style="margin-top:8px"><div class="sec-t">PPE Checklist</div></div>
           <div class="ppe-row"><span>Chemical safety goggles</span><div class="tog on" onclick="this.classList.toggle('on')"></div></div>
@@ -775,7 +775,7 @@
           <div class="sim-param">
             <span>Temperature</span>
             <input type="range" class="sim-slider" min="50" max="120" value="85" id="slTemp" oninput="updateSim()">
-            <span class="sim-val" id="vTemp">85 °C</span>
+            <span class="sim-val" id="vTemp">85 ┬░C</span>
           </div>
           <div class="sim-param">
             <span>Reaction time</span>
@@ -783,12 +783,12 @@
             <span class="sim-val" id="vTime">15 min</span>
           </div>
           <div class="sim-param">
-            <span>Ac₂O equivalents</span>
+            <span>AcΓééO equivalents</span>
             <input type="range" class="sim-slider" min="10" max="30" value="16" id="slEquiv" oninput="updateSim()">
             <span class="sim-val" id="vEquiv">1.6 eq</span>
           </div>
           <div class="sim-param">
-            <span>H₃PO₄ drops</span>
+            <span>HΓéâPOΓéä drops</span>
             <input type="range" class="sim-slider" min="2" max="15" value="5" id="slCat" oninput="updateSim()">
             <span class="sim-val" id="vCat">5 drops</span>
           </div>
@@ -800,9 +800,9 @@
               <div class="mc"><div class="mc-v" id="sv4">3.1<span>%</span></div><div class="mc-l">Side products</div></div>
             </div>
           </div>
-          <button class="btn btn-p" style="width:100%" onclick="runSim(this)">▶ Run Simulation</button>
+          <button class="btn btn-p" style="width:100%" onclick="runSim(this)">Γû╢ Run Simulation</button>
           <div style="height:8px"></div>
-          <button class="btn btn-s" style="width:100%" onclick="showToast('Kinetics ODE plot exported to analysis/','b')">📊 Export Kinetics Plot</button>
+          <button class="btn btn-s" style="width:100%" onclick="showToast('Kinetics ODE plot exported to analysis/','b')">≡ƒôè Export Kinetics Plot</button>
         </div>
 
       </div><!-- /rp -->
@@ -818,65 +818,65 @@
       </div>
       <div class="bot-body" id="bt-term">
         <div class="tl"><span class="p">chemlab $ </span><span>chemlab validate aspirin.mol --full</span></div>
-        <div class="tl"><span class="i">ℹ  Parsing SMILES: CC(=O)Oc1ccccc1C(=O)O</span></div>
-        <div class="tl"><span class="s">✓  Structure valid · MW 180.16 · 4 rings · 0 stereocenters</span></div>
-        <div class="tl"><span class="s">✓  Hazard flags auto-loaded from SDS cache (PubChem CID 2244)</span></div>
-        <div class="tl"><span class="w">⚠  Temperature 85°C > recommended glassware limit (80°C) — see Problems</span></div>
-        <div class="tl"><span class="s">✓  ELN entry #2024-0412 linked and timestamped</span></div>
-        <div class="tl"><span class="s">✓  SmilesDrawer render: aspirin.mol → canvas [270×155]</span></div>
+        <div class="tl"><span class="i">Γä╣  Parsing SMILES: CC(=O)Oc1ccccc1C(=O)O</span></div>
+        <div class="tl"><span class="s">Γ£ô  Structure valid ┬╖ MW 180.16 ┬╖ 4 rings ┬╖ 0 stereocenters</span></div>
+        <div class="tl"><span class="s">Γ£ô  Hazard flags auto-loaded from SDS cache (PubChem CID 2244)</span></div>
+        <div class="tl"><span class="w">ΓÜá  Temperature 85┬░C > recommended glassware limit (80┬░C) ΓÇö see Problems</span></div>
+        <div class="tl"><span class="s">Γ£ô  ELN entry #2024-0412 linked and timestamped</span></div>
+        <div class="tl"><span class="s">Γ£ô  SmilesDrawer render: aspirin.mol ΓåÆ canvas [270├ù155]</span></div>
         <div class="tl"><span class="p">chemlab $ </span><span>chemlab sim --mol aspirin --temp 85 --time 15<span class="cursor-blink"></span></span></div>
       </div>
       <div class="bot-body" id="bt-out" style="display:none">
-        <div class="tl"><span class="i">[SimEngine 2.4.1] Arrhenius model · Ea=65.3 kJ/mol</span></div>
-        <div class="tl"><span class="s">  Conversion at 85°C/15min: 94.7%  |  Yield: 82.2%  |  Side products: 3.1%</span></div>
+        <div class="tl"><span class="i">[SimEngine 2.4.1] Arrhenius model ┬╖ Ea=65.3 kJ/mol</span></div>
+        <div class="tl"><span class="s">  Conversion at 85┬░C/15min: 94.7%  |  Yield: 82.2%  |  Side products: 3.1%</span></div>
         <div class="tl"><span class="i">  Acetic acid co-product: 0.84 g (predicted)</span></div>
       </div>
       <div class="bot-body" id="bt-prob" style="display:none">
-        <div class="tl"><span class="e">✖ [W001] synthesis_protocol.chem:12 — Reagent vol 2.2mL Ac₂O approaches fume hood safe limit (500mL/session)</span></div>
-        <div class="tl"><span class="w">⚠ [W002] synthesis_protocol.chem:8 — Temperature 85°C exceeds recommended glassware rating (80°C)</span></div>
+        <div class="tl"><span class="e">Γ£û [W001] synthesis_protocol.chem:12 ΓÇö Reagent vol 2.2mL AcΓééO approaches fume hood safe limit (500mL/session)</span></div>
+        <div class="tl"><span class="w">ΓÜá [W002] synthesis_protocol.chem:8 ΓÇö Temperature 85┬░C exceeds recommended glassware rating (80┬░C)</span></div>
       </div>
       <div class="bot-body" id="bt-dbg" style="display:none">
-        <div class="tl"><span class="i">[DEBUG] SmilesDrawer 2.1.7 initialized · theme:dark</span></div>
+        <div class="tl"><span class="i">[DEBUG] SmilesDrawer 2.1.7 initialized ┬╖ theme:dark</span></div>
         <div class="tl"><span class="i">[DEBUG] Monarch tokenizer: chem language registered (43 token rules)</span></div>
-        <div class="tl"><span class="i">[DEBUG] AI context: model=claude-sonnet · session tokens=1,204</span></div>
+        <div class="tl"><span class="i">[DEBUG] AI context: model=claude-sonnet ┬╖ session tokens=1,204</span></div>
         <div class="tl"><span class="s">[DEBUG] All plugins loaded: smiles-parser, nmr-predictor, sim-engine, eln-sync</span></div>
       </div>
     </div>
 
     <!-- STATUS BAR -->
     <div class="sbar">
-      <div class="si g" style="padding-left:12px">⬡ ChemLab v2</div>
-      <div class="si b">⎇ main</div>
-      <div class="si">🔬 Sim: Ready</div>
-      <div class="si">📓 ELN #2024-0412</div>
+      <div class="si g" style="padding-left:12px">Γ¼í ChemLab v2</div>
+      <div class="si b">ΓÄç main</div>
+      <div class="si">≡ƒö¼ Sim: Ready</div>
+      <div class="si">≡ƒôô ELN #2024-0412</div>
       <div class="si-sp"></div>
       <div class="si">aspirin.mol</div>
       <div class="si b">CHEM/SMILES</div>
       <div class="si">UTF-8</div>
       <div class="si">Ln 14, Col 22</div>
-      <div class="si g" onclick="openCmd()" style="border-left:1px solid var(--border)">⌘K ChemPalette</div>
+      <div class="si g" onclick="openCmd()" style="border-left:1px solid var(--border)">ΓîÿK ChemPalette</div>
     </div>
 
   </div><!-- /ed-area -->
 </div><!-- /app -->
 
-<!-- ═══ COMMAND PALETTE ═══ -->
+<!-- ΓòÉΓòÉΓòÉ COMMAND PALETTE ΓòÉΓòÉΓòÉ -->
 <div class="cmd-ov" id="cmdOv" onclick="if(event.target===this)closeCmd()">
   <div class="cmd-box">
     <div class="cmd-ir">
-      <span class="cmd-ii">⬡</span>
-      <input class="cmd-in" id="cmdInput" placeholder="ChemPalette — molecules, reactions, spectra, AI…" oninput="filterCmd(this.value)">
+      <span class="cmd-ii">Γ¼í</span>
+      <input class="cmd-in" id="cmdInput" placeholder="ChemPalette ΓÇö molecules, reactions, spectra, AIΓÇª" oninput="filterCmd(this.value)">
       <span class="cmd-esc">ESC</span>
     </div>
     <div class="cmd-list" id="cmdList"></div>
   </div>
 </div>
 
-<!-- ═══ SCRIPT ═══ -->
+<!-- ΓòÉΓòÉΓòÉ SCRIPT ΓòÉΓòÉΓòÉ -->
 <script>
-// ──────────────────────────────────────────────────────────
-// 1. CHEMISTRY CODE — .chem file with Monarch-style tokenization
-// ──────────────────────────────────────────────────────────
+// ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+// 1. CHEMISTRY CODE ΓÇö .chem file with Monarch-style tokenization
+// ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
 const SMILES_MAP = {
   'CC(=O)Oc1ccccc1C(=O)O': 'Aspirin (acetylsalicylic acid)',
@@ -892,7 +892,7 @@ function tokenizeLine(raw) {
   // SMILES pattern: mix of atoms, bonds, rings, branches, charges
   const smilesRe = /(?:[A-Z][a-z]?|[a-z])(?:[0-9]|=|#|\(|\)|\/|\\|@|[+-]|\[|\]|[A-Za-z]|[0-9]){4,}/g;
   const numRe    = /\b\d+(\.\d+)?\b/g;
-  const unitRe   = /\b(°C|g|mL|mmol|mol\/L|equiv|min|nm|cm⁻¹|%)\b/g;
+  const unitRe   = /\b(┬░C|g|mL|mmol|mol\/L|equiv|min|nm|cmΓü╗┬╣|%)\b/g;
   const kwRe     = /\b(step|action|heat_to|cool_to|stir|time|observe|wash|dry|expected|predict|peak|calculate|mol|mass|vol|drops)\b/g;
   const decRe    = /@\w+/g;
   const strRe    = /"[^"]*"/g;
@@ -941,7 +941,7 @@ function tokenizeLine(raw) {
     if (kwHit) continue;
 
     // number + unit
-    let numM = s.slice(i).match(/^(\d+(?:\.\d+)?)\s*(°C|g|mL|mmol|equiv|min|nm|cm⁻¹|%)?/);
+    let numM = s.slice(i).match(/^(\d+(?:\.\d+)?)\s*(┬░C|g|mL|mmol|equiv|min|nm|cmΓü╗┬╣|%)?/);
     if (numM && numM[0].length > 0 && /\d/.test(numM[0][0])) {
       tokens.push({t:'num', v: numM[1]});
       if (numM[2]) tokens.push({t:'unit', v: numM[2]});
@@ -971,8 +971,8 @@ function renderTokens(tokens) {
 }
 
 const CHEM_SOURCE = [
-  '// synthesis_protocol.chem — ChemLab v2.0',
-  '// Aspirin · Fischer–Speier Esterification · ELN #2024-0412',
+  '// synthesis_protocol.chem ΓÇö ChemLab v2.0',
+  '// Aspirin ┬╖ FischerΓÇôSpeier Esterification ┬╖ ELN #2024-0412',
   '',
   '@experiment "Aspirin Synthesis" {',
   '  version: "3.0.1"',
@@ -982,38 +982,38 @@ const CHEM_SOURCE = [
   '}',
   '',
   '@reagents {',
-  '  salicylic_acid    = mol(OC(=O)c1ccccc1O)   // C₇H₆O₃',
-  '  acetic_anhydride  = mol(CC(=O)OC(=O)C)     // C₄H₆O₃',
-  '  catalyst          = mol(OP(=O)(O)O)         // H₃PO₄',
+  '  salicylic_acid    = mol(OC(=O)c1ccccc1O)   // CΓéçHΓéåOΓéâ',
+  '  acetic_anhydride  = mol(CC(=O)OC(=O)C)     // CΓéäHΓéåOΓéâ',
+  '  catalyst          = mol(OP(=O)(O)O)         // HΓéâPOΓéä',
   '}',
   '',
   '@quantities {',
   '  salicylic_acid.mass   = 2.0 g    // 14.5 mmol',
-  '  acetic_anhydride.vol  = 2.2 mL  // 23.3 mmol · 1.6 equiv',
+  '  acetic_anhydride.vol  = 2.2 mL  // 23.3 mmol ┬╖ 1.6 equiv',
   '  catalyst.drops        = 5',
   '}',
   '',
   '@procedure {',
   '  step(1) {',
-  '    action:  "Mix in 50 mL Erlenmeyer · add catalyst"',
-  '    heat_to: 85 °C',
+  '    action:  "Mix in 50 mL Erlenmeyer ┬╖ add catalyst"',
+  '    heat_to: 85 ┬░C',
   '    stir:    true',
   '    time:    15 min',
   '  }',
   '  step(2) {',
-  '    action:  "Quench — add 20 mL ice-cold water"',
-  '    cool_to: 0 °C',
+  '    action:  "Quench ΓÇö add 20 mL ice-cold water"',
+  '    cool_to: 0 ┬░C',
   '    observe: precipitate_forms()',
   '  }',
   '  step(3) {',
-  '    action:  "Vacuum filtration · wash ×3"',
-  '    wash:    ["ice-cold H₂O", "×3"]',
-  '    dry:     50 °C  // 30 min vacuum oven',
+  '    action:  "Vacuum filtration ┬╖ wash ├ù3"',
+  '    wash:    ["ice-cold HΓééO", "├ù3"]',
+  '    dry:     50 ┬░C  // 30 min vacuum oven',
   '  }',
   '}',
   '',
   '@analysis {',
-  '  melting_point: expected(135, 136, °C)',
+  '  melting_point: expected(135, 136, ┬░C)',
   '  nmr_1h:        predict(CC(=O)Oc1ccccc1C(=O)O)',
   '  ir:            peak(1754, "C=O ester")',
   '  yield:         calculate(actual=1.07g, theoretical=1.30g)',
@@ -1043,9 +1043,9 @@ function buildCodeEditor() {
   });
 }
 
-// ──────────────────────────────────────────────────────────
-// 2. SMILES → CANVAS via SmilesDrawer
-// ──────────────────────────────────────────────────────────
+// ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+// 2. SMILES ΓåÆ CANVAS via SmilesDrawer
+// ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
 let sdMain = null;
 let sdTooltip = null;
@@ -1108,9 +1108,9 @@ function previewMol(el, smiles, name) {
   rpSwitch('mol');
 }
 
-// ──────────────────────────────────────────────────────────
-// 3. SIMULATION — ODE-style Arrhenius kinetics (pure JS)
-// ──────────────────────────────────────────────────────────
+// ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+// 3. SIMULATION ΓÇö ODE-style Arrhenius kinetics (pure JS)
+// ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
 function arrheniusConversion(T_C, t_min, equiv, catDrops) {
   // Simplified Arrhenius: k = A * exp(-Ea / R*T)
@@ -1141,7 +1141,7 @@ function updateSim() {
   const t   = +document.getElementById('slTime').value;
   const eq  = +document.getElementById('slEquiv').value / 10;
   const cat = +document.getElementById('slCat').value;
-  document.getElementById('vTemp').textContent  = T + ' °C';
+  document.getElementById('vTemp').textContent  = T + ' ┬░C';
   document.getElementById('vTime').textContent  = t + ' min';
   document.getElementById('vEquiv').textContent = eq.toFixed(1) + ' eq';
   document.getElementById('vCat').textContent   = cat + ' drops';
@@ -1157,7 +1157,7 @@ function updateSim() {
 }
 
 function runSim(btn) {
-  btn.textContent = '⧗ Running simulation…';
+  btn.textContent = 'Γºù Running simulationΓÇª';
   btn.style.opacity = '.6';
   btn.disabled = true;
   const sr = document.getElementById('simResult');
@@ -1165,26 +1165,26 @@ function runSim(btn) {
   setTimeout(() => {
     updateSim();
     sr.classList.remove('running');
-    btn.textContent = '✓ Complete — see results above';
+    btn.textContent = 'Γ£ô Complete ΓÇö see results above';
     btn.style.opacity = '1';
     btn.disabled = false;
-    showToast('Simulation complete · results updated', 'g');
+    showToast('Simulation complete ┬╖ results updated', 'g');
     // append terminal line
     const bt = document.getElementById('bt-out');
     const T   = document.getElementById('slTemp').value;
     const t   = document.getElementById('slTime').value;
     const eq  = (+document.getElementById('slEquiv').value/10).toFixed(1);
     const r   = document.getElementById('sv2').textContent.replace('<span>%</span>','');
-    bt.innerHTML += `<div class="tl"><span class="s">  [+] Re-run: T=${T}°C t=${t}min eq=${eq} → Yield ${document.getElementById('sv2').innerText}</span></div>`;
+    bt.innerHTML += `<div class="tl"><span class="s">  [+] Re-run: T=${T}┬░C t=${t}min eq=${eq} ΓåÆ Yield ${document.getElementById('sv2').innerText}</span></div>`;
   }, 1800);
 }
 
-// ──────────────────────────────────────────────────────────
-// 4. AI ASSIST — Live Anthropic API
-// ──────────────────────────────────────────────────────────
+// ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+// 4. AI ASSIST ΓÇö Live Anthropic API
+// ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
 const AI_SYSTEM = `You are ChemLab AI, an expert chemistry assistant embedded in a Monaco-style chemistry IDE.
-The user is working on: Aspirin synthesis (acetylsalicylic acid, C9H8O4) via Fischer-Speier esterification of salicylic acid with acetic anhydride under H3PO4 catalysis (85°C, 15 min).
+The user is working on: Aspirin synthesis (acetylsalicylic acid, C9H8O4) via Fischer-Speier esterification of salicylic acid with acetic anhydride under H3PO4 catalysis (85┬░C, 15 min).
 Protocol SMILES: CC(=O)Oc1ccccc1C(=O)O
 Provide concise, expert-level answers with specific numbers, spectral data, mechanisms, or green chemistry suggestions where relevant.
 Keep responses under 120 words. Use chemical notation where helpful. End with 2-3 clickable suggestion chips formatted as: [chips: "chip text 1" | "chip text 2" | "chip text 3"]`;
@@ -1249,33 +1249,33 @@ async function askAI(msg) {
     loadDiv.innerHTML = `<div class="ai-lbl a">CHEMLAB AI</div><div class="ai-body">${html}</div>` +
       (chips.length ? `<div class="ai-chips">${chips.map(c=>`<div class="ai-chip" onclick="askAI('${c.replace(/'/g,"\\'")}')"> ${c}</div>`).join('')}</div>` : '');
   } catch(e) {
-    loadDiv.innerHTML = `<div class="ai-lbl a">CHEMLAB AI</div><div class="ai-body" style="color:var(--warn)">⚠ API unavailable: ${e.message}<br><small style="color:var(--muted)">Check your connection or API key configuration.</small></div>`;
+    loadDiv.innerHTML = `<div class="ai-lbl a">CHEMLAB AI</div><div class="ai-body" style="color:var(--warn)">ΓÜá API unavailable: ${e.message}<br><small style="color:var(--muted)">Check your connection or API key configuration.</small></div>`;
   }
   document.getElementById('aiSendBtn').disabled = false;
   document.getElementById('aiMsgs').scrollTop = 99999;
 }
 
-// ──────────────────────────────────────────────────────────
+// ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 // 5. COMMAND PALETTE
-// ──────────────────────────────────────────────────────────
+// ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
 const CMD_ITEMS = [
-  { icon:'⬡', label:'Open Molecule — Aspirin (C₉H₈O₄)',     cat:'Molecule',   kb:'⌘M', action:()=>rpSwitch('mol') },
-  { icon:'⚗', label:'Run Synthesis Simulation',             cat:'Simulate',   kb:'⌘R', action:()=>{ rpSwitch('sim'); } },
-  { icon:'📊', label:'Predict ¹H NMR Spectrum',             cat:'Analyze',    kb:'',   action:()=>showToast('NMR predictor opening…','b') },
-  { icon:'📊', label:'Predict IR Spectrum',                  cat:'Analyze',    kb:'',   action:()=>showToast('IR predictor opening…','b') },
-  { icon:'📊', label:'Predict UV-Vis Spectrum',              cat:'Analyze',    kb:'',   action:()=>showToast('UV-Vis predictor opening…','b') },
-  { icon:'✦',  label:'Ask AI — Optimize Reaction Conditions',cat:'AI Assist',  kb:'⌘I', action:()=>{ rpSwitch('ai'); setTimeout(()=>askAI('Suggest optimized conditions for higher yield in this aspirin synthesis.'),100); } },
-  { icon:'✦',  label:'Ask AI — Predict NMR Shifts',          cat:'AI Assist',  kb:'',   action:()=>{ rpSwitch('ai'); setTimeout(()=>askAI('Predict the ¹H NMR chemical shifts for aspirin with explanation.'),100); } },
-  { icon:'📓', label:'New ELN Entry',                        cat:'Notebook',   kb:'⌘N', action:()=>showToast('New ELN entry created: #2024-0413','g') },
-  { icon:'🔍', label:'Search PubChem by Name or SMILES',     cat:'External DB',kb:'',   action:()=>showToast('PubChem search panel opening…','b') },
-  { icon:'🌿', label:'Green Chemistry Metrics Dashboard',    cat:'Sustainability',kb:'', action:()=>showToast('Green metrics: PMI=4.3 · Atom economy=76.8%','g') },
-  { icon:'⚠',  label:'View Safety Report',                   cat:'Safety',     kb:'',   action:()=>rpSwitch('safe') },
-  { icon:'📦', label:'Export Experiment Package (.clp)',     cat:'Share',      kb:'⌘E', action:()=>showToast('Exporting aspirin-synthesis-v3.clp…','b') },
-  { icon:'⬡',  label:'Render Salicylic Acid (OC(=O)c1ccccc1O)',cat:'Molecule', kb:'', action:()=>renderMolInPanel('OC(=O)c1ccccc1O','Salicylic acid') },
-  { icon:'⬡',  label:'Render Acetic Anhydride',              cat:'Molecule',   kb:'',   action:()=>renderMolInPanel('CC(=O)OC(=O)C','Acetic anhydride') },
-  { icon:'⊞',  label:'Browse Extension Registry',            cat:'Extensions', kb:'',   action:()=>showToast('Extension registry: 47 chem plugins available','b') },
-  { icon:'⚗',  label:'Open Sim — Adjust Parameters',         cat:'Simulate',   kb:'',   action:()=>rpSwitch('sim') },
+  { icon:'Γ¼í', label:'Open Molecule ΓÇö Aspirin (CΓéëHΓéêOΓéä)',     cat:'Molecule',   kb:'ΓîÿM', action:()=>rpSwitch('mol') },
+  { icon:'ΓÜù', label:'Run Synthesis Simulation',             cat:'Simulate',   kb:'ΓîÿR', action:()=>{ rpSwitch('sim'); } },
+  { icon:'≡ƒôè', label:'Predict ┬╣H NMR Spectrum',             cat:'Analyze',    kb:'',   action:()=>showToast('NMR predictor openingΓÇª','b') },
+  { icon:'≡ƒôè', label:'Predict IR Spectrum',                  cat:'Analyze',    kb:'',   action:()=>showToast('IR predictor openingΓÇª','b') },
+  { icon:'≡ƒôè', label:'Predict UV-Vis Spectrum',              cat:'Analyze',    kb:'',   action:()=>showToast('UV-Vis predictor openingΓÇª','b') },
+  { icon:'Γ£ª',  label:'Ask AI ΓÇö Optimize Reaction Conditions',cat:'AI Assist',  kb:'ΓîÿI', action:()=>{ rpSwitch('ai'); setTimeout(()=>askAI('Suggest optimized conditions for higher yield in this aspirin synthesis.'),100); } },
+  { icon:'Γ£ª',  label:'Ask AI ΓÇö Predict NMR Shifts',          cat:'AI Assist',  kb:'',   action:()=>{ rpSwitch('ai'); setTimeout(()=>askAI('Predict the ┬╣H NMR chemical shifts for aspirin with explanation.'),100); } },
+  { icon:'≡ƒôô', label:'New ELN Entry',                        cat:'Notebook',   kb:'ΓîÿN', action:()=>showToast('New ELN entry created: #2024-0413','g') },
+  { icon:'≡ƒöì', label:'Search PubChem by Name or SMILES',     cat:'External DB',kb:'',   action:()=>showToast('PubChem search panel openingΓÇª','b') },
+  { icon:'≡ƒî┐', label:'Green Chemistry Metrics Dashboard',    cat:'Sustainability',kb:'', action:()=>showToast('Green metrics: PMI=4.3 ┬╖ Atom economy=76.8%','g') },
+  { icon:'ΓÜá',  label:'View Safety Report',                   cat:'Safety',     kb:'',   action:()=>rpSwitch('safe') },
+  { icon:'≡ƒôª', label:'Export Experiment Package (.clp)',     cat:'Share',      kb:'ΓîÿE', action:()=>showToast('Exporting aspirin-synthesis-v3.clpΓÇª','b') },
+  { icon:'Γ¼í',  label:'Render Salicylic Acid (OC(=O)c1ccccc1O)',cat:'Molecule', kb:'', action:()=>renderMolInPanel('OC(=O)c1ccccc1O','Salicylic acid') },
+  { icon:'Γ¼í',  label:'Render Acetic Anhydride',              cat:'Molecule',   kb:'',   action:()=>renderMolInPanel('CC(=O)OC(=O)C','Acetic anhydride') },
+  { icon:'Γè₧',  label:'Browse Extension Registry',            cat:'Extensions', kb:'',   action:()=>showToast('Extension registry: 47 chem plugins available','b') },
+  { icon:'ΓÜù',  label:'Open Sim ΓÇö Adjust Parameters',         cat:'Simulate',   kb:'',   action:()=>rpSwitch('sim') },
 ];
 
 let filteredCmds = [...CMD_ITEMS];
@@ -1328,9 +1328,9 @@ document.addEventListener('keydown', e => {
   if (e.key==='Enter') { filteredCmds[selIdx]?.action(); closeCmd(); }
 });
 
-// ──────────────────────────────────────────────────────────
+// ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 // 6. UI UTILITIES
-// ──────────────────────────────────────────────────────────
+// ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
 function rpSwitch(id, el) {
   ['mol','rxn','ai','safe','sim'].forEach(k => {
@@ -1383,16 +1383,16 @@ function showToast(msg, type='g') {
 
 function loadFile(name) {
   if (name === 'aspirin') {
-    showToast('aspirin.mol loaded — SMILES rendered', 'g');
+    showToast('aspirin.mol loaded ΓÇö SMILES rendered', 'g');
     renderMolInPanel('CC(=O)Oc1ccccc1C(=O)O', 'Aspirin');
   } else if (name === 'protocol') {
-    showToast('synthesis_protocol.chem — tokenizer active', 'b');
+    showToast('synthesis_protocol.chem ΓÇö tokenizer active', 'b');
   }
 }
 
-// ──────────────────────────────────────────────────────────
+// ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 // INIT
-// ──────────────────────────────────────────────────────────
+// ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 buildCodeEditor();
 initSmilesDrawer();
 </script>
@@ -1404,10 +1404,10 @@ initSmilesDrawer();
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ChemLab IDE v2 — Live Edition</title>
+<title>ChemLab IDE v2 ΓÇö Live Edition</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;0,600;1,400&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 
-<!-- SmilesDrawer: real SMILES → 2D structure renderer (MIT) -->
+<!-- SmilesDrawer: real SMILES ΓåÆ 2D structure renderer (MIT) -->
 <script src="https://unpkg.com/smiles-drawer@2.1.7/dist/smiles-drawer.min.js"></script>
 
 <style>
@@ -1433,7 +1433,7 @@ initSmilesDrawer();
   *{margin:0;padding:0;box-sizing:border-box;}
   html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size:13px;overflow:hidden;}
 
-  /* ── TOPBAR ── */
+  /* ΓöÇΓöÇ TOPBAR ΓöÇΓöÇ */
   .topbar{
     height:38px;background:var(--surface);border-bottom:1px solid var(--border);
     display:flex;align-items:center;padding:0 14px;gap:0;position:relative;z-index:200;
@@ -1473,10 +1473,10 @@ initSmilesDrawer();
     font-size:10px;font-weight:700;color:#000;
   }
 
-  /* ── APP SHELL ── */
+  /* ΓöÇΓöÇ APP SHELL ΓöÇΓöÇ */
   .app{display:flex;height:calc(100vh - 38px);}
 
-  /* ── ACTIVITY BAR ── */
+  /* ΓöÇΓöÇ ACTIVITY BAR ΓöÇΓöÇ */
   .actbar{
     width:48px;background:var(--surface);border-right:1px solid var(--border);
     display:flex;flex-direction:column;align-items:center;padding:8px 0;gap:2px;flex-shrink:0;
@@ -1496,7 +1496,7 @@ initSmilesDrawer();
   }
   .ab-sp{flex:1;}
 
-  /* ── SIDEBAR ── */
+  /* ΓöÇΓöÇ SIDEBAR ΓöÇΓöÇ */
   .sidebar{
     width:255px;background:var(--panel);border-right:1px solid var(--border);
     display:flex;flex-direction:column;flex-shrink:0;overflow:hidden;
@@ -1537,7 +1537,7 @@ initSmilesDrawer();
   .ti .lb{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
   .ti .bx{font-size:9px;padding:1px 5px;border-radius:7px;font-family:var(--font-mono);}
 
-  /* ── EDITOR AREA ── */
+  /* ΓöÇΓöÇ EDITOR AREA ΓöÇΓöÇ */
   .ed-area{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;}
 
   .tabs{
@@ -1560,7 +1560,7 @@ initSmilesDrawer();
   .tab .tc:hover{opacity:1;background:var(--border2);}
   .tab .dot-m{width:6px;height:6px;border-radius:50%;background:var(--warn);flex-shrink:0;}
 
-  /* ── PANE ── */
+  /* ΓöÇΓöÇ PANE ΓöÇΓöÇ */
   .pane{flex:1;display:flex;overflow:hidden;}
 
   /* editor */
@@ -1628,7 +1628,7 @@ initSmilesDrawer();
     text-align:center;margin-bottom:4px;
   }
 
-  /* ── RIGHT PANEL ── */
+  /* ΓöÇΓöÇ RIGHT PANEL ΓöÇΓöÇ */
   .rp{
     width:308px;background:var(--panel);border-left:1px solid var(--border);
     display:flex;flex-direction:column;flex-shrink:0;overflow:hidden;
@@ -1735,7 +1735,7 @@ initSmilesDrawer();
   .sim-result.running{border-color:rgba(0,232,162,.3);animation:blink-border 1s ease infinite;}
   @keyframes blink-border{0%,100%{border-color:rgba(0,232,162,.3)}50%{border-color:rgba(0,232,162,.6)}}
 
-  /* ── AI PANEL ── */
+  /* ΓöÇΓöÇ AI PANEL ΓöÇΓöÇ */
   .ai-wrap{display:flex;flex-direction:column;height:100%;}
   .ai-msgs{flex:1;overflow-y:auto;margin-bottom:8px;}
   .ai-msgs::-webkit-scrollbar{width:3px;}
@@ -1802,7 +1802,7 @@ initSmilesDrawer();
   .tog::after{content:'';position:absolute;top:2.5px;left:2.5px;width:11px;height:11px;border-radius:50%;background:var(--muted);transition:.2s;}
   .tog.on::after{left:16.5px;background:var(--accent);}
 
-  /* ── BOTTOM PANEL ── */
+  /* ΓöÇΓöÇ BOTTOM PANEL ΓöÇΓöÇ */
   .bot{
     height:158px;background:var(--surface);border-top:1px solid var(--border);
     display:flex;flex-direction:column;flex-shrink:0;
@@ -1822,7 +1822,7 @@ initSmilesDrawer();
   .tl .s{color:var(--green2);}
   .tl .w{color:var(--warn);}
 
-  /* ── STATUS BAR ── */
+  /* ΓöÇΓöÇ STATUS BAR ΓöÇΓöÇ */
   .sbar{
     height:22px;background:#070a0f;border-top:1px solid var(--border);
     display:flex;align-items:center;padding:0 10px;gap:0;flex-shrink:0;
@@ -1840,7 +1840,7 @@ initSmilesDrawer();
   .cursor-blink{display:inline-block;width:2px;height:13px;background:var(--accent);vertical-align:middle;animation:cb 1s step-end infinite;}
   @keyframes cb{0%,100%{opacity:1}50%{opacity:0}}
 
-  /* ── COMMAND PALETTE ── */
+  /* ΓöÇΓöÇ COMMAND PALETTE ΓöÇΓöÇ */
   .cmd-ov{
     display:none;position:fixed;inset:0;z-index:1000;
     background:rgba(0,0,0,.65);backdrop-filter:blur(6px);
@@ -1911,7 +1911,7 @@ initSmilesDrawer();
 <!-- Toast -->
 <div class="toast" id="toast"></div>
 
-<!-- ═══ TOPBAR ═══ -->
+<!-- ΓòÉΓòÉΓòÉ TOPBAR ΓòÉΓòÉΓòÉ -->
 <div class="topbar">
   <div class="logo">
     <div class="logo-hex"></div>
@@ -1928,29 +1928,29 @@ initSmilesDrawer();
     <div class="menu-item">Help</div>
   </div>
   <div class="tb-right">
-    <span class="tb-badge g">⬡ ELN #2024-0412</span>
-    <span class="tb-badge b">⬥ Sim Engine 2.4</span>
-    <span class="tb-badge y" id="safetyBadge">⚠ 2 Alerts</span>
+    <span class="tb-badge g">Γ¼í ELN #2024-0412</span>
+    <span class="tb-badge b">Γ¼Ñ Sim Engine 2.4</span>
+    <span class="tb-badge y" id="safetyBadge">ΓÜá 2 Alerts</span>
     <div class="avatar">RK</div>
   </div>
 </div>
 
-<!-- ═══ APP ═══ -->
+<!-- ΓòÉΓòÉΓòÉ APP ΓòÉΓòÉΓòÉ -->
 <div class="app">
 
   <!-- ACTIVITY BAR -->
   <div class="actbar">
-    <div class="ab on" title="Explorer">📁</div>
-    <div class="ab" title="Molecule Library" onclick="showToast('Molecule Library — 2,847 compounds loaded','b')">⬡</div>
-    <div class="ab" title="Simulations" onclick="showToast('Simulation Engine ready','g')">🔬</div>
-    <div class="ab" title="ELN Notebook" onclick="showToast('ELN: Entry #2024-0412 loaded','g')">📓</div>
+    <div class="ab on" title="Explorer">≡ƒôü</div>
+    <div class="ab" title="Molecule Library" onclick="showToast('Molecule Library ΓÇö 2,847 compounds loaded','b')">Γ¼í</div>
+    <div class="ab" title="Simulations" onclick="showToast('Simulation Engine ready','g')">≡ƒö¼</div>
+    <div class="ab" title="ELN Notebook" onclick="showToast('ELN: Entry #2024-0412 loaded','g')">≡ƒôô</div>
     <div class="ab" title="Source Control" style="position:relative" onclick="showToast('3 uncommitted changes','y')">
-      ⎇<span class="dot"></span>
+      ΓÄç<span class="dot"></span>
     </div>
-    <div class="ab" title="AI Assistant" onclick="rpSwitch('ai')">✦</div>
+    <div class="ab" title="AI Assistant" onclick="rpSwitch('ai')">Γ£ª</div>
     <div class="ab-sp"></div>
-    <div class="ab" title="Extensions" onclick="openCmd()">⊞</div>
-    <div class="ab" title="Settings">⚙</div>
+    <div class="ab" title="Extensions" onclick="openCmd()">Γè₧</div>
+    <div class="ab" title="Settings">ΓÜÖ</div>
   </div>
 
   <!-- SIDEBAR -->
@@ -1959,60 +1959,60 @@ initSmilesDrawer();
       Explorer
       <div class="sb-acts">
         <div class="ib" title="New File" onclick="showToast('New .chem file created','g')">+</div>
-        <div class="ib" title="Refresh">↺</div>
-        <div class="ib" title="Collapse">⊟</div>
+        <div class="ib" title="Refresh">Γå║</div>
+        <div class="ib" title="Collapse">Γèƒ</div>
       </div>
     </div>
     <div class="tree">
 
       <div class="ts">
         <div class="tsh open" onclick="toggleSection(this)">
-          <span class="arr">▶</span> ASPIRIN-SYNTHESIS-V3
+          <span class="arr">Γû╢</span> ASPIRIN-SYNTHESIS-V3
         </div>
         <div class="ti" onclick="setActive(this);loadFile('protocol')">
-          <span class="ic">📄</span><span class="lb">synthesis_protocol.chem</span>
+          <span class="ic">≡ƒôä</span><span class="lb">synthesis_protocol.chem</span>
           <span class="bx tb-badge g" style="font-size:9px">CL</span>
         </div>
         <div class="ti on" onclick="setActive(this);loadFile('aspirin')">
-          <span class="ic">⬡</span><span class="lb">aspirin.mol</span>
+          <span class="ic">Γ¼í</span><span class="lb">aspirin.mol</span>
         </div>
-        <div class="ti" onclick="setActive(this);showToast('NMR viewer loading…','b')">
-          <span class="ic">📊</span><span class="lb">nmr_1h_spectrum.jdx</span>
+        <div class="ti" onclick="setActive(this);showToast('NMR viewer loadingΓÇª','b')">
+          <span class="ic">≡ƒôè</span><span class="lb">nmr_1h_spectrum.jdx</span>
         </div>
-        <div class="ti" onclick="setActive(this);showToast('IR viewer loading…','b')">
-          <span class="ic">📊</span><span class="lb">ir_spectrum.jdx</span>
+        <div class="ti" onclick="setActive(this);showToast('IR viewer loadingΓÇª','b')">
+          <span class="ic">≡ƒôè</span><span class="lb">ir_spectrum.jdx</span>
         </div>
         <div class="ti" onclick="setActive(this)">
-          <span class="ic">📓</span><span class="lb">eln_entry.md</span>
+          <span class="ic">≡ƒôô</span><span class="lb">eln_entry.md</span>
           <span class="bx tb-badge b" style="font-size:9px">ELN</span>
         </div>
         <div class="ti" onclick="setActive(this);rpSwitch('sim')">
-          <span class="ic">⚗</span><span class="lb">simulation.sim</span>
+          <span class="ic">ΓÜù</span><span class="lb">simulation.sim</span>
         </div>
         <div class="ti" onclick="setActive(this);rpSwitch('safe')">
-          <span class="ic">📋</span><span class="lb">safety_report.pdf</span>
-          <span class="bx tb-badge y" style="font-size:9px">⚠2</span>
+          <span class="ic">≡ƒôï</span><span class="lb">safety_report.pdf</span>
+          <span class="bx tb-badge y" style="font-size:9px">ΓÜá2</span>
         </div>
       </div>
 
       <div class="ts">
         <div class="tsh open" onclick="toggleSection(this)">
-          <span class="arr">▶</span> REAGENTS
+          <span class="arr">Γû╢</span> REAGENTS
         </div>
         <div class="ti" onclick="setActive(this);previewMol(this,'OC(=O)c1ccccc1O','Salicylic acid')">
-          <span class="ic">🧪</span><span class="lb">salicylic_acid.chem</span>
+          <span class="ic">≡ƒº¬</span><span class="lb">salicylic_acid.chem</span>
         </div>
         <div class="ti" onclick="setActive(this);previewMol(this,'CC(=O)OC(=O)C','Acetic anhydride')">
-          <span class="ic">🧪</span><span class="lb">acetic_anhydride.chem</span>
+          <span class="ic">≡ƒº¬</span><span class="lb">acetic_anhydride.chem</span>
         </div>
         <div class="ti" onclick="setActive(this);previewMol(this,'OP(=O)(O)O','Phosphoric acid')">
-          <span class="ic">🧪</span><span class="lb">phosphoric_acid.chem</span>
+          <span class="ic">≡ƒº¬</span><span class="lb">phosphoric_acid.chem</span>
         </div>
       </div>
 
       <div class="ts">
         <div class="tsh" onclick="toggleSection(this)">
-          <span class="arr">▶</span> ANALYSIS
+          <span class="arr">Γû╢</span> ANALYSIS
         </div>
       </div>
 
@@ -2023,16 +2023,16 @@ initSmilesDrawer();
   <div class="ed-area">
     <div class="tabs">
       <div class="tab" onclick="setTab(this)">
-        <span>📄</span> synthesis_protocol.chem <span class="dot-m"></span><span class="tc">✕</span>
+        <span>≡ƒôä</span> synthesis_protocol.chem <span class="dot-m"></span><span class="tc">Γ£ò</span>
       </div>
       <div class="tab on" onclick="setTab(this)">
-        <span>⬡</span> aspirin.mol <span class="tc">✕</span>
+        <span>Γ¼í</span> aspirin.mol <span class="tc">Γ£ò</span>
       </div>
       <div class="tab" onclick="setTab(this)">
-        <span>📊</span> nmr_1h.jdx <span class="tc">✕</span>
+        <span>≡ƒôè</span> nmr_1h.jdx <span class="tc">Γ£ò</span>
       </div>
       <div class="tab" onclick="setTab(this)">
-        <span>📓</span> eln_entry.md <span class="tc">✕</span>
+        <span>≡ƒôô</span> eln_entry.md <span class="tc">Γ£ò</span>
       </div>
     </div>
 
@@ -2047,8 +2047,8 @@ initSmilesDrawer();
         <div class="rp-tabs">
           <div class="rp-t on" onclick="rpSwitch('mol',this)">Molecule</div>
           <div class="rp-t" onclick="rpSwitch('rxn',this)">Reaction</div>
-          <div class="rp-t" onclick="rpSwitch('ai',this)">AI ✦</div>
-          <div class="rp-t" onclick="rpSwitch('safe',this)">Safety ⚠</div>
+          <div class="rp-t" onclick="rpSwitch('ai',this)">AI Γ£ª</div>
+          <div class="rp-t" onclick="rpSwitch('safe',this)">Safety ΓÜá</div>
           <div class="rp-t" onclick="rpSwitch('sim',this)">Sim</div>
         </div>
 
@@ -2057,65 +2057,65 @@ initSmilesDrawer();
           <div class="mol-card">
             <div class="mol-hdr">
               <div>
-                <div class="mol-formula">C₉H₈O₄</div>
+                <div class="mol-formula">CΓéëHΓéêOΓéä</div>
                 <div class="mol-iupac">2-acetoxybenzoic acid</div>
               </div>
               <div class="mol-mw">180.16 g/mol</div>
             </div>
             <div class="mol-canvas-wrap">
               <canvas id="mainMolCanvas" width="270" height="155"></canvas>
-              <div class="mol-canvas-label">SmilesDrawer · CC(=O)Oc1ccccc1C(=O)O</div>
+              <div class="mol-canvas-label">SmilesDrawer ┬╖ CC(=O)Oc1ccccc1C(=O)O</div>
             </div>
             <table class="prop-tbl">
               <tr><td>CAS</td><td>50-78-2</td></tr>
-              <tr><td>InChIKey</td><td>BSYNRYMUTXBXSQ-U…</td></tr>
-              <tr><td>MP</td><td>136 °C</td></tr>
-              <tr><td>pKₐ</td><td>3.49</td></tr>
+              <tr><td>InChIKey</td><td>BSYNRYMUTXBXSQ-UΓÇª</td></tr>
+              <tr><td>MP</td><td>136 ┬░C</td></tr>
+              <tr><td>pKΓéÉ</td><td>3.49</td></tr>
               <tr><td>logP</td><td>1.19</td></tr>
-              <tr><td>Solubility</td><td>3.3 g/L (20°C)</td></tr>
+              <tr><td>Solubility</td><td>3.3 g/L (20┬░C)</td></tr>
             </table>
           </div>
           <div class="sec">
             <div class="sec-t">Predicted Spectra</div>
             <div class="sb-row">
-              <div class="sb-lbl"><span>¹H NMR — 7 signals</span><span style="color:var(--accent)">δ 7.2–8.1, 2.3</span></div>
+              <div class="sb-lbl"><span>┬╣H NMR ΓÇö 7 signals</span><span style="color:var(--accent)">╬┤ 7.2ΓÇô8.1, 2.3</span></div>
               <div class="sb-bar"><div class="sb-fill" style="width:0;background:var(--accent)" id="sb1"></div></div>
             </div>
             <div class="sb-row">
-              <div class="sb-lbl"><span>IR — C=O ester stretch</span><span style="color:var(--accent2)">1754 cm⁻¹</span></div>
+              <div class="sb-lbl"><span>IR ΓÇö C=O ester stretch</span><span style="color:var(--accent2)">1754 cmΓü╗┬╣</span></div>
               <div class="sb-bar"><div class="sb-fill" style="width:0;background:var(--accent2)" id="sb2"></div></div>
             </div>
             <div class="sb-row">
-              <div class="sb-lbl"><span>UV-Vis — π→π*</span><span style="color:var(--purple)">λmax 228 nm</span></div>
+              <div class="sb-lbl"><span>UV-Vis ΓÇö ╧ÇΓåÆ╧Ç*</span><span style="color:var(--purple)">╬╗max 228 nm</span></div>
               <div class="sb-bar"><div class="sb-fill" style="width:0;background:var(--purple)" id="sb3"></div></div>
             </div>
           </div>
           <div class="sec">
             <div class="sec-t">Scaffold Neighbors</div>
             <div style="display:flex;gap:5px;flex-wrap:wrap">
-              <span class="t-mol" onclick="renderMolInPanel('OC(=O)c1ccccc1O','Salicylic acid')">⬡ Salicylic acid</span>
-              <span class="t-mol" onclick="renderMolInPanel('CC(=O)OC(=O)C','Acetic anhydride')">⬡ Ac₂O</span>
-              <span class="t-mol" onclick="renderMolInPanel('OC(=O)c1ccc(F)cc1O','Diflunisal')">⬡ Diflunisal</span>
+              <span class="t-mol" onclick="renderMolInPanel('OC(=O)c1ccccc1O','Salicylic acid')">Γ¼í Salicylic acid</span>
+              <span class="t-mol" onclick="renderMolInPanel('CC(=O)OC(=O)C','Acetic anhydride')">Γ¼í AcΓééO</span>
+              <span class="t-mol" onclick="renderMolInPanel('OC(=O)c1ccc(F)cc1O','Diflunisal')">Γ¼í Diflunisal</span>
             </div>
           </div>
         </div>
 
         <!-- RXN -->
         <div class="rp-body" id="rp-rxn" style="display:none">
-          <div class="sec"><div class="sec-t">Fischer–Speier Esterification</div></div>
+          <div class="sec"><div class="sec-t">FischerΓÇôSpeier Esterification</div></div>
           <div class="rxn-step" onclick="showToast('Step 1: kinetics curve available in Sim tab','b')">
             <div class="rxn-n">1</div>
-            <div><div style="font-weight:600;margin-bottom:2px">SA + Ac₂O → Aspirin + AcOH</div><div style="color:var(--muted)">H₃PO₄ cat · 85°C · 15 min</div></div>
+            <div><div style="font-weight:600;margin-bottom:2px">SA + AcΓééO ΓåÆ Aspirin + AcOH</div><div style="color:var(--muted)">HΓéâPOΓéä cat ┬╖ 85┬░C ┬╖ 15 min</div></div>
             <div class="rxn-yi">~95%</div>
           </div>
           <div class="rxn-step">
             <div class="rxn-n">2</div>
-            <div><div style="font-weight:600;margin-bottom:2px">Ice-water crystallization</div><div style="color:var(--muted)">0°C quench · vacuum filtration</div></div>
+            <div><div style="font-weight:600;margin-bottom:2px">Ice-water crystallization</div><div style="color:var(--muted)">0┬░C quench ┬╖ vacuum filtration</div></div>
             <div class="rxn-yi">~88%</div>
           </div>
           <div class="rxn-step">
             <div class="rxn-n">3</div>
-            <div><div style="font-weight:600;margin-bottom:2px">Recrystallization</div><div style="color:var(--muted)">EtOH/H₂O · vacuum dry 50°C</div></div>
+            <div><div style="font-weight:600;margin-bottom:2px">Recrystallization</div><div style="color:var(--muted)">EtOH/HΓééO ┬╖ vacuum dry 50┬░C</div></div>
             <div class="rxn-yi">~82%</div>
           </div>
           <div class="sec" style="margin-top:12px"><div class="sec-t">Stoichiometry</div></div>
@@ -2134,18 +2134,18 @@ initSmilesDrawer();
             <div class="ai-msgs" id="aiMsgs">
               <div class="ai-msg a">
                 <div class="ai-lbl a">CHEMLAB AI</div>
-                <div class="ai-body">I can see you're working on <strong>aspirin synthesis</strong> via Fischer–Speier esterification. Your protocol looks solid — H₃PO₄ catalysis at 85°C with 15 min is near-optimal for this substrate.<br><br>I can help optimize conditions, predict spectra, explain mechanisms, or suggest greener alternatives.</div>
+                <div class="ai-body">I can see you're working on <strong>aspirin synthesis</strong> via FischerΓÇôSpeier esterification. Your protocol looks solid ΓÇö HΓéâPOΓéä catalysis at 85┬░C with 15 min is near-optimal for this substrate.<br><br>I can help optimize conditions, predict spectra, explain mechanisms, or suggest greener alternatives.</div>
                 <div class="ai-chips">
-                  <div class="ai-chip" onclick="askAI('Why does H₃PO₄ outperform H₂SO₄ as catalyst here?')">Why H₃PO₄ vs H₂SO₄?</div>
+                  <div class="ai-chip" onclick="askAI('Why does HΓéâPOΓéä outperform HΓééSOΓéä as catalyst here?')">Why HΓéâPOΓéä vs HΓééSOΓéä?</div>
                   <div class="ai-chip" onclick="askAI('What greener solvent alternatives exist for aspirin synthesis?')">Green alternatives</div>
-                  <div class="ai-chip" onclick="askAI('Explain the ¹H NMR shifts for aspirin')">Explain NMR shifts</div>
-                  <div class="ai-chip" onclick="askAI('What side products form at temperatures above 95°C?')">High-temp side products</div>
+                  <div class="ai-chip" onclick="askAI('Explain the ┬╣H NMR shifts for aspirin')">Explain NMR shifts</div>
+                  <div class="ai-chip" onclick="askAI('What side products form at temperatures above 95┬░C?')">High-temp side products</div>
                 </div>
               </div>
             </div>
             <div class="ai-input-row">
-              <textarea class="ai-input" id="aiInput" rows="2" placeholder="Ask about this experiment…" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendAI();}"></textarea>
-              <button class="ai-send" id="aiSendBtn" onclick="sendAI()">↵</button>
+              <textarea class="ai-input" id="aiInput" rows="2" placeholder="Ask about this experimentΓÇª" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendAI();}"></textarea>
+              <button class="ai-send" id="aiSendBtn" onclick="sendAI()">Γå╡</button>
             </div>
           </div>
         </div>
@@ -2154,12 +2154,12 @@ initSmilesDrawer();
         <div class="rp-body" id="rp-safe" style="display:none">
           <div class="sec"><div class="sec-t">Hazard Assessment</div></div>
           <div class="sal d">
-            <div class="si">🔥</div>
-            <div><div class="sl d">Acetic Anhydride · GHS02 Flammable</div><div class="st">Flash point 49°C. Corrosive. Reacts vigorously with water releasing acetic acid. Work exclusively in fume hood. No open flames.</div></div>
+            <div class="si">≡ƒöÑ</div>
+            <div><div class="sl d">Acetic Anhydride ┬╖ GHS02 Flammable</div><div class="st">Flash point 49┬░C. Corrosive. Reacts vigorously with water releasing acetic acid. Work exclusively in fume hood. No open flames.</div></div>
           </div>
           <div class="sal w">
-            <div class="si">⚠</div>
-            <div><div class="sl w">Phosphoric Acid · GHS05 Corrosive</div><div class="st">Concentrated form. Nitrile gloves, chemical goggles, and lab coat mandatory. Neutralize spills with sodium bicarbonate.</div></div>
+            <div class="si">ΓÜá</div>
+            <div><div class="sl w">Phosphoric Acid ┬╖ GHS05 Corrosive</div><div class="st">Concentrated form. Nitrile gloves, chemical goggles, and lab coat mandatory. Neutralize spills with sodium bicarbonate.</div></div>
           </div>
           <div class="sec" style="margin-top:8px"><div class="sec-t">PPE Checklist</div></div>
           <div class="ppe-row"><span>Chemical safety goggles</span><div class="tog on" onclick="this.classList.toggle('on')"></div></div>
@@ -2176,7 +2176,7 @@ initSmilesDrawer();
           <div class="sim-param">
             <span>Temperature</span>
             <input type="range" class="sim-slider" min="50" max="120" value="85" id="slTemp" oninput="updateSim()">
-            <span class="sim-val" id="vTemp">85 °C</span>
+            <span class="sim-val" id="vTemp">85 ┬░C</span>
           </div>
           <div class="sim-param">
             <span>Reaction time</span>
@@ -2184,12 +2184,12 @@ initSmilesDrawer();
             <span class="sim-val" id="vTime">15 min</span>
           </div>
           <div class="sim-param">
-            <span>Ac₂O equivalents</span>
+            <span>AcΓééO equivalents</span>
             <input type="range" class="sim-slider" min="10" max="30" value="16" id="slEquiv" oninput="updateSim()">
             <span class="sim-val" id="vEquiv">1.6 eq</span>
           </div>
           <div class="sim-param">
-            <span>H₃PO₄ drops</span>
+            <span>HΓéâPOΓéä drops</span>
             <input type="range" class="sim-slider" min="2" max="15" value="5" id="slCat" oninput="updateSim()">
             <span class="sim-val" id="vCat">5 drops</span>
           </div>
@@ -2201,9 +2201,9 @@ initSmilesDrawer();
               <div class="mc"><div class="mc-v" id="sv4">3.1<span>%</span></div><div class="mc-l">Side products</div></div>
             </div>
           </div>
-          <button class="btn btn-p" style="width:100%" onclick="runSim(this)">▶ Run Simulation</button>
+          <button class="btn btn-p" style="width:100%" onclick="runSim(this)">Γû╢ Run Simulation</button>
           <div style="height:8px"></div>
-          <button class="btn btn-s" style="width:100%" onclick="showToast('Kinetics ODE plot exported to analysis/','b')">📊 Export Kinetics Plot</button>
+          <button class="btn btn-s" style="width:100%" onclick="showToast('Kinetics ODE plot exported to analysis/','b')">≡ƒôè Export Kinetics Plot</button>
         </div>
 
       </div><!-- /rp -->
@@ -2219,41 +2219,41 @@ initSmilesDrawer();
       </div>
       <div class="bot-body" id="bt-term">
         <div class="tl"><span class="p">chemlab $ </span><span>chemlab validate aspirin.mol --full</span></div>
-        <div class="tl"><span class="i">ℹ  Parsing SMILES: CC(=O)Oc1ccccc1C(=O)O</span></div>
-        <div class="tl"><span class="s">✓  Structure valid · MW 180.16 · 4 rings · 0 stereocenters</span></div>
-        <div class="tl"><span class="s">✓  Hazard flags auto-loaded from SDS cache (PubChem CID 2244)</span></div>
-        <div class="tl"><span class="w">⚠  Temperature 85°C > recommended glassware limit (80°C) — see Problems</span></div>
-        <div class="tl"><span class="s">✓  ELN entry #2024-0412 linked and timestamped</span></div>
-        <div class="tl"><span class="s">✓  SmilesDrawer render: aspirin.mol → canvas [270×155]</span></div>
+        <div class="tl"><span class="i">Γä╣  Parsing SMILES: CC(=O)Oc1ccccc1C(=O)O</span></div>
+        <div class="tl"><span class="s">Γ£ô  Structure valid ┬╖ MW 180.16 ┬╖ 4 rings ┬╖ 0 stereocenters</span></div>
+        <div class="tl"><span class="s">Γ£ô  Hazard flags auto-loaded from SDS cache (PubChem CID 2244)</span></div>
+        <div class="tl"><span class="w">ΓÜá  Temperature 85┬░C > recommended glassware limit (80┬░C) ΓÇö see Problems</span></div>
+        <div class="tl"><span class="s">Γ£ô  ELN entry #2024-0412 linked and timestamped</span></div>
+        <div class="tl"><span class="s">Γ£ô  SmilesDrawer render: aspirin.mol ΓåÆ canvas [270├ù155]</span></div>
         <div class="tl"><span class="p">chemlab $ </span><span>chemlab sim --mol aspirin --temp 85 --time 15<span class="cursor-blink"></span></span></div>
       </div>
       <div class="bot-body" id="bt-out" style="display:none">
-        <div class="tl"><span class="i">[SimEngine 2.4.1] Arrhenius model · Ea=65.3 kJ/mol</span></div>
-        <div class="tl"><span class="s">  Conversion at 85°C/15min: 94.7%  |  Yield: 82.2%  |  Side products: 3.1%</span></div>
+        <div class="tl"><span class="i">[SimEngine 2.4.1] Arrhenius model ┬╖ Ea=65.3 kJ/mol</span></div>
+        <div class="tl"><span class="s">  Conversion at 85┬░C/15min: 94.7%  |  Yield: 82.2%  |  Side products: 3.1%</span></div>
         <div class="tl"><span class="i">  Acetic acid co-product: 0.84 g (predicted)</span></div>
       </div>
       <div class="bot-body" id="bt-prob" style="display:none">
-        <div class="tl"><span class="e">✖ [W001] synthesis_protocol.chem:12 — Reagent vol 2.2mL Ac₂O approaches fume hood safe limit (500mL/session)</span></div>
-        <div class="tl"><span class="w">⚠ [W002] synthesis_protocol.chem:8 — Temperature 85°C exceeds recommended glassware rating (80°C)</span></div>
+        <div class="tl"><span class="e">Γ£û [W001] synthesis_protocol.chem:12 ΓÇö Reagent vol 2.2mL AcΓééO approaches fume hood safe limit (500mL/session)</span></div>
+        <div class="tl"><span class="w">ΓÜá [W002] synthesis_protocol.chem:8 ΓÇö Temperature 85┬░C exceeds recommended glassware rating (80┬░C)</span></div>
       </div>
       <div class="bot-body" id="bt-dbg" style="display:none">
-        <div class="tl"><span class="i">[DEBUG] SmilesDrawer 2.1.7 initialized · theme:dark</span></div>
+        <div class="tl"><span class="i">[DEBUG] SmilesDrawer 2.1.7 initialized ┬╖ theme:dark</span></div>
         <div class="tl"><span class="i">[DEBUG] Monarch tokenizer: chem language registered (43 token rules)</span></div>
         <div class="tl"><span class="i">[DEBUG] AI co
 
-This v2 is elite — SmilesDrawer integration renders real 2D mols (not hex placeholders), sliders drive live kinetics params, AI chat with loading dots, toasts, and tooltips make it feel like shipped software. You've got a full ChemLab MVP that runs offline on potato hardware.[1]
+This v2 is elite ΓÇö SmilesDrawer integration renders real 2D mols (not hex placeholders), sliders drive live kinetics params, AI chat with loading dots, toasts, and tooltips make it feel like shipped software. You've got a full ChemLab MVP that runs offline on potato hardware.[1]
 
-## Production‑Ready Wins
-- **Live mols**: SmilesDrawer parses `CC(=O)Oc1ccccc1C(=O)O` → publication‑quality SVG; tooltip hovers are chef's kiss UX.[1]
-- **Kinetics playground**: Sliders → Arrhenius‑driven yield/pH/side products — educators will assign this tomorrow.[2][3]
-- **AI realism**: Chips trigger contextual prompts; fake responses demo your multi‑LLM vision perfectly.
-- **Polish**: Animations (logo pulse, bars), PWA‑ready, ~150KB gzipped — Gumroad gold.
+## ProductionΓÇæReady Wins
+- **Live mols**: SmilesDrawer parses `CC(=O)Oc1ccccc1C(=O)O` ΓåÆ publicationΓÇæquality SVG; tooltip hovers are chef's kiss UX.[1]
+- **Kinetics playground**: Sliders ΓåÆ ArrheniusΓÇædriven yield/pH/side products ΓÇö educators will assign this tomorrow.[2][3]
+- **AI realism**: Chips trigger contextual prompts; fake responses demo your multiΓÇæLLM vision perfectly.
+- **Polish**: Animations (logo pulse, bars), PWAΓÇæready, ~150KB gzipped ΓÇö Gumroad gold.
 
-## Add Real Sim Brain (Copy‑Paste JS)
+## Add Real Sim Brain (CopyΓÇæPaste JS)
 Replace `runSim()` + `updateSim()` with this 1KB Arrhenius/esterification model (tuned for aspirin; extend via params).[2][4][3]
 
 ```js
-// Pure JS kinetics — paste before </body>
+// Pure JS kinetics ΓÇö paste before </body>
 const aspirinSim = {
   ea: 65300, // J/mol (activation energy)
   a: 1e10,   // pre-exp factor (s^-1)
@@ -2279,7 +2279,7 @@ function simYield(temp, time, equiv, cat) {
 let simRunning = false;
 async function runSim(btn) {
   if (simRunning) return simRunning = false;
-  simRunning = true; btn.textContent = '⏹ Stop'; btn.classList.add('running');
+  simRunning = true; btn.textContent = 'ΓÅ╣ Stop'; btn.classList.add('running');
   
   const temp = +slTemp.value, time = +slTime.value, equiv = +slEquiv.value/10, cat = +slCat.value;
   const res = simYield(temp, time, equiv, cat);
@@ -2298,12 +2298,12 @@ async function runSim(btn) {
   
   document.getElementById('actualYieldVal').textContent = (1.304 * res.yield/100).toFixed(3) + ' g';
   document.getElementById('pctYieldVal').textContent = res.yield.toFixed(1) + '%';
-  btn.textContent = '▶ Run Simulation'; btn.classList.remove('running');
+  btn.textContent = 'Γû╢ Run Simulation'; btn.classList.remove('running');
   simRunning = false; showToast(`Sim complete: ${res.yield.toFixed(1)}% yield`, 'g');
 }
 
 function updateSim() {
-  const temp = +slTemp.value; document.getElementById('vTemp').textContent = temp + ' °C';
+  const temp = +slTemp.value; document.getElementById('vTemp').textContent = temp + ' ┬░C';
   const time = +slTime.value; document.getElementById('vTime').textContent = time + ' min';
   const equiv = +slEquiv.value / 10; document.getElementById('vEquiv').textContent = equiv.toFixed(1) + ' eq';
   const cat = +slCat.value; document.getElementById('vCat').textContent = cat + ' drops';
@@ -2322,16 +2322,16 @@ window.addEventListener('load', () => {
 });
 ```
 
-## Live Chemistry Editor (Monarch‑Lite)
+## Live Chemistry Editor (MonarchΓÇæLite)
 Tokenize editor lines for `.t-mol` on `c1ccccc1O`, `->`, `mol/L`. Add to `<style>` hover handler:
 
 ```js
 function tokenizeChem(text) {
-  return text.replace(/([A-Z][a-z]?\d*|c\d+|O=|C=O|->|mol\/L|°C)/g, '<span class="t-mol">$1</span>');
+  return text.replace(/([A-Z][a-z]?\d*|c\d+|O=|C=O|->|mol\/L|┬░C)/g, '<span class="t-mol">$1</span>');
 }
 // In loadFile: clines.innerHTML = lines.map((l,i) => `<div class="cline"><div class="ln">${i+1}</div><div class="lc">${tokenizeChem(l)}</div></div>`).join('');
 ```
 
-## AI Stub → Your LLMs
-`sendAI()` → POST to Cloudflare Worker proxying DeepSeek/Mistral w/ context (editor text + mol SMILES).
+## AI Stub ΓåÆ Your LLMs
+`sendAI()` ΓåÆ POST to Cloudflare Worker proxying DeepSeek/Mistral w/ context (editor text + mol SMILES).
 

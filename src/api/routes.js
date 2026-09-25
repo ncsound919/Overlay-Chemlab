@@ -1,4 +1,4 @@
-'use strict';
+﻿'use strict';
 
 const { Router } = require('express');
 const { molecularWeight, morganFingerprint, tanimotoSimilarity } = require('../core/molecular-embeddings.js');
@@ -9,6 +9,7 @@ const { parseReaction } = require('../core/reaction-parser.js');
 const { assessDruglikeness } = require('../core/drug-likeness.js');
 const greenChem = require('../core/green-chemistry.js');
 const pubchem = require('./pubchem.js');
+const advisory = require('../core/llm-advisory.js');
 const { version } = require('../../package.json');
 
 const router = Router();
@@ -123,7 +124,7 @@ router.get('/molecule/similarity', (req, res) => {
 });
 
 // POST /api/molecule/risk
-router.post('/molecule/risk', (req, res) => {
+router.post('/molecule/risk', async (req, res) => {
   try {
     const { smiles, embedding } = req.body;
     if (!smiles && !embedding) {
@@ -139,7 +140,20 @@ router.post('/molecule/risk', (req, res) => {
     const score = riskScore(emb, DEFAULT_WEIGHTS, DEFAULT_BIAS);
     const classification = classifyRisk(score);
 
-    res.json({ score, ...classification });
+    const payload = { score, ...classification };
+
+    // Optional advisory lane (?advisory=1 or { advisory: true }): Jev screening
+    // signal + MiniCPM explanation. Fail-soft — offline advisories are included
+    // with ok:false and never alter the deterministic classification.
+    if (req.query.advisory === '1' || req.body.advisory === true) {
+      const [jev, prose] = await Promise.all([
+        advisory.riskAdvisory({ score, threshold: 0.65, level: classification.level }),
+        advisory.explainRisk({ score, level: classification.level, smiles }),
+      ]);
+      payload.advisory = { jev, explanation: prose };
+    }
+
+    res.json(payload);
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
@@ -318,23 +332,23 @@ router.get('/pubchem/autocomplete', async (req, res) => {
   }
 });
 
-// POST /api/chem-assistant — server-side chemistry knowledge base
+// POST /api/chem-assistant ΓÇö server-side chemistry knowledge base
 const CHEM_KNOWLEDGE = {
-  'h3po4': '**H₃PO₄ vs H₂SO₄**: Phosphoric acid is preferred because it\'s a weaker acid (pKₐ₁ = 2.15 vs −3 for H₂SO₄), reducing charring and side-product formation. H₂SO₄ can sulphonate the aromatic ring at >100°C, yielding unwanted aryl sulfonic acids. H₃PO₄ provides sufficient catalytic protons without degrading the salicylic acid substrate.\n[chips: "What is the mechanism?" | "Compare yields with each catalyst" | "Temperature effect on selectivity"]',
-  'green': '**Green alternatives for aspirin synthesis**: Replace acetic anhydride with acetic acid (lower atom economy but less corrosive). Use **microwave-assisted** synthesis (2 min vs 15 min, 90% yield). Consider **solvent-free mechanochemical** grinding. Water is already the quench/recrystallization solvent — E-factor ≈ 4.3. Biocatalytic routes using lipases (CAL-B) show promise at 40°C.\n[chips: "Microwave conditions?" | "Calculate E-factor" | "Enzyme catalysis details"]',
-  'nmr': '**¹H NMR of Aspirin** (CDCl₃, 400 MHz):\n• **δ 2.36** (s, 3H, OCOCH₃) — acetyl methyl\n• **δ 7.12** (dd, 1H, H-3, J=8.1, 1.1 Hz)\n• **δ 7.33** (td, 1H, H-5, J=7.6, 1.2 Hz)\n• **δ 7.61** (td, 1H, H-4, J=7.8, 1.8 Hz)\n• **δ 8.11** (dd, 1H, H-6, J=7.8, 1.8 Hz)\n• **δ 11.0** (br s, 1H, COOH — exchangeable)\nThe methyl singlet at δ 2.36 confirms acetylation vs salicylic acid (no methyl).\n[chips: "¹³C NMR shifts?" | "How to confirm purity by NMR?" | "Compare with salicylic acid NMR"]',
-  'side products': '**Side products above 95°C**:\n1. **Acetylsalicylic anhydride** — over-acetylation at high [Ac₂O]\n2. **Salicylic acid dimer** — dehydration condensation\n3. **Polymeric tar** — charring from acid-catalyzed degradation >110°C\n4. **Acetic acid** (expected co-product, but excess at high T)\nAt 85°C: ~3% side products. At 100°C: ~8%. At 120°C: >15% with visible darkening.\n[chips: "How to minimize side products?" | "TLC monitoring protocol" | "Purification methods"]',
-  'mechanism': '**Fischer esterification mechanism** (acid-catalyzed):\n1. Protonation of Ac₂O carbonyl oxygen by H₃PO₄\n2. Nucleophilic attack by phenolic −OH of salicylic acid\n3. Tetrahedral intermediate forms\n4. Proton transfer\n5. Loss of acetic acid (AcOH) as leaving group\n6. Deprotonation yields aspirin\nRate-determining step: nucleophilic addition (step 2). Ea ≈ 65.3 kJ/mol.\n[chips: "Draw the transition state" | "Why is step 2 rate-limiting?" | "Compare with Schotten-Baumann"]',
-  'yield': '**Optimizing yield**: Current conditions give ~82% yield. To improve:\n• **Increase Ac₂O to 2.0 equiv** (drives equilibrium, ~87% yield)\n• **Extend time to 20 min** at 85°C (+3% conversion)\n• **Use dry glassware** — moisture hydrolyzes Ac₂O\n• **Recrystallize from ethanol/water** (3:1) instead of pure water\n• **Theoretical max**: ~92% (limited by crystallization losses)\n[chips: "Calculate theoretical yield" | "Effect of excess reagent" | "Recrystallization tips"]',
-  'melting point': '**Melting point analysis**: Pure aspirin mp = **135–136°C**. If your crystals melt at 128–132°C, impurities (salicylic acid, mp 159°C) are present — use mixed mp test. Broad melting range (>2°C) indicates need for recrystallization. DSC shows sharp endotherm at 141°C (decomposition begins).\n[chips: "How to do mixed melting point?" | "DSC vs mp apparatus" | "Common impurities"]',
-  'ir': '**IR spectrum of aspirin**:\n• **1754 cm⁻¹** — C=O ester stretch (confirms acetylation)\n• **1689 cm⁻¹** — C=O carboxylic acid\n• **2500–3300 cm⁻¹** — broad O−H stretch (COOH)\n• **1185 cm⁻¹** — C−O ester stretch\n• **No broad 3200–3550 cm⁻¹** peak = no free phenolic OH (salicylic acid gone)\n[chips: "Compare with salicylic acid IR" | "How to identify ester vs acid C=O" | "Sample preparation for IR"]',
-  'solubility': '**Aspirin solubility**: 3.3 g/L in water at 20°C, 10 g/L at 37°C. Freely soluble in ethanol (200 g/L), acetone, chloroform. The low water solubility enables precipitation upon quenching with ice water. pKₐ = 3.49 means at stomach pH (~2), aspirin is mostly unionized → crosses gastric membrane → GI absorption.\n[chips: "Why does it dissolve in blood?" | "Buffered aspirin formulation" | "Henderson-Hasselbalch calculation"]',
+  'h3po4': '**HΓéâPOΓéä vs HΓééSOΓéä**: Phosphoric acid is preferred because it\'s a weaker acid (pKΓéÉΓéü = 2.15 vs ΓêÆ3 for HΓééSOΓéä), reducing charring and side-product formation. HΓééSOΓéä can sulphonate the aromatic ring at >100┬░C, yielding unwanted aryl sulfonic acids. HΓéâPOΓéä provides sufficient catalytic protons without degrading the salicylic acid substrate.\n[chips: "What is the mechanism?" | "Compare yields with each catalyst" | "Temperature effect on selectivity"]',
+  'green': '**Green alternatives for aspirin synthesis**: Replace acetic anhydride with acetic acid (lower atom economy but less corrosive). Use **microwave-assisted** synthesis (2 min vs 15 min, 90% yield). Consider **solvent-free mechanochemical** grinding. Water is already the quench/recrystallization solvent ΓÇö E-factor Γëê 4.3. Biocatalytic routes using lipases (CAL-B) show promise at 40┬░C.\n[chips: "Microwave conditions?" | "Calculate E-factor" | "Enzyme catalysis details"]',
+  'nmr': '**┬╣H NMR of Aspirin** (CDClΓéâ, 400 MHz):\nΓÇó **╬┤ 2.36** (s, 3H, OCOCHΓéâ) ΓÇö acetyl methyl\nΓÇó **╬┤ 7.12** (dd, 1H, H-3, J=8.1, 1.1 Hz)\nΓÇó **╬┤ 7.33** (td, 1H, H-5, J=7.6, 1.2 Hz)\nΓÇó **╬┤ 7.61** (td, 1H, H-4, J=7.8, 1.8 Hz)\nΓÇó **╬┤ 8.11** (dd, 1H, H-6, J=7.8, 1.8 Hz)\nΓÇó **╬┤ 11.0** (br s, 1H, COOH ΓÇö exchangeable)\nThe methyl singlet at ╬┤ 2.36 confirms acetylation vs salicylic acid (no methyl).\n[chips: "┬╣┬│C NMR shifts?" | "How to confirm purity by NMR?" | "Compare with salicylic acid NMR"]',
+  'side products': '**Side products above 95┬░C**:\n1. **Acetylsalicylic anhydride** ΓÇö over-acetylation at high [AcΓééO]\n2. **Salicylic acid dimer** ΓÇö dehydration condensation\n3. **Polymeric tar** ΓÇö charring from acid-catalyzed degradation >110┬░C\n4. **Acetic acid** (expected co-product, but excess at high T)\nAt 85┬░C: ~3% side products. At 100┬░C: ~8%. At 120┬░C: >15% with visible darkening.\n[chips: "How to minimize side products?" | "TLC monitoring protocol" | "Purification methods"]',
+  'mechanism': '**Fischer esterification mechanism** (acid-catalyzed):\n1. Protonation of AcΓééO carbonyl oxygen by HΓéâPOΓéä\n2. Nucleophilic attack by phenolic ΓêÆOH of salicylic acid\n3. Tetrahedral intermediate forms\n4. Proton transfer\n5. Loss of acetic acid (AcOH) as leaving group\n6. Deprotonation yields aspirin\nRate-determining step: nucleophilic addition (step 2). Ea Γëê 65.3 kJ/mol.\n[chips: "Draw the transition state" | "Why is step 2 rate-limiting?" | "Compare with Schotten-Baumann"]',
+  'yield': '**Optimizing yield**: Current conditions give ~82% yield. To improve:\nΓÇó **Increase AcΓééO to 2.0 equiv** (drives equilibrium, ~87% yield)\nΓÇó **Extend time to 20 min** at 85┬░C (+3% conversion)\nΓÇó **Use dry glassware** ΓÇö moisture hydrolyzes AcΓééO\nΓÇó **Recrystallize from ethanol/water** (3:1) instead of pure water\nΓÇó **Theoretical max**: ~92% (limited by crystallization losses)\n[chips: "Calculate theoretical yield" | "Effect of excess reagent" | "Recrystallization tips"]',
+  'melting point': '**Melting point analysis**: Pure aspirin mp = **135ΓÇô136┬░C**. If your crystals melt at 128ΓÇô132┬░C, impurities (salicylic acid, mp 159┬░C) are present ΓÇö use mixed mp test. Broad melting range (>2┬░C) indicates need for recrystallization. DSC shows sharp endotherm at 141┬░C (decomposition begins).\n[chips: "How to do mixed melting point?" | "DSC vs mp apparatus" | "Common impurities"]',
+  'ir': '**IR spectrum of aspirin**:\nΓÇó **1754 cmΓü╗┬╣** ΓÇö C=O ester stretch (confirms acetylation)\nΓÇó **1689 cmΓü╗┬╣** ΓÇö C=O carboxylic acid\nΓÇó **2500ΓÇô3300 cmΓü╗┬╣** ΓÇö broad OΓêÆH stretch (COOH)\nΓÇó **1185 cmΓü╗┬╣** ΓÇö CΓêÆO ester stretch\nΓÇó **No broad 3200ΓÇô3550 cmΓü╗┬╣** peak = no free phenolic OH (salicylic acid gone)\n[chips: "Compare with salicylic acid IR" | "How to identify ester vs acid C=O" | "Sample preparation for IR"]',
+  'solubility': '**Aspirin solubility**: 3.3 g/L in water at 20┬░C, 10 g/L at 37┬░C. Freely soluble in ethanol (200 g/L), acetone, chloroform. The low water solubility enables precipitation upon quenching with ice water. pKΓéÉ = 3.49 means at stomach pH (~2), aspirin is mostly unionized ΓåÆ crosses gastric membrane ΓåÆ GI absorption.\n[chips: "Why does it dissolve in blood?" | "Buffered aspirin formulation" | "Henderson-Hasselbalch calculation"]',
   'default': 'I can help with aspirin synthesis analysis. Try asking about reaction mechanisms, NMR/IR spectra, optimizing yield, green chemistry alternatives, or side product formation.\n[chips: "Explain the mechanism" | "Predict NMR shifts" | "Green alternatives"]'
 };
 
 function getChemAnswer(msg) {
   const q = msg.toLowerCase();
-  if (q.includes('h3po4') || q.includes('h₃po₄') || q.includes('phosphoric') || q.includes('h2so4') || q.includes('catalyst')) return CHEM_KNOWLEDGE['h3po4'];
+  if (q.includes('h3po4') || q.includes('hΓéâpoΓéä') || q.includes('phosphoric') || q.includes('h2so4') || q.includes('catalyst')) return CHEM_KNOWLEDGE['h3po4'];
   if (q.includes('green') || q.includes('solvent') || q.includes('sustainable') || q.includes('eco')) return CHEM_KNOWLEDGE['green'];
   if (q.includes('nmr') || q.includes('shift') || q.includes('spectrum') || q.includes('spectra')) return CHEM_KNOWLEDGE['nmr'];
   if (q.includes('side product') || q.includes('temperature') || q.includes('above 95') || q.includes('high-temp') || q.includes('byproduct')) return CHEM_KNOWLEDGE['side products'];

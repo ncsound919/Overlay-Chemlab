@@ -1,4 +1,4 @@
-'use strict';
+﻿'use strict';
 
 /**
  * Drug-likeness assessment module.
@@ -7,27 +7,27 @@
  * hit identification and lead optimisation:
  *
  *   - Lipinski Rule of Five  (Pfizer, 1997)
- *     Lipinski et al. Adv. Drug Deliv. Rev. 23, 3–25 (1997)
+ *     Lipinski et al. Adv. Drug Deliv. Rev. 23, 3ΓÇô25 (1997)
  *
  *   - Veber Oral Bioavailability Rules  (GSK, 2002)
- *     Veber et al. J. Med. Chem. 45, 2615–2623 (2002)
+ *     Veber et al. J. Med. Chem. 45, 2615ΓÇô2623 (2002)
  *
  *   - Rule of Three for FBDD  (Astex Pharmaceuticals, 2003)
- *     Congreve et al. Drug Discov. Today 8, 876–877 (2003)
+ *     Congreve et al. Drug Discov. Today 8, 876ΓÇô877 (2003)
  *
  *   - TPSA atom contributions
- *     Ertl et al. J. Med. Chem. 43, 3714–3717 (2000)
+ *     Ertl et al. J. Med. Chem. 43, 3714ΓÇô3717 (2000)
  *
- *   - logP atom contributions (simplified Wildman–Crippen)
- *     Wildman & Crippen J. Chem. Inf. Comput. Sci. 39, 868–873 (1999)
- *     NOTE: accuracy ±1–2 log units; use PubChem XLogP3 for precise values.
+ *   - logP atom contributions (simplified WildmanΓÇôCrippen)
+ *     Wildman & Crippen J. Chem. Inf. Comput. Sci. 39, 868ΓÇô873 (1999)
+ *     NOTE: accuracy ┬▒1ΓÇô2 log units; use PubChem XLogP3 for precise values.
  */
 
 const { parseSMILES, molecularWeight } = require('./molecular-embeddings.js');
 
-// ─────────────────────────────────────────────────────────────
+// ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 // Internal helpers
-// ─────────────────────────────────────────────────────────────
+// ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
 const VALENCES = { C: 4, N: 3, O: 2, S: 2, P: 3, F: 1, Cl: 1, Br: 1, I: 1 };
 
@@ -69,12 +69,12 @@ function _atomDetails(smiles) {
   };
 }
 
-// ─────────────────────────────────────────────────────────────
+// ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 // H-bond Donors and Acceptors
-// ─────────────────────────────────────────────────────────────
+// ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
 /**
- * Count H-bond donors: O–H and N–H groups.
+ * Count H-bond donors: OΓÇôH and NΓÇôH groups.
  * PubChem/Lipinski definition: number of NH and OH groups (not individual H atoms).
  *
  * @param {string} smiles
@@ -99,13 +99,13 @@ function countHBA(smiles) {
   return parsed.atoms.filter(a => a.symbol === 'O' || a.symbol === 'N').length;
 }
 
-// ─────────────────────────────────────────────────────────────
+// ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 // Rotatable Bonds
-// ─────────────────────────────────────────────────────────────
+// ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
 /**
  * Find the set of bond indices that are part of at least one ring.
- * Uses Tarjan bridge-finding (DFS) — O(V+E).
+ * Uses Tarjan bridge-finding (DFS) ΓÇö O(V+E).
  * A bond is a ring bond iff it is NOT a bridge (i.e., its removal
  * would disconnect the graph).
  *
@@ -191,9 +191,9 @@ function countRotatableBonds(smiles) {
   return count;
 }
 
-// ─────────────────────────────────────────────────────────────
-// logP Estimation (simplified Wildman–Crippen)
-// ─────────────────────────────────────────────────────────────
+// ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+// logP Estimation (simplified WildmanΓÇôCrippen)
+// ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
 /**
  * Estimate logP using simplified atom-type contributions.
@@ -202,14 +202,14 @@ function countRotatableBonds(smiles) {
  *   - Aromatic C       +0.355
  *   - sp3 C (all single bonds)  +0.175
  *   - sp2 C (double bond or high bond-order sum)  +0.050
- *   - O–H (hydroxyl, carboxyl)  –0.590
- *   - C=O oxygen (carbonyl)     –0.520
- *   - Ether / ester O           –0.290
- *   - N (NH₂)   –0.960  |  N (NH)  –0.450  |  N–  –0.080
- *   - Aromatic N  –0.550
- *   - S, halogens, P  — published Crippen values
+ *   - OΓÇôH (hydroxyl, carboxyl)  ΓÇô0.590
+ *   - C=O oxygen (carbonyl)     ΓÇô0.520
+ *   - Ether / ester O           ΓÇô0.290
+ *   - N (NHΓéé)   ΓÇô0.960  |  N (NH)  ΓÇô0.450  |  NΓÇô  ΓÇô0.080
+ *   - Aromatic N  ΓÇô0.550
+ *   - S, halogens, P  ΓÇö published Crippen values
  *
- * Accuracy: ±1–2 log units for typical drug-like molecules.
+ * Accuracy: ┬▒1ΓÇô2 log units for typical drug-like molecules.
  * For more precise XLogP3 values use GET /api/pubchem/compound?smiles=
  *
  * @param {string} smiles
@@ -243,16 +243,16 @@ function estimateLogP(smiles) {
         break;
 
       case 'O':
-        if (h > 0)       logP += -0.590;  // –OH (alcohol / carboxyl)
+        if (h > 0)       logP += -0.590;  // ΓÇôOH (alcohol / carboxyl)
         else if (deg <= 1) logP += -0.520; // C=O (carbonyl oxygen)
         else               logP += -0.290; // ether / ester oxygen
         break;
 
       case 'N':
         if (a.aromatic)    logP += -0.550;
-        else if (h >= 2)   logP += -0.960;  // –NH₂
-        else if (h === 1)  logP += -0.450;  // –NH–
-        else               logP += -0.080;  // –N< (tertiary)
+        else if (h >= 2)   logP += -0.960;  // ΓÇôNHΓéé
+        else if (h === 1)  logP += -0.450;  // ΓÇôNHΓÇô
+        else               logP += -0.080;  // ΓÇôN< (tertiary)
         break;
 
       case 'S':
@@ -271,24 +271,24 @@ function estimateLogP(smiles) {
   return Math.round(logP * 100) / 100;
 }
 
-// ─────────────────────────────────────────────────────────────
+// ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 // TPSA Estimation  (Ertl 2000)
-// ─────────────────────────────────────────────────────────────
+// ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
 /**
- * Estimate Topological Polar Surface Area (TPSA) in Å².
+ * Estimate Topological Polar Surface Area (TPSA) in ├à┬▓.
  *
  * Uses atom-surface contributions from:
- *   Ertl et al. J. Med. Chem. 43, 3714–3717 (2000).
+ *   Ertl et al. J. Med. Chem. 43, 3714ΓÇô3717 (2000).
  *
  * Atom type assignment is based on element, aromaticity, degree,
  * and implicit hydrogen count derived from SMILES connectivity.
  *
- * Accuracy: typically within ±5 Å² for drug-like molecules.
- * Validated: aspirin (CC(=O)Oc1ccccc1C(=O)O) → 63.6 Å² (PubChem: 63.6 Å²).
+ * Accuracy: typically within ┬▒5 ├à┬▓ for drug-like molecules.
+ * Validated: aspirin (CC(=O)Oc1ccccc1C(=O)O) ΓåÆ 63.6 ├à┬▓ (PubChem: 63.6 ├à┬▓).
  *
  * @param {string} smiles
- * @returns {number} TPSA in Å²
+ * @returns {number} TPSA in ├à┬▓
  */
 function estimateTPSA(smiles) {
   const { atoms, bonds } = parseSMILES(smiles);
@@ -311,7 +311,7 @@ function estimateTPSA(smiles) {
     const h   = _implicitH(a.symbol, a.aromatic, bs);
 
     if (a.symbol === 'O') {
-      if (h > 0)            tpsa += 20.23;  // –OH (alcohol, phenol, carboxyl OH)
+      if (h > 0)            tpsa += 20.23;  // ΓÇôOH (alcohol, phenol, carboxyl OH)
       else if (deg <= 1)    tpsa += 17.07;  // C=O (carbonyl oxygen)
       else if (a.aromatic)  tpsa += 13.14;  // aromatic O (furan-type)
       else                  tpsa +=  9.23;  // ether / ester O
@@ -319,9 +319,9 @@ function estimateTPSA(smiles) {
     } else if (a.symbol === 'N') {
       if (a.aromatic && h > 0)  tpsa += 15.79;  // pyrrole-like NH
       else if (a.aromatic)      tpsa += 12.89;  // pyridine-like N
-      else if (h >= 2)          tpsa += 26.02;  // –NH₂
-      else if (h === 1)         tpsa += 17.07;  // –NH–
-      else                      tpsa +=  3.24;  // tertiary –N<
+      else if (h >= 2)          tpsa += 26.02;  // ΓÇôNHΓéé
+      else if (h === 1)         tpsa += 17.07;  // ΓÇôNHΓÇô
+      else                      tpsa +=  3.24;  // tertiary ΓÇôN<
 
     } else if (a.symbol === 'S') {
       tpsa += (h > 0) ? 38.80 : 25.30;
@@ -334,18 +334,18 @@ function estimateTPSA(smiles) {
   return Math.round(tpsa * 10) / 10;
 }
 
-// ─────────────────────────────────────────────────────────────
+// ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 // Drug-likeness rules
-// ─────────────────────────────────────────────────────────────
+// ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
 /**
  * Evaluate Lipinski Rule of Five (Pfizer, 1997).
  *
  * Predicts oral drug absorption / permeability for drug-like small molecules:
- *   1. MW  ≤ 500 Da
- *   2. logP ≤ 5
- *   3. HBD ≤ 5
- *   4. HBA ≤ 10
+ *   1. MW  Γëñ 500 Da
+ *   2. logP Γëñ 5
+ *   3. HBD Γëñ 5
+ *   4. HBA Γëñ 10
  *
  * One violation is acceptable (the original paper tolerates one failure,
  * e.g. for substrates of active transporters or efflux pumps).
@@ -360,10 +360,10 @@ function lipinskiRuleOfFive(smiles) {
   const hba  = countHBA(smiles);
 
   const criteria = [
-    { name: 'MW ≤ 500',  value: mw,   threshold: 500, unit: 'Da', pass: mw   <= 500 },
-    { name: 'logP ≤ 5',  value: logP, threshold:   5, unit: '',   pass: logP <=   5 },
-    { name: 'HBD ≤ 5',   value: hbd,  threshold:   5, unit: '',   pass: hbd  <=   5 },
-    { name: 'HBA ≤ 10',  value: hba,  threshold:  10, unit: '',   pass: hba  <=  10 },
+    { name: 'MW Γëñ 500',  value: mw,   threshold: 500, unit: 'Da', pass: mw   <= 500 },
+    { name: 'logP Γëñ 5',  value: logP, threshold:   5, unit: '',   pass: logP <=   5 },
+    { name: 'HBD Γëñ 5',   value: hbd,  threshold:   5, unit: '',   pass: hbd  <=   5 },
+    { name: 'HBA Γëñ 10',  value: hba,  threshold:  10, unit: '',   pass: hba  <=  10 },
   ];
 
   const violations = criteria.filter(c => !c.pass).length;
@@ -384,8 +384,8 @@ function lipinskiRuleOfFive(smiles) {
  *
  * Derived from a retrospective study of 1100 drug candidates in rats.
  * Compounds satisfying both criteria show good oral bioavailability:
- *   1. Rotatable bonds ≤ 10
- *   2. TPSA ≤ 140 Å²  OR  (HBD + HBA) ≤ 12
+ *   1. Rotatable bonds Γëñ 10
+ *   2. TPSA Γëñ 140 ├à┬▓  OR  (HBD + HBA) Γëñ 12
  *
  * @param {string} smiles
  * @returns {{ pass: boolean, rotBonds, rotPass, tpsa, tpsaPass, hbSum, hbSumPass }}
@@ -413,10 +413,10 @@ function veberRules(smiles) {
  *
  * Fragments are lower-MW starting points for structure-based drug design.
  * One violation is tolerated:
- *   1. MW  ≤ 300 Da
- *   2. logP ≤ 3
- *   3. HBD ≤ 3
- *   4. HBA ≤ 3
+ *   1. MW  Γëñ 300 Da
+ *   2. logP Γëñ 3
+ *   3. HBD Γëñ 3
+ *   4. HBA Γëñ 3
  *
  * @param {string} smiles
  * @returns {{ pass: boolean, violations: number, criteria: object[] }}
@@ -428,10 +428,10 @@ function ruleOfThree(smiles) {
   const hba  = countHBA(smiles);
 
   const criteria = [
-    { name: 'MW ≤ 300',  value: mw,   threshold: 300, pass: mw   <= 300 },
-    { name: 'logP ≤ 3',  value: logP, threshold:   3, pass: logP <=   3 },
-    { name: 'HBD ≤ 3',   value: hbd,  threshold:   3, pass: hbd  <=   3 },
-    { name: 'HBA ≤ 3',   value: hba,  threshold:   3, pass: hba  <=   3 },
+    { name: 'MW Γëñ 300',  value: mw,   threshold: 300, pass: mw   <= 300 },
+    { name: 'logP Γëñ 3',  value: logP, threshold:   3, pass: logP <=   3 },
+    { name: 'HBD Γëñ 3',   value: hbd,  threshold:   3, pass: hbd  <=   3 },
+    { name: 'HBA Γëñ 3',   value: hba,  threshold:   3, pass: hba  <=   3 },
   ];
 
   const violations = criteria.filter(c => !c.pass).length;
