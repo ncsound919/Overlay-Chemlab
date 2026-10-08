@@ -1,4 +1,4 @@
-﻿{
+{
   "name": "overlay-chemlab",
   "version": "2.1.0",
   "description": "Full-stack digital chemical laboratory ΓÇö Monaco-style IDE with live molecule rendering, Arrhenius kinetics simulation, Bayesian risk scoring, molecular embeddings, and PubChem integration",
@@ -21,6 +21,6 @@
   "author": "Overlay Eco",
   "license": "MIT",
   "dependencies": {
-    "express": "^4.21.2"
+    "express": "^5.2.1"
   }
 }
